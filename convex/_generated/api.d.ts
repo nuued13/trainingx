@@ -27,6 +27,7 @@ import type * as passwordReset_ResendOTPPasswordReset from "../passwordReset/Res
 import type * as posts from "../posts.js";
 import type * as practiceProjects from "../practiceProjects.js";
 import type * as projects from "../projects.js";
+import type * as quizResults from "../quizResults.js";
 import type * as quizzes from "../quizzes.js";
 import type * as users from "../users.js";
 
@@ -64,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   posts: typeof posts;
   practiceProjects: typeof practiceProjects;
   projects: typeof projects;
+  quizResults: typeof quizResults;
   quizzes: typeof quizzes;
   users: typeof users;
 }>;
