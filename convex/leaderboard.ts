@@ -32,6 +32,7 @@ export const getLeaderboard = query({
           totalScore,
           streak: stats.streak,
           badges: (stats.badges || []).length,
+          upvotes: stats.communityActivity.upvotesReceived,
           assessmentComplete: stats.assessmentComplete,
           rank: 0, // Will be calculated after sorting
         };
@@ -88,9 +89,23 @@ export const getUserRank = query({
       return b.totalScore - a.totalScore;
     });
 
-    // Find user's rank
-    const userRank = scores.findIndex((s) => s.userId === userId) + 1;
+    // Find user's rank and score
+    const userIndex = scores.findIndex((s) => s.userId === userId);
+    
+    if (userIndex === -1) {
+      return null;
+    }
 
-    return userRank > 0 ? userRank : null;
+    const userStats = allStats.find((s) => s.userId === userId);
+    if (!userStats) {
+      return null;
+    }
+
+    const totalScore = userStats.promptScore + userStats.communityActivity.communityScore;
+
+    return {
+      rank: userIndex + 1,
+      totalScore,
+    };
   },
 });

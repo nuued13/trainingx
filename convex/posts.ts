@@ -29,9 +29,9 @@ export const getPosts = query({
         const author = await ctx.db.get(post.authorId);
         return {
           ...post,
-          author: author ? {
+          author: author && "name" in author ? {
             name: author.name || "Anonymous",
-            image: author.image,
+            image: "image" in author ? author.image : undefined,
           } : null,
         };
       })

@@ -1,5 +1,4 @@
 "use client";
-"use client";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { trackEvent } from "@/lib/analytics";

@@ -48,6 +48,7 @@ export const initializeUserStats = mutation({
       lastActiveDate: Date.now(),
       assessmentComplete: false,
       unlockedCareers: [],
+      weeklyPracticeMinutes: 0,
       communityActivity: {
         postsCreated: 0,
         upvotesReceived: 0,

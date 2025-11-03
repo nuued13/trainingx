@@ -1,6 +1,6 @@
-import { SignInWithPassword } from "@/auth/SignInWithPassword";
+import { SignInWithPassword } from "@/components/SignInWithPassword";
 import { Toaster } from "@/components/ui/toaster";
-import { SignInWithOAuth } from "@/auth/SignInWithOAuth";
+import { SignInWithOAuth } from "@/components/SignInWithOAuth";
 
 export function SignInFormPassword() {
   return (

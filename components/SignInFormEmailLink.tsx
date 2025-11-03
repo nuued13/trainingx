@@ -1,10 +1,10 @@
-import { useAuthActions } from "@convex-dev/auth/react";
-import { SignInMethodDivider } from "@/auth/SignInMethodDivider";
-import { SignInWithOAuth } from "@/auth/SignInWithOAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
+import { SignInMethodDivider } from "@/components/SignInMethodDivider";
+import { SignInWithOAuth } from "@/components/SignInWithOAuth";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
 
 export function SignInFormEmailLink() {

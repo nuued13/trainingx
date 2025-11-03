@@ -13,7 +13,6 @@ import {
   Sparkles,
   GraduationCap,
 } from "lucide-react";
-import dashboardImage from "@assets/generated_images/Skills_chart_visualization_cb96a16e.png";
 import AnimatedSection from "./AnimatedSection";
 import AnimatedCard from "./AnimatedCard";
 
@@ -133,11 +132,64 @@ export default function PracticeZone() {
           <div>
             <Card className="overflow-hidden hover-elevate">
               <CardContent className="p-0">
-                <img
-                  src={dashboardImage}
-                  alt="TrainingX Dashboard - Track Your AI Skills Progress"
-                  className="w-full h-auto"
-                />
+                <div className="h-full w-full bg-gradient-to-br from-gradient-from/20 via-background to-gradient-to/40 p-6">
+                  <div className="grid gap-4 text-left text-sm text-muted-foreground">
+                    <div>
+                      <p className="text-xs uppercase text-gradient-from">
+                        Skill Momentum
+                      </p>
+                      <p className="text-2xl font-semibold text-foreground">
+                        +24% this month
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-border/60 bg-background/80 p-4">
+                      <p className="text-xs uppercase text-muted-foreground">
+                        Key Metrics
+                      </p>
+                      <ul className="mt-2 space-y-2">
+                        <li className="flex items-center justify-between">
+                          <span>Daily streak</span>
+                          <span className="font-semibold text-gradient-from">
+                            18 days
+                          </span>
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <span>Projects completed</span>
+                          <span className="font-semibold text-gradient-to">
+                            32
+                          </span>
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <span>Opportunities unlocked</span>
+                          <span className="font-semibold text-foreground">
+                            12
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="grid gap-2 rounded-lg border border-border/60 bg-background/80 p-4">
+                      <p className="text-xs uppercase text-muted-foreground">
+                        Skill focus
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 rounded-full bg-gradient-from/20">
+                          <div className="h-2 w-4/5 rounded-full bg-gradient-from" />
+                        </div>
+                        <span className="text-xs font-semibold text-gradient-from">
+                          Prompting
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 rounded-full bg-gradient-to/20">
+                          <div className="h-2 w-3/5 rounded-full bg-gradient-to" />
+                        </div>
+                        <span className="text-xs font-semibold text-gradient-to">
+                          Agentic
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 

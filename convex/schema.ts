@@ -379,6 +379,7 @@ export default defineSchema({
     lastActiveDate: v.number(),
     assessmentComplete: v.boolean(),
     unlockedCareers: v.optional(v.array(v.string())),
+    weeklyPracticeMinutes: v.optional(v.number()),
     communityActivity: v.object({
       postsCreated: v.number(),
       upvotesReceived: v.number(),

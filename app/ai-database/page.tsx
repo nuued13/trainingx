@@ -1,6 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+
 import Link from "next/link";
+import { useMemo } from "react";
+import { useQuery } from "convex/react";
+import { api } from "convex/_generated/api";
+
 import { SidebarLayout } from "@/components/SidebarLayout";
 import {
   Card,
@@ -11,21 +15,20 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { loadState } from "@/lib/storage";
-import { UserState } from "@shared/schema";
+import { useAuth } from "@/contexts/AuthContextProvider";
 import { computeMatches, meetsRequirements } from "@/lib/matching";
 import {
+  ArrowRight,
   Briefcase,
   Building2,
-  DollarSign,
-  Wrench,
-  Lock,
   CheckCircle,
-  TrendingUp,
-  MapPin,
-  Home,
-  ArrowRight,
   Database,
+  DollarSign,
+  Home,
+  Lock,
+  MapPin,
+  TrendingUp,
+  Wrench,
 } from "lucide-react";
 
 const categoryIcons = {
@@ -50,81 +53,134 @@ const categoryLabels = {
 };
 
 export default function AIDatabase() {
-  const [userState, setUserState] = useState<UserState | null>(null);
-
-  useEffect(() => {
-    const state = loadState();
-    setUserState(state);
-  }, []);
-
-  if (!userState) {
-    return (
-    <SidebarLayout>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p>Loading...</p>
-      </SidebarLayout>
-    );
-  }
-
-  const completedProjectSlugs = userState.completedProjects.map((p) => p.slug);
-
-  // Compute all possible matches - NO filters applied in database view
-  const allMatches = computeMatches(
-    userState.promptScore,
-    userState.skills,
-    userState.completedProjects.length,
-    completedProjectSlugs,
+  const { user } = useAuth();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userId = user?._id as any;
+  const userStats = useQuery(
+    api.users.getUserStats,
+    userId ? { userId } : "skip"
   );
 
-  const groupByCategory = (matches: typeof allMatches) => {
-    return matches.reduce(
+  const completedProjects = useMemo(
+    () => userStats?.completedProjects ?? [],
+    [userStats?.completedProjects]
+  );
+
+  const completedProjectSlugs = useMemo(
+    () => completedProjects.map((project) => project.slug),
+    [completedProjects]
+  );
+
+  const allMatches = useMemo(
+    () =>
+      userStats
+        ? computeMatches(
+            userStats.promptScore,
+            userStats.skills,
+            completedProjects.length,
+            completedProjectSlugs
+          )
+        : [],
+    [userStats, completedProjects.length, completedProjectSlugs]
+  );
+
+  const matchesByCategory = useMemo(() => {
+    return allMatches.reduce(
       (acc, match) => {
         if (!acc[match.type]) acc[match.type] = [];
         acc[match.type].push(match);
         return acc;
       },
-      {} as Record<string, typeof allMatches>,
+      {} as Record<string, typeof allMatches>
     );
-  };
+  }, [allMatches]);
 
-  const matchesByCategory = groupByCategory(allMatches);
+  if (!user) {
+    return (
+      <SidebarLayout>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center text-center space-y-3">
+          <div>
+            <p className="text-xl font-semibold">
+              Sign in to explore personalized AI opportunities.
+            </p>
+            <Link href="/auth">
+              <Button className="mt-3 bg-gradient-to-r from-gradient-from to-gradient-to">
+                Go to Sign In
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </SidebarLayout>
+    );
+  }
 
-  // Count unlocked for stats
-  const unlockedCount = allMatches.filter((m) =>
+  if (userStats === undefined) {
+    return (
+      <SidebarLayout>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <p>Loading your opportunity database...</p>
+        </div>
+      </SidebarLayout>
+    );
+  }
+
+  if (!userStats) {
+    return (
+      <SidebarLayout>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center text-center space-y-3">
+          <div>
+            <p className="text-xl font-semibold mb-2">
+              Unlock the database by completing the matching quiz.
+            </p>
+            <p className="text-gray-600">
+              Your opportunities unlock as soon as we understand your skills.
+            </p>
+            <Link href="/matching-quiz">
+              <Button className="mt-4 bg-gradient-to-r from-gradient-from to-gradient-to">
+                Take the Matching Quiz
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </SidebarLayout>
+    );
+  }
+
+  const unlockedCount = allMatches.filter((match) =>
     meetsRequirements(
-      m,
-      userState.promptScore,
-      userState.skills,
-      userState.completedProjects.length,
-    ),
+      match,
+      userStats.promptScore,
+      userStats.skills,
+      completedProjects.length
+    )
   ).length;
 
   const renderMatchCard = (
-    match: (typeof allMatches)[0],
-    isUnlocked: boolean,
+    match: (typeof allMatches)[number],
+    isUnlocked: boolean
   ) => {
     const Icon =
       categoryIcons[match.type as keyof typeof categoryIcons] || Briefcase;
     const colorClass =
       categoryColors[match.type as keyof typeof categoryColors];
-    const psGap = Math.max(0, (match.requiredPS || 0) - userState.promptScore);
+    const psGap = Math.max(0, (match.requiredPS || 0) - userStats.promptScore);
 
-    // Calculate missing skills using career-specific thresholds
     const missingSkills = match.skillThresholds
       ? Object.entries(match.skillThresholds)
           .filter(
             ([skill, threshold]) =>
-              userState.skills[skill as keyof typeof userState.skills] <
-              threshold,
+              userStats.skills[skill as keyof typeof userStats.skills] <
+              threshold
           )
           .map(([skill]) => skill)
       : match.requiredSkills.filter(
           (skill) =>
-            userState.skills[skill as keyof typeof userState.skills] < 60,
+            userStats.skills[skill as keyof typeof userStats.skills] < 60
         );
 
     return (
-    <SidebarLayout>
       <Card
         key={match.title}
         className={`flex flex-col justify-between ${isUnlocked ? "border-l-4 border-l-green-500" : ""}`}
@@ -138,11 +194,11 @@ export default function AIDatabase() {
                     className={`p-2 rounded-lg bg-gradient-to-r ${colorClass}`}
                   >
                     <Icon className="h-4 w-4 text-white" />
-                  </SidebarLayout>
+                  </div>
                   <div className="flex-1">
                     <CardTitle className="text-lg">{match.title}</CardTitle>
-                  </SidebarLayout>
-                </SidebarLayout>
+                  </div>
+                </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <Badge variant="outline" className="text-xs">
                     {categoryLabels[
@@ -159,18 +215,17 @@ export default function AIDatabase() {
                       {match.employmentType}
                     </Badge>
                   )}
-                </SidebarLayout>
-              </SidebarLayout>
+                </div>
+              </div>
               {isUnlocked ? (
                 <CheckCircle className="h-6 w-6 text-green-500" />
               ) : (
                 <Lock className="h-6 w-6 text-gray-400" />
               )}
-            </SidebarLayout>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-5">
-              {/* Location & Remote */}
               <div className="flex flex-wrap gap-3 text-sm">
                 {match.location && (
                   <div
@@ -179,7 +234,7 @@ export default function AIDatabase() {
                   >
                     <MapPin className="h-4 w-4" />
                     <span>{match.location}</span>
-                  </SidebarLayout>
+                  </div>
                 )}
                 {match.remotePolicy && (
                   <div
@@ -188,11 +243,10 @@ export default function AIDatabase() {
                   >
                     <Home className="h-4 w-4" />
                     <span>{match.remotePolicy}</span>
-                  </SidebarLayout>
+                  </div>
                 )}
-              </SidebarLayout>
+              </div>
 
-              {/* Salary */}
               {match.salaryRange && (
                 <div
                   className="p-3 py-5 bg-gradient-to-r from-gradient-from/10 to-gradient-to/10 rounded-lg"
@@ -200,28 +254,25 @@ export default function AIDatabase() {
                 >
                   <div className="font-semibold text-gray-800">
                     {match.salaryRange}
-                  </SidebarLayout>
-                </SidebarLayout>
+                  </div>
+                </div>
               )}
 
-              {/* Match reason */}
               <p className="text-sm text-gray-600 italic">{match.reason}</p>
 
-              {/* Requirements */}
               <div className="space-y-3">
                 {match.requiredSkills.length > 0 && (
                   <div>
                     <div className="text-sm text-gray-600 mb-1">
                       Required Skills:
-                    </SidebarLayout>
+                    </div>
                     <div className="flex flex-wrap gap-1">
                       {match.requiredSkills.map((skill) => {
                         const hasSkill =
-                          userState.skills[
-                            skill as keyof typeof userState.skills
+                          userStats.skills[
+                            skill as keyof typeof userStats.skills
                           ] >= 60;
                         return (
-    <SidebarLayout>
                           <Badge
                             key={skill}
                             variant={hasSkill ? "default" : "outline"}
@@ -231,8 +282,8 @@ export default function AIDatabase() {
                           </Badge>
                         );
                       })}
-                    </SidebarLayout>
-                  </SidebarLayout>
+                    </div>
+                  </div>
                 )}
 
                 {!isUnlocked && (
@@ -247,18 +298,17 @@ export default function AIDatabase() {
                             {missingSkills
                               .map((s) => s.replace(/_/g, " "))
                               .join(", ")}
-                          </SidebarLayout>
+                          </div>
                         )}
-                      </SidebarLayout>
-                    </SidebarLayout>
-                  </SidebarLayout>
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </SidebarLayout>
-            </SidebarLayout>
+              </div>
+            </div>
           </CardContent>
-        </SidebarLayout>
+        </div>
         <CardFooter className="w-full block">
-          {/* View Details Button */}
           {match.careerId && (
             <Link href={`/career/${match.careerId}`}>
               <Button
@@ -277,115 +327,112 @@ export default function AIDatabase() {
 
   return (
     <SidebarLayout>
-    <div className="bg-gray-50 min-h-full">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Database className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">AI Opportunity Database</h1>
-          </SidebarLayout>
-          <p className="text-gray-600">
-            Browse our complete collection of {allMatches.length} AI career
-            opportunities. {unlockedCount} unlocked based on your current
-            skills.
-          </p>
-        </SidebarLayout>
+      <div className="bg-gray-50 min-h-full">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <Database className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold">AI Opportunity Database</h1>
+            </div>
+            <p className="text-gray-600">
+              Browse our complete collection of {allMatches.length} AI career
+              opportunities. {unlockedCount} unlocked based on your current
+              skills.
+            </p>
+          </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {Object.entries(categoryIcons).map(([category, Icon]) => {
-            const categoryMatches = matchesByCategory[category] || [];
-            const unlocked = categoryMatches.filter((m) =>
-              meetsRequirements(
-                m,
-                userState.promptScore,
-                userState.skills,
-                userState.completedProjects.length,
-              ),
-            ).length;
-            const total = categoryMatches.length;
-            const colorClass =
-              categoryColors[category as keyof typeof categoryColors];
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            {Object.entries(categoryIcons).map(([category, Icon]) => {
+              const categoryMatches = matchesByCategory[category] || [];
+              const unlocked = categoryMatches.filter((match) =>
+                meetsRequirements(
+                  match,
+                  userStats.promptScore,
+                  userStats.skills,
+                  completedProjects.length
+                )
+              ).length;
+              const total = categoryMatches.length;
+              const colorClass =
+                categoryColors[category as keyof typeof categoryColors];
 
-            return (
-    <SidebarLayout>
-              <Card key={category}>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`p-3 rounded-lg bg-gradient-to-r ${colorClass}`}
-                    >
-                      <Icon className="h-5 w-5 text-white" />
-                    </SidebarLayout>
-                    <div>
-                      <div className="text-2xl font-bold">
-                        {unlocked}/{total}
-                      </SidebarLayout>
-                      <div className="text-sm text-gray-600 capitalize">
-                        {
-                          categoryLabels[
-                            category as keyof typeof categoryLabels
-                          ]
-                        }
-                      </SidebarLayout>
-                    </SidebarLayout>
-                  </SidebarLayout>
+              return (
+                <Card key={category}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`p-3 rounded-lg bg-gradient-to-r ${colorClass}`}
+                      >
+                        <Icon className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold">
+                          {unlocked}/{total}
+                        </div>
+                        <div className="text-sm text-gray-600 capitalize">
+                          {
+                            categoryLabels[
+                              category as keyof typeof categoryLabels
+                            ]
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          <div className="space-y-6">
+            {Object.entries(matchesByCategory).map(([category, matches]) => (
+              <div key={category}>
+                <h2 className="text-xl font-bold mb-4 capitalize flex items-center gap-2">
+                  {(() => {
+                    const Icon =
+                      categoryIcons[category as keyof typeof categoryIcons];
+                    return <Icon className="h-5 w-5" />;
+                  })()}
+                  {categoryLabels[category as keyof typeof categoryLabels]} (
+                  {matches.length})
+                </h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {matches.map((match) => {
+                    const isUnlocked = meetsRequirements(
+                      match,
+                      userStats.promptScore,
+                      userStats.skills,
+                      completedProjects.length
+                    );
+                    return renderMatchCard(match, isUnlocked);
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {allMatches.length === 0 && (
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-8 text-center">
+                  <Database className="h-12 w-12 mx-auto mb-4 text-blue-600" />
+                  <h3 className="text-xl font-bold mb-2">
+                    No Opportunities Found
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {`Based on your quiz preferences, we couldn't find matching
+                    opportunities. Try adjusting your preferences.`}
+                  </p>
+                  <Link href="/matching-quiz">
+                    <Button className="bg-gradient-to-r from-gradient-from to-gradient-to">
+                      Retake Quiz
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
-            );
-          })}
-        </SidebarLayout>
-
-        {/* All Opportunities */}
-        <div className="space-y-6">
-          {Object.entries(matchesByCategory).map(([category, matches]) => (
-            <div key={category}>
-              <h2 className="text-xl font-bold mb-4 capitalize flex items-center gap-2">
-                {(() => {
-                  const Icon =
-                    categoryIcons[category as keyof typeof categoryIcons];
-                  return <Icon className="h-5 w-5" />;
-                })()}
-                {categoryLabels[category as keyof typeof categoryLabels]} (
-                {matches.length})
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                {matches.map((match) => {
-                  const isUnlocked = meetsRequirements(
-                    match,
-                    userState.promptScore,
-                    userState.skills,
-                    userState.completedProjects.length,
-                  );
-                  return renderMatchCard(match, isUnlocked);
-                })}
-              </SidebarLayout>
-            </SidebarLayout>
-          ))}
-
-          {allMatches.length === 0 && (
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="p-8 text-center">
-                <Database className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-                <h3 className="text-xl font-bold mb-2">
-                  No Opportunities Found
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Based on your quiz preferences, we couldn't find matching
-                  opportunities. Try adjusting your preferences.
-                </p>
-                <Link href="/matching-quiz">
-                  <Button className="bg-gradient-to-r from-gradient-from to-gradient-to">
-                    Retake Quiz
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
-        </SidebarLayout>
-      </SidebarLayout>
+            )}
+          </div>
+        </div>
+      </div>
     </SidebarLayout>
   );
 }

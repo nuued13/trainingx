@@ -1,4 +1,4 @@
-import { SignInWithPassword } from "@/auth/SignInWithPassword";
+import { SignInWithPassword } from "@/components/SignInWithPassword";
 import { Toaster } from "@/components/ui/toaster";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";

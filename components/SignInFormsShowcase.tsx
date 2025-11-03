@@ -1,11 +1,11 @@
-// import { SignInFormAnonymous } from "@/auth/SignInFormAnonymous";
-import { SignInFormEmailCode } from "@/auth/SignInFormEmailCode";
-import { SignInFormEmailLink } from "@/auth/SignInFormEmailLink";
-import { SignInFormPassword } from "@/auth/SignInFormPassword";
-import { SignInFormPasswordAndResetViaCode } from "@/auth/SignInFormPasswordAndResetViaCode";
-import { SignInFormPasswordAndVerifyViaCode } from "@/auth/SignInFormPasswordAndVerifyViaCode";
-import { SignInFormPasswordAndCustomField } from "@/auth/SignInFormPasswordAndCustomField";
-import { SignInFormPhoneCode } from "@/auth/SignInFormPhoneCode";
+// import { SignInFormAnonymous } from "@/components/SignInFormAnonymous";
+import { SignInFormEmailCode } from "@/components/SignInFormEmailCode";
+import { SignInFormEmailLink } from "@/components/SignInFormEmailLink";
+import { SignInFormPassword } from "@/components/SignInFormPassword";
+import { SignInFormPasswordAndCustomField } from "@/components/SignInFormPasswordAndCustomField";
+import { SignInFormPasswordAndResetViaCode } from "@/components/SignInFormPasswordAndResetViaCode";
+import { SignInFormPasswordAndVerifyViaCode } from "@/components/SignInFormPasswordAndVerifyViaCode";
+import { SignInFormPhoneCode } from "@/components/SignInFormPhoneCode";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // This component is here to showcase different combinations of sign-in methods.

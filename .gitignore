@@ -9,10 +9,10 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
+.next
 # testing
 /coverage
-
+.pnpm-store
 # next.js
 /.next/
 /out/

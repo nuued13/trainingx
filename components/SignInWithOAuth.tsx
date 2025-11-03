@@ -1,6 +1,6 @@
-import { SignInWithApple } from "@/auth/oauth/SignInWithApple";
-import { SignInWithGitHub } from "@/auth/oauth/SignInWithGitHub";
-import { SignInWithGoogle } from "@/auth/oauth/SignInWithGoogle";
+import { SignInWithApple } from "@/components/oauth/SignInWithApple";
+import { SignInWithGitHub } from "@/components/oauth/SignInWithGitHub";
+import { SignInWithGoogle } from "@/components/oauth/SignInWithGoogle";
 
 export function SignInWithOAuth() {
   return (

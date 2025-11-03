@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -117,7 +118,7 @@ function AnimatedStatCard({ icon: Icon, value, label, delay }: AnimatedStatCardP
             ease: "easeOut"
           }}
         >
-          <Icon className="h-8 w-8 mb-3 mx-auto" />
+          {React.createElement(Icon, { className: "h-8 w-8 mb-3 mx-auto" })}
         </motion.div>
         <div className="text-3xl font-bold mb-2" data-testid={`text-value-${label.replace(/\s+/g, '-').toLowerCase()}`}>
           {displayValue}

@@ -1,9 +1,9 @@
-import { useAuthActions } from "@convex-dev/auth/react";
-import { CodeInput } from "@/auth/CodeInput";
-import { SignInWithEmailCode } from "@/auth/SignInWithEmailCode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { CodeInput } from "@/components/CodeInput";
+import { SignInWithEmailCode } from "@/components/SignInWithEmailCode";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
 
 export function ResetPasswordWithEmailCode({

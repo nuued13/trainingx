@@ -1,6 +1,6 @@
-import { SignInMethodDivider } from "@/auth/SignInMethodDivider";
-import { SignInWithOAuth } from "@/auth/SignInWithOAuth";
-import { SignInWithPassword } from "@/auth/SignInWithPassword";
+import { SignInMethodDivider } from "@/components/SignInMethodDivider";
+import { SignInWithOAuth } from "@/components/SignInWithOAuth";
+import { SignInWithPassword } from "@/components/SignInWithPassword";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useState } from "react";

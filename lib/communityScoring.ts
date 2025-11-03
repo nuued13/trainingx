@@ -1,4 +1,4 @@
-import { CommunityActivity } from "@shared/schema";
+import { CommunityActivity } from "./shared-types";
 
 export interface CommunityBadge {
   id: string;

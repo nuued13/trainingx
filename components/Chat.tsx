@@ -1,5 +1,5 @@
-import { Message } from "@/Chat/Message";
-import { MessageList } from "@/Chat/MessageList";
+import { Message } from "./Chat/Message";
+import { MessageList } from "./Chat/MessageList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQuery } from "convex/react";

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Brain, Lightbulb, MessageSquare, Palette, Zap } from "lucide-react";
-import skillsChart from "@assets/generated_images/Skills_chart_visualization_cb96a16e.png";
 import AnimatedSection from "./AnimatedSection";
 import AnimatedCard from "./AnimatedCard";
 
@@ -76,12 +75,51 @@ export default function SkillsMastery() {
           <div className="text-center">
             <Card className="p-8 hover-elevate">
               <CardContent className="p-0">
-                <img
-                  src={skillsChart}
-                  alt="Skills Chart Visualization"
-                  className="w-full h-auto rounded-lg mb-6"
-                />
-                <p className="text-gray-600 italic">
+                <div className="rounded-xl border border-border/60 bg-gradient-to-br from-gradient-from/10 via-background to-gradient-to/20 p-6">
+                  <div className="grid gap-4">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="h-20 rounded-full bg-gradient-from/30" />
+                      <div className="h-24 rounded-full bg-gradient-to/30" />
+                      <div className="h-16 rounded-full bg-gradient-from/20" />
+                    </div>
+                    <div className="grid gap-2">
+                      <p className="text-xs uppercase text-muted-foreground">
+                        Current Focus Index
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 rounded-full bg-gradient-from/20">
+                          <div className="h-2 w-3/4 rounded-full bg-gradient-from" />
+                        </div>
+                        <span className="text-sm font-semibold text-gradient-from">
+                          76%
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 rounded-full bg-gradient-to/20">
+                          <div className="h-2 w-2/3 rounded-full bg-gradient-to" />
+                        </div>
+                        <span className="text-sm font-semibold text-gradient-to">
+                          68%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-left text-xs">
+                      <div className="rounded-lg border border-border/50 bg-background/70 p-3">
+                        <p className="text-muted-foreground">Opportunities</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          12 unlocked
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-border/50 bg-background/70 p-3">
+                        <p className="text-muted-foreground">Next Target</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          Prompt Score 90+
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-6 text-gray-600 italic">
                   Your skill thumbprint visualization
                 </p>
               </CardContent>

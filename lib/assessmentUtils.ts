@@ -1,5 +1,5 @@
 import { Rubric, computePromptScore, computeSkillSignals } from "./scoring";
-import { Step } from "@shared/schema";
+import { Step } from "./shared-types";
 
 export interface AssessmentResults {
   promptScore: number;

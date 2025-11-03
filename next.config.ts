@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   turbopack: {
-    // Add Turbopack configuration here if needed
+    root: __dirname,
   },
 };
 

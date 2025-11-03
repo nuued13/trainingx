@@ -1,10 +1,9 @@
-import { CodeInput } from "@/auth/CodeInput";
 import { Button } from "@/components/ui/button";
-import { useAuthActions } from "@convex-dev/auth/react";
-
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
+import { CodeInput } from "@/components/CodeInput";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
 
 export function SignInFormPhoneCode() {

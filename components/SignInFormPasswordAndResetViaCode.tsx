@@ -1,5 +1,5 @@
-import { ResetPasswordWithEmailCode } from "@/auth/ResetPasswordWithEmailCode";
-import { SignInWithPassword } from "@/auth/SignInWithPassword";
+import { ResetPasswordWithEmailCode } from "@/components/ResetPasswordWithEmailCode";
+import { SignInWithPassword } from "@/components/SignInWithPassword";
 import { Toaster } from "@/components/ui/toaster";
 import { useState } from "react";
 

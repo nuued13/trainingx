@@ -1,12 +1,12 @@
-import { useAuthActions } from "@convex-dev/auth/react";
-import { CodeInput } from "@/auth/CodeInput";
-import { ResetPasswordWithEmailCode } from "@/auth/ResetPasswordWithEmailCode";
-import { SignInMethodDivider } from "@/auth/SignInMethodDivider";
-import { SignInWithOAuth } from "@/auth/SignInWithOAuth";
-import { SignInWithPassword } from "@/auth/SignInWithPassword";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
+import { CodeInput } from "@/components/CodeInput";
+import { ResetPasswordWithEmailCode } from "@/components/ResetPasswordWithEmailCode";
+import { SignInMethodDivider } from "@/components/SignInMethodDivider";
+import { SignInWithOAuth } from "@/components/SignInWithOAuth";
+import { SignInWithPassword } from "@/components/SignInWithPassword";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
 
 /**

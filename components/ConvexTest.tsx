@@ -35,7 +35,7 @@ export function ConvexTest() {
             {projects.map((project) => (
               <div key={project._id} className="p-2 border rounded">
                 <p className="font-medium">{project.title}</p>
-                <p className="text-sm text-gray-600">{project.category} - Level {project.level}</p>
+                <p className="text-sm text-gray-600">{project.category} - {project.difficulty}</p>
               </div>
             ))}
           </div>

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ArrowRight, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
-import { MultipleChoiceOption } from "@shared/schema";
+import { MultipleChoiceOption } from "@/lib/shared-types";
 
 interface QuestionCardProps {
   question: string;

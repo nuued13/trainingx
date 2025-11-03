@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PlayCircle, Star, Award, ExternalLink } from "lucide-react";
-import appStudioImage from "@assets/generated_images/App_studio_projects_74222fd3.png";
 import AnimatedSection from "./AnimatedSection";
 import AnimatedCard from "./AnimatedCard";
 
@@ -51,11 +50,51 @@ export default function AppStudio() {
           <div>
             <Card className="overflow-hidden hover-elevate mb-6">
               <CardContent className="p-0">
-                <img 
-                  src={appStudioImage} 
-                  alt="App Studio Projects" 
-                  className="w-full h-auto"
-                />
+                <div className="h-full w-full bg-gradient-to-br from-gradient-from/10 via-background to-gradient-to/20 p-8">
+                  <div className="grid gap-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs uppercase text-muted-foreground">
+                          Featured App
+                        </p>
+                        <p className="text-lg font-semibold text-foreground">
+                          Spiral the Study Buddy
+                        </p>
+                      </div>
+                      <Badge className="bg-gradient-to-r from-gradient-from to-gradient-to text-white">
+                        Flagship
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-4">
+                        <p className="text-muted-foreground">Projects built</p>
+                        <p className="text-xl font-semibold text-gradient-from">
+                          1,274
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-4">
+                        <p className="text-muted-foreground">Avg. rating</p>
+                        <p className="text-xl font-semibold text-gradient-to">
+                          4.9 / 5
+                        </p>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-border/60 bg-background/80 p-4 text-xs">
+                      <p className="text-muted-foreground">Key skills</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          Agentic AI
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          Creativity
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          Communication
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 

@@ -1,4 +1,4 @@
-import { Step } from "@shared/schema";
+import { Step } from "@/lib/shared-types";
 import { Rubric } from "@/lib/scoring";
 
 export const questions: (Step & { primaryDimension: keyof Rubric })[] = [
