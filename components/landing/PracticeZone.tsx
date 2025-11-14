@@ -192,7 +192,7 @@ const trendingSkills = [
                 <ProjectCard
                   key={project.slug}
                   project={project}
-                  unlocked={isProjectUnlocked(project.slug)}
+                  unlocked={isProjectUnlocked(project)}
                   completed={false}
                   stats={stats}
                   isLevelUnlocked={isLevelUnlocked}

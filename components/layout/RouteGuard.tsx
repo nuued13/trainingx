@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '../contexts/AuthContextProvider';
+import { useAuth } from "@/contexts/AuthContextProvider";
 
 export default function RouteGuard({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();

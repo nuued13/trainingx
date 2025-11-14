@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import type { PromptArenaCard } from "@/data/prompt-arena-deck";
 import type { LucideIcon } from "lucide-react";
 
