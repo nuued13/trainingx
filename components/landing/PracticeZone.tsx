@@ -260,7 +260,7 @@ const trendingSkills = [
         </div>
 
         {/* Auto Quiz Preview */}
-        <Card className="mb-12 border-gray-200 shadow-xl">
+        {/* <Card className="mb-12 border-gray-200 shadow-xl">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -352,10 +352,10 @@ const trendingSkills = [
               </Button>
             </div>
           </CardFooter>
-        </Card>
+        </Card> */}
 
         {/* CTA */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <Button
             asChild
             size="lg"
@@ -367,7 +367,7 @@ const trendingSkills = [
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-        </div>
+        </div> */}
       </div>
     </AnimatedSection>
   );

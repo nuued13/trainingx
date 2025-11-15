@@ -7,7 +7,7 @@ export default function ComparisonTable() {
     { 
       feature: "Track Record", 
       trainingX: { value: "10 years", icon: <CheckCircle className="h-5 w-5 text-green-500" /> },
-      coursera: { value: "2-3 yrs", icon: <Clock className="h-5 w-5 text-yellow-500" /> },
+      coursera: { value: "2-3 py", icon: <Clock className="h-5 w-5 text-yellow-500" /> },
       udemy: { value: "1-2 yrs", icon: <Clock className="h-5 w-5 text-yellow-500" /> },
       others: { value: "New", icon: <X className="h-5 w-5 text-red-500" /> }
     },
@@ -56,7 +56,7 @@ export default function ComparisonTable() {
   ];
 
   return (
-    <AnimatedSection className="py-0 bg-white">
+    <AnimatedSection className="py-20 bg-white">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">

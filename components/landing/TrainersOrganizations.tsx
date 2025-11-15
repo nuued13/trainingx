@@ -126,7 +126,7 @@ export default function TrainersOrganizations() {
         </div>
 
         {/* CTA */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <Button 
             size="lg"
             className="bg-gradient-to-r from-gradient-from to-gradient-to px-8 py-3 text-lg"
@@ -135,7 +135,7 @@ export default function TrainersOrganizations() {
             Schedule Demo
             <Calendar className="ml-2 h-5 w-5" />
           </Button>
-        </div>
+        </div> */}
       </div>
     </AnimatedSection>
   );

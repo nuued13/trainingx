@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  useScroll,
-  useTransform,
-  motion,
-} from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import { useScroll, useTransform, motion } from "framer-motion";
+import React, { useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface TimelineEntry {
@@ -15,32 +11,22 @@ interface TimelineEntry {
 }
 
 const Timeline = ({ data }: { data: TimelineEntry[] }) => {
-  const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
-
-  useEffect(() => {
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      setHeight(rect.height);
-    }
-  }, [ref]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start 10%", "end 50%"],
   });
 
-  const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);
   const opacityTransform = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
 
   return (
     <div
       id="track-record"
-      className="w-full bg-background font-sans md:px-10"
+      className="w-full bg-background font-sans md:px-10  py-20"
       ref={containerRef}
     >
-      <div className="max-w-7xl mx-auto items-center justify-center flex flex-col py-0 px-4 md:px-8 lg:px-10">
+      <div className="max-w-7xl mx-auto items-center justify-center flex flex-col px-4 md:px-8 lg:px-10 mb-8">
         <h2 className="text-center text-3xl sm:text-5xl mb-4 text-foreground max-w-4xl font-bold bg-gradient-to-r from-gradient-from to-gradient-to bg-clip-text text-transparent">
           The TrainingX.AI Story
         </h2>
@@ -49,7 +35,7 @@ const Timeline = ({ data }: { data: TimelineEntry[] }) => {
         </p>
       </div>
 
-      <div ref={ref} className="relative max-w-7xl mx-auto pb-20">
+      <div className="relative max-w-7xl mx-auto pb-20">
         {data.map((item, index) => (
           <div
             key={index}
@@ -81,17 +67,14 @@ const Timeline = ({ data }: { data: TimelineEntry[] }) => {
           </div>
         ))}
         <div
-          style={{
-            height: height + "px",
-          }}
-          className="absolute left-8 md:left-16 lg:left-25 top-0 overflow-hidden w-[2px] bg-gradient-to-b from-transparent from-[0%] via-border to-transparent to-[99%] [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]"
+          className="absolute left-8 md:left-16 lg:left-25 top-0 bottom-0 overflow-hidden w-[2px] bg-gradient-to-b from-transparent via-border to-transparent [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]"
         >
           <motion.div
             style={{
-              height: heightTransform,
+              scaleY: scrollYProgress,
               opacity: opacityTransform,
             }}
-            className="absolute inset-x-0 top-0 w-[2px] bg-gradient-to-t from-gradient-from via-gradient-to to-transparent from-[0%] via-[10%] rounded-full"
+            className="absolute inset-x-0 top-0 h-full w-[2px] origin-top rounded-full bg-gradient-to-t from-gradient-from via-gradient-to to-transparent from-[0%] via-[10%]"
           />
         </div>
       </div>

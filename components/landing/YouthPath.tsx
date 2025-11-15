@@ -90,7 +90,7 @@ export default function YouthPath() {
         </div>
 
         {/* CTA */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <Button 
             size="lg"
             className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-8 py-3 text-lg"
@@ -99,7 +99,7 @@ export default function YouthPath() {
             Explore Youth Mode
             <GraduationCap className="ml-2 h-5 w-5" />
           </Button>
-        </div>
+        </div> */}
       </div>
     </AnimatedSection>
   );

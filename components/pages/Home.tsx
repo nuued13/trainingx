@@ -19,7 +19,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navigation />
-      <main className="flex flex-col gap-24">
+      <main className="flex flex-col">
         <Hero />
         <HowItWorks />
         <WhyThisMatters />
@@ -29,8 +29,8 @@ export default function HomePage() {
         {/* <AnalyticsCertificates /> */}
         {/* <AppStudio /> */}
         <CareerHub />
-        <SkillsMatchingDemo />
-        <YouthPath />
+        {/* <SkillsMatchingDemo /> */}
+        {/* <YouthPath /> */}
         <TrainersOrganizations />
         <ComparisonTable />
         <FinalCTA />

@@ -64,7 +64,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <AnimatedSection className="py-0 bg-white">
+    <AnimatedSection className="py-10 bg-white">
       <div className="max-w-6xl px-4 mx-auto px-4 md:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
