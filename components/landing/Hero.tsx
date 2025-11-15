@@ -146,7 +146,7 @@ export default function Hero() {
       </div>
 
       {/* Dark Overlay for Text Readability */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/80 to-black/90"></div>
 
       {/* Animated Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-tr from-gradient-to/10 via-transparent to-gradient-from/10 animate-pulse" />

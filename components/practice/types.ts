@@ -21,6 +21,7 @@ export type UserStats = {
   completedProjects: Array<{ slug: string }>;
   badges: string[];
   weeklyPracticeMinutes: number;
+  streak?: number;
 };
 
 export type LevelProgress = {
