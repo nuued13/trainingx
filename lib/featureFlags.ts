@@ -3,5 +3,10 @@ export const comingSoonConfig = {
   logoSrc: "/logo.webp",
   logoAlt: "TrainingX.Ai logo",
   headline: "Coming soon",
-  message: "",
+  message:
+    "We are building a faster, more powerful TrainingX experience. Check back soon for the relaunch.",
+};
+
+export const landingOnlyMode = {
+  enabled: true,
 };

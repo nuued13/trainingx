@@ -4,7 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Providers } from "@/components/layout/providers";
 import { Toaster } from "react-hot-toast";
 import ComingSoon from "@/components/ComingSoon";
-import { comingSoonConfig } from "@/lib/featureFlags";
+import { comingSoonConfig, landingOnlyMode } from "@/lib/featureFlags";
+import HomePage from "@/components/pages/Home";
 import "./globals.css";
 
 const bricolageGrotesque = Bricolage_Grotesque({
@@ -26,14 +27,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const isComingSoon = true
   const isComingSoon = comingSoonConfig.enabled;
+  const landingOnlyEnabled = landingOnlyMode.enabled;
 
   return (
     <html lang="en" className={bricolageGrotesque.variable}>
       <body className="font-sans antialiased">
         {isComingSoon ? (
           <ComingSoon />
+        ) : landingOnlyEnabled ? (
+          <Providers>
+            <TooltipProvider>
+              <HomePage />
+              {/* @ts-expect-error - elevenlabs-convai is not a valid HTML element */}
+              <elevenlabs-convai agent-id="agent_7701ka2g90che218dkm8pw4hmsa8"></elevenlabs-convai>
+              <script
+                src="https://unpkg.com/@elevenlabs/convai-widget-embed"
+                async
+                type="text/javascript"
+              ></script>
+              <Toaster />
+            </TooltipProvider>
+          </Providers>
         ) : (
           <Providers>
             <TooltipProvider>
