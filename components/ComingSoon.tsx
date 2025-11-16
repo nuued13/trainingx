@@ -18,7 +18,7 @@ export default function ComingSoon() {
             priority
           />
         </div>
-        <p className="w-full text-7xl font-black uppercase">
+        <p className="w-full text-6xl font-black uppercase">
           {headline}
         </p>
       </div>
