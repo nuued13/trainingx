@@ -427,11 +427,18 @@ const resultTemplates: Record<LaneType, ResultData> = {
 
 function getScoreLevel(score: number, maxScore: number): string {
   const percentage = (score / maxScore) * 100;
-  if (percentage >= 80) return "Expert";
-  if (percentage >= 60) return "Advanced";
-  if (percentage >= 40) return "Intermediate";
-  if (percentage >= 20) return "Developing";
-  return "Beginner";
+  if (percentage >= 80) return "On the path";
+  if (percentage >= 60) return "Focused effort";
+  if (percentage >= 40) return "Consistent practice";
+  if (percentage >= 20) return "Exploring fundamentals";
+  return "Starting out";
+}
+
+function getIndicatorClassName(score: number, maxScore = 20) {
+  const percentage = (score / maxScore) * 100;
+  if (percentage >= 90) return "bg-emerald-500";
+  if (percentage >= 50) return "bg-amber-500";
+  return "bg-rose-500";
 }
 
 export default function PromptingIntelligenceQuiz() {
@@ -531,15 +538,15 @@ export default function PromptingIntelligenceQuiz() {
 
     return (
       <div className="min-h-screen p-4 bg-gradient-to-br from-gradient-from/10 to-gradient-to/10">
-        <div className="max-w-4xl mx-auto space-y-6 py-8">
-          <Card>
+        <div className="max-w-2xl mx-auto space-y-6 py-8">
+          <Card className="px-4">
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
                 <div className="p-4 bg-gradient-to-br from-gradient-from to-gradient-to rounded-full">
                   <IconComponent className="w-12 h-12 text-white" />
                 </div>
               </div>
-              <div>
+              {/* <div>
                 <p className="text-4xl mb-2">{result.emoji}</p>
                 <CardTitle className="text-3xl font-bold">
                   {result.title}
@@ -550,10 +557,10 @@ export default function PromptingIntelligenceQuiz() {
                 <p className="text-muted-foreground">
                   SUCCESS PATHWAY: {result.pathway}
                 </p>
-              </div>
+              </div> */}
             </CardHeader>
             <CardContent className="space-y-6">
-              <p className="text-center text-lg">{result.description}</p>
+              {/* <p className="text-center text-lg">{result.description}</p> */}
 
               <div className="space-y-3">
                 <h3 className="text-xl font-semibold">YOUR SCORES:</h3>
@@ -577,6 +584,7 @@ export default function PromptingIntelligenceQuiz() {
                         <Progress
                           value={(scores[lane] / 30) * 100}
                           className="h-2"
+                          indicatorClassName={getIndicatorClassName(scores[lane], 30)}
                         />
                       </div>
                     ),
@@ -594,6 +602,7 @@ export default function PromptingIntelligenceQuiz() {
                         <Progress
                           value={(scores[lane] / 20) * 100}
                           className="h-2"
+                          indicatorClassName={getIndicatorClassName(scores[lane])}
                         />
                       </div>
                     ),

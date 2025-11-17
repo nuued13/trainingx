@@ -45,15 +45,15 @@ export default function CareerHub() {
       description:
         "Discover opportunities across all categories at your own pace",
       icon: <Search className="h-6 w-6" />,
-      action: "Explore Career Database",
+      action: "Explore AI Database",
       variant: "outline" as const,
     },
     {
-      title: "Take Assessment → Get Matched",
+      title: "Take Assessment → We'll find your path",
       description:
-        "Get personalized recommendations based on your skills and interests",
+        "Get personalized recommendations for careers, learning paths and more based on your skills and interests",
       icon: <Target className="h-6 w-6" />,
-      action: "Take Matching Assessment",
+      action: "Take Assessment",
       variant: "default" as const,
     },
   ];

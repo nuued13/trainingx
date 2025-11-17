@@ -23,69 +23,17 @@ export const getMigrationStatus = internalQuery({
   },
 });
 
-// Seed practice tracks from legacy categories
-export const seedTracks = internalMutation({
+// DEPRECATED: Old schema - use seedStarterDomain instead
+// This function is kept for reference but should not be used
+export const seedTracks_DEPRECATED = internalMutation({
   args: {},
   handler: async (ctx) => {
-    const systemUserId = await getSystemUserId(ctx);
-
-    const tracks = [
-      {
-        slug: "content",
-        title: "Content & Campaigns",
-        description: "Master content creation, social media, and marketing campaigns",
-        level: 1,
-        icon: "✍️",
-        order: 1,
-        tags: ["generative_ai", "creativity", "communication"],
-        status: "live",
-      },
-      {
-        slug: "analytics",
-        title: "Analytics & Insights",
-        description: "Learn data analysis, business intelligence, and insight generation",
-        level: 2,
-        icon: "📊",
-        order: 2,
-        tags: ["analysis", "logic", "synthetic_ai"],
-        status: "live",
-      },
-      {
-        slug: "ops",
-        title: "Ops & Automation",
-        description: "Build workflows, automate processes, and optimize operations",
-        level: 2,
-        icon: "⚙️",
-        order: 3,
-        tags: ["agentic_ai", "planning", "collaboration"],
-        status: "live",
-      },
-      {
-        slug: "strategy",
-        title: "Strategy & Leadership",
-        description: "Develop strategic thinking, planning, and leadership skills",
-        level: 3,
-        icon: "🎯",
-        order: 4,
-        tags: ["planning", "analysis", "communication"],
-        status: "live",
-      },
-    ];
-
-    const insertedIds = [];
-    for (const track of tracks) {
-      const existing = await ctx.db
-        .query("practiceTracks")
-        .withIndex("by_slug", (q) => q.eq("slug", track.slug))
-        .first();
-
-      if (!existing) {
-        const id = await ctx.db.insert("practiceTracks", track);
-        insertedIds.push(id);
-      }
-    }
-
-    return { inserted: insertedIds.length, total: tracks.length };
+    return { 
+      inserted: 0, 
+      total: 0, 
+      deprecated: true,
+      message: "Use seedStarterDomain:seedStarterDomain instead" 
+    };
   },
 });
 
@@ -266,6 +214,8 @@ export const migrateLegacyProjects = internalMutation({
         const itemId = await ctx.db.insert("practiceItems", {
           templateId: mcTemplate._id,
           scenarioId: undefined,
+          type: step.type,
+          category: legacy.category,
           params: {
             question: step.question,
             options: step.options,
@@ -346,64 +296,9 @@ export const runAllMigrations = internalMutation({
       itemsSeeded: items.length > 0,
     };
 
-    if (!status.tracksSeeded) {
-      const systemUserId = await getSystemUserId(ctx);
-      const trackData = [
-        {
-          slug: "content",
-          title: "Content & Campaigns",
-          description: "Master content creation, social media, and marketing campaigns",
-          level: 1,
-          icon: "✍️",
-          order: 1,
-          tags: ["generative_ai", "creativity", "communication"],
-          status: "live",
-        },
-        {
-          slug: "analytics",
-          title: "Analytics & Insights",
-          description: "Learn data analysis, business intelligence, and insight generation",
-          level: 2,
-          icon: "📊",
-          order: 2,
-          tags: ["analysis", "logic", "synthetic_ai"],
-          status: "live",
-        },
-        {
-          slug: "ops",
-          title: "Ops & Automation",
-          description: "Build workflows, automate processes, and optimize operations",
-          level: 2,
-          icon: "⚙️",
-          order: 3,
-          tags: ["agentic_ai", "planning", "collaboration"],
-          status: "live",
-        },
-        {
-          slug: "strategy",
-          title: "Strategy & Leadership",
-          description: "Develop strategic thinking, planning, and leadership skills",
-          level: 3,
-          icon: "🎯",
-          order: 4,
-          tags: ["planning", "analysis", "communication"],
-          status: "live",
-        },
-      ];
-
-      let inserted = 0;
-      for (const track of trackData) {
-        const existing = await ctx.db
-          .query("practiceTracks")
-          .withIndex("by_slug", (q: any) => q.eq("slug", track.slug))
-          .first();
-        if (!existing) {
-          await ctx.db.insert("practiceTracks", track);
-          inserted++;
-        }
-      }
-      results.tracks = { inserted, total: trackData.length };
-    }
+    // DEPRECATED: Old track schema - use seedStarterDomain instead
+    // Tracks are now seeded via seedStarterDomain:seedStarterDomain
+    results.tracks = { inserted: 0, total: 0 };
 
     if (!status.templatesSeeded) {
       const systemUserId = await getSystemUserId(ctx);

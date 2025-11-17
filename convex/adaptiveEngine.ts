@@ -215,3 +215,197 @@ export const getUserSkillRatings = query({
     }));
   },
 });
+
+// Get prompt by difficulty for the rating game
+export const getPromptByDifficulty = query({
+  args: {
+    userId: v.id("users"),
+    difficulty: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const { userId, difficulty } = args;
+
+    // Get items near the target difficulty
+    const allItems = await ctx.db
+      .query("practiceItems")
+      .withIndex("by_status", (q) => q.eq("status", "live"))
+      .collect();
+
+    // Filter items within difficulty range (±200 Elo)
+    const candidates = allItems
+      .filter(item => Math.abs(item.elo - difficulty) <= 200)
+      .sort(() => Math.random() - 0.5) // Randomize
+      .slice(0, 1);
+
+    if (candidates.length === 0) {
+      // Fallback: get any live item
+      const fallback = allItems.filter(item => item.status === "live");
+      return fallback[Math.floor(Math.random() * fallback.length)] ?? null;
+    }
+
+    const item = candidates[0];
+
+    // Get user stats for this session
+    const today = new Date().toISOString().split("T")[0];
+    const todayAttempts = await ctx.db
+      .query("practiceAttempts")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect()
+      .then(attempts => 
+        attempts.filter(a => {
+          const attemptDate = new Date(a.completedAt).toISOString().split("T")[0];
+          return attemptDate === today;
+        })
+      );
+
+    const correctCount = todayAttempts.filter(a => a.correct).length;
+    const accuracy = todayAttempts.length > 0 
+      ? Math.round((correctCount / todayAttempts.length) * 100)
+      : 0;
+
+    return {
+      _id: item._id,
+      prompt: item.params?.question || "Practice prompt",
+      scenario: item.params?.scenario,
+      templateId: item.templateId,
+      elo: item.elo,
+      userStats: {
+        ratedToday: todayAttempts.length,
+        accuracy,
+      },
+    };
+  },
+});
+
+// Record prompt rating and adjust difficulty
+export const recordPromptRating = mutation({
+  args: {
+    userId: v.id("users"),
+    promptId: v.id("practiceItems"),
+    rating: v.union(v.literal("good"), v.literal("almost"), v.literal("bad")),
+    currentDifficulty: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const { userId, promptId, rating, currentDifficulty } = args;
+
+    const item = await ctx.db.get(promptId);
+    if (!item) throw new Error("Prompt not found");
+
+    // Record the attempt
+    await ctx.db.insert("practiceAttempts", {
+      userId,
+      itemId: promptId,
+      response: { rating },
+      score: rating === "good" ? 1 : rating === "almost" ? 0.5 : 0,
+      correct: rating === "good",
+      timeMs: 0,
+      startedAt: Date.now(),
+      completedAt: Date.now(),
+      metadata: {
+        mode: "rating_game",
+        difficultyBand: item.difficultyBand,
+      },
+    });
+
+    // Calculate difficulty adjustment based on rating
+    let newDifficulty = currentDifficulty;
+    
+    if (rating === "good") {
+      // User found it easy, increase difficulty
+      newDifficulty = currentDifficulty + 50;
+    } else if (rating === "almost") {
+      // User found it medium, keep similar
+      newDifficulty = currentDifficulty + 10;
+    } else {
+      // User found it hard, decrease difficulty
+      newDifficulty = currentDifficulty - 50;
+    }
+
+    // Clamp difficulty between 1000 and 2000
+    newDifficulty = Math.max(1000, Math.min(2000, newDifficulty));
+
+    return {
+      success: true,
+      newDifficulty,
+      ratingRecorded: rating,
+    };
+  },
+});
+
+// Get practice items for card deck display
+export const getPracticeItemsForDeck = query({
+  args: {
+    userId: v.id("users"),
+    difficulty: v.number(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { difficulty, limit = 24 } = args;
+
+    // Get items near the target difficulty (±200 Elo)
+    const allItems = await ctx.db
+      .query("practiceItems")
+      .withIndex("by_status", (q) => q.eq("status", "live"))
+      .collect();
+
+    // Filter and sort by difficulty proximity
+    const candidates = allItems
+      .filter(item => Math.abs(item.elo - difficulty) <= 200)
+      .sort((a, b) => Math.abs(a.elo - difficulty) - Math.abs(b.elo - difficulty))
+      .slice(0, limit);
+
+    // If not enough items, fill with random items
+    if (candidates.length < limit) {
+      const remaining = allItems
+        .filter(item => !candidates.includes(item))
+        .sort(() => Math.random() - 0.5)
+        .slice(0, limit - candidates.length);
+      
+      candidates.push(...remaining);
+    }
+
+    // Transform items to include necessary fields for the card deck
+    return candidates.map(item => {
+      // Extract scenario and prompt from params
+      // If params has 'question' field, that's the scenario
+      // If params has 'options' array, pick a random option as the prompt
+      let scenario = "Rate this prompt";
+      let prompt = "Practice prompt";
+      let correctAnswer: "bad" | "almost" | "good" = "good";
+      let feedback = "Great job!";
+
+      if (item.params) {
+        // Check if this is a multiple-choice question format
+        if (item.params.question && item.params.options && Array.isArray(item.params.options)) {
+          scenario = item.params.question;
+          // Pick a random option to show as the prompt
+          const randomOption = item.params.options[Math.floor(Math.random() * item.params.options.length)];
+          if (randomOption) {
+            prompt = randomOption.text || randomOption.prompt || "Practice prompt";
+            correctAnswer = randomOption.quality || "good";
+            feedback = randomOption.explanation || "Great job!";
+          }
+        } else {
+          // Fallback to direct fields
+          scenario = item.params.scenario || item.params.question || "Rate this prompt";
+          prompt = item.params.text || item.params.prompt || "Practice prompt";
+          correctAnswer = item.params.correctAnswer || "good";
+          feedback = item.params.feedback || item.params.explanation || "Great job!";
+        }
+      }
+
+      return {
+        _id: item._id,
+        scenario,
+        prompt,
+        correctAnswer,
+        feedback,
+        category: item.tags?.[0] || "Practice",
+        tags: item.tags,
+        elo: item.elo,
+        difficultyBand: item.difficultyBand,
+        params: item.params,
+      };
+    });
+  },
+});

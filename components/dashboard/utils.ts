@@ -21,7 +21,7 @@ export function getNextBestAction(
     return {
       title: "Complete Full Assessment",
       description: "Unlock detailed skill insights and career matches",
-      link: "/assessment",
+      link: "/quiz",
       iconType: "target"
     };
   }

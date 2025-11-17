@@ -418,20 +418,102 @@ export default defineSchema({
 
   // ===== PHASE 1: NEW NORMALIZED SCHEMA (FEATURE FLAGGED) =====
   
-  // Practice Tracks (replaces category grouping)
-  practiceTracks: defineTable({
+  // Practice Domains (Top-level categories)
+  practiceDomains: defineTable({
     slug: v.string(),
     title: v.string(),
     description: v.string(),
-    level: v.number(),
-    icon: v.optional(v.string()),
+    icon: v.string(),
+    color: v.string(),
     order: v.number(),
+    trackCount: v.number(),
+    isStarter: v.boolean(), // True for "General AI Skills"
+    status: v.string(), // "draft" | "live" | "archived"
+  })
+    .index("by_slug", ["slug"])
+    .index("by_order", ["order"])
+    .index("by_status", ["status"]),
+
+  // Practice Tracks (replaces category grouping)
+  practiceTracks: defineTable({
+    domainId: v.id("practiceDomains"),
+    slug: v.string(),
+    title: v.string(),
+    description: v.string(),
+    icon: v.string(),
+    order: v.number(),
+    levelCount: v.number(),
+    totalChallenges: v.number(),
+    estimatedHours: v.number(),
+    difficulty: v.string(), // "beginner" | "intermediate" | "advanced"
+    prerequisites: v.array(v.string()), // Track slugs
     tags: v.array(v.string()),
     status: v.string(), // "draft" | "live" | "archived"
   })
     .index("by_slug", ["slug"])
-    .index("by_level", ["level"])
+    .index("by_domain", ["domainId"])
     .index("by_status", ["status"]),
+
+  // Practice Levels (Difficulty tiers within tracks)
+  practiceLevels: defineTable({
+    trackId: v.id("practiceTracks"),
+    levelNumber: v.number(),
+    title: v.string(),
+    description: v.string(),
+    challengeCount: v.number(),
+    estimatedMinutes: v.number(),
+    requiredScore: v.number(), // % needed to unlock next level
+    difficultyRange: v.object({
+      min: v.number(),
+      max: v.number(),
+    }),
+    status: v.string(), // "draft" | "live" | "archived"
+  })
+    .index("by_track", ["trackId"])
+    .index("by_track_level", ["trackId", "levelNumber"]),
+
+  // User Track Progress
+  userTrackProgress: defineTable({
+    userId: v.id("users"),
+    trackId: v.id("practiceTracks"),
+    currentLevel: v.number(),
+    completedLevels: v.array(v.number()),
+    totalChallengesCompleted: v.number(),
+    totalChallenges: v.number(),
+    percentComplete: v.number(),
+    startedAt: v.number(),
+    lastAccessedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_track", ["trackId"])
+    .index("by_user_track", ["userId", "trackId"]),
+
+  // User Level Progress
+  userLevelProgress: defineTable({
+    userId: v.id("users"),
+    levelId: v.id("practiceLevels"),
+    challengesCompleted: v.number(),
+    totalChallenges: v.number(),
+    percentComplete: v.number(),
+    averageScore: v.number(),
+    status: v.string(), // "locked" | "in_progress" | "completed"
+    startedAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_level", ["levelId"])
+    .index("by_user_level", ["userId", "levelId"]),
+
+  // User Domain Unlocks
+  userDomainUnlocks: defineTable({
+    userId: v.id("users"),
+    domainId: v.id("practiceDomains"),
+    unlockedAt: v.number(),
+    unlockedBy: v.string(), // "completed_level_1" | "admin_override"
+  })
+    .index("by_user", ["userId"])
+    .index("by_domain", ["domainId"])
+    .index("by_user_domain", ["userId", "domainId"]),
 
   // Practice Scenarios (reusable context shells)
   practiceScenarios: defineTable({
@@ -485,8 +567,11 @@ export default defineSchema({
 
   // Practice Items (calibrated question instances)
   practiceItems: defineTable({
+    levelId: v.optional(v.id("practiceLevels")), // For curated challenges
     templateId: v.id("practiceItemTemplates"),
     scenarioId: v.optional(v.id("practiceScenarios")),
+    type: v.string(), // "rate" | "choose" | "fix" | "spot" | "improve" | "before_after"
+    category: v.string(), // For filtering
     params: v.any(),
     version: v.string(),
     elo: v.number(),
@@ -497,9 +582,12 @@ export default defineSchema({
     createdAt: v.number(),
     status: v.string(), // "live" | "retired" | "experimental"
   })
+    .index("by_level", ["levelId"])
     .index("by_template", ["templateId"])
     .index("by_scenario", ["scenarioId"])
     .index("by_status", ["status"])
+    .index("by_type", ["type"])
+    .index("by_category", ["category"])
     .index("by_difficulty", ["difficultyBand"]),
 
   // Practice Activities (project step definitions)

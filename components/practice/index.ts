@@ -1,9 +1,12 @@
-export { LevelSection } from "./LevelSection";
-export { LevelHeader } from "./LevelHeader";
+// Core Practice Zone Components
+export { DomainSelection } from "./DomainSelection";
+export { TrackSelection } from "./TrackSelection";
+export { LevelSelection } from "./LevelSelection";
+export { PracticeCardDeck } from "./PracticeCardDeck";
 export { ProjectCard } from "./ProjectCard";
-export { StatsCards } from "./StatsCards";
+
+// Utilities
 export { LoadingState } from "./LoadingState";
-export { AdaptivePracticeSection } from "./AdaptivePracticeSection";
 export { usePracticeData } from "./usePracticeData";
 export { useUnlockLogic } from "./useUnlockLogic";
 export * from "./types";

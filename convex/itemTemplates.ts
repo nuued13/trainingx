@@ -101,6 +101,8 @@ export const generateItemFromTemplate = mutation({
     const itemId = await ctx.db.insert("practiceItems", {
       templateId,
       scenarioId,
+      type: template.type,
+      category: "general",
       params,
       version: "1.0",
       elo: 1500, // Initial Elo
@@ -136,6 +138,8 @@ export const batchGenerateItems = mutation({
       const itemId = await ctx.db.insert("practiceItems", {
         templateId,
         scenarioId,
+        type: template.type,
+        category: "general",
         params,
         version: "1.0",
         elo: 1500,

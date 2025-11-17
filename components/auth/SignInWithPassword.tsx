@@ -7,7 +7,6 @@ import toast from 'react-hot-toast';
 import { useState } from "react";
 import { ConvexError } from "convex/values";
 import { INVALID_PASSWORD } from "convex/errors";
-import { useLocation } from "wouter";
 
 export function SignInWithPassword({
   provider,
@@ -25,7 +24,6 @@ export function SignInWithPassword({
   const { signIn } = useAuthActions();
   const [flow, setFlow] = useState<"signIn" | "signUp">("signIn");
   const [submitting, setSubmitting] = useState(false);
-  const [, setLocation] = useLocation();
   return (
     <form
       className="flex flex-col"
@@ -36,11 +34,8 @@ export function SignInWithPassword({
         signIn(provider ?? "password", formData)
           .then(() => {
             handleSent?.(formData.get("email") as string);
-            // Redirect to saved location or dashboard after successful sign-in
             toast.success("You're signed in!");
-            const redirectTo = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
-            sessionStorage.removeItem('redirectAfterLogin');
-            setTimeout(() => setLocation(redirectTo), 500);
+            // Auth page will handle redirect via useEffect
           })
           .catch((error) => {
             console.error(error);

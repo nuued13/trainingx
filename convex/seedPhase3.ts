@@ -492,6 +492,8 @@ export const seedProductionPracticeItems = mutation({
     for (const item of items) {
       const itemId = await ctx.db.insert("practiceItems", {
         templateId,
+        type: "rate",
+        category: "prompt-engineering",
         params: {
           question: item.question,
           options: item.options,

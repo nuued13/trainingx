@@ -74,17 +74,16 @@ export default function Navigation() {
               )
             )}
           </div>
-
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
             {!isLoggedIn && (
-              <Link href="/">
+              <Link href="/auth">
                 <Button
                   className="bg-gradient-to-r from-gradient-from to-gradient-to"
                   data-testid="button-get-started"
                 >
                   {/* Get Started */}
-                  Coming Soon
+                  Get Started
                 </Button>
               </Link>
             )}

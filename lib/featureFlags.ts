@@ -10,3 +10,5 @@ export const comingSoonConfig = {
 export const landingOnlyMode = {
   enabled: false,
 };
+
+export const IS_DEV = process.env.NEXT_PUBLIC_IS_DEV === "true";

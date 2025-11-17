@@ -89,7 +89,7 @@ export default function PracticeZone() {
     },
     {
       icon: <CheckCircle className="h-7 w-7" />,
-      text: "Real-Time Career & Opportunity Matching",
+      text: "AI Career & Opportunity Matching",
     },
     {
       icon: <CheckCircle className="h-7 w-7" />,
@@ -108,8 +108,8 @@ export default function PracticeZone() {
   const platformFeatures = [
     {
       icon: <Sparkles className="h-6 w-6" />,
-      title: "Custom Agent Builder",
-      description: "Create your own AI assistants with custom instructions",
+      title: "Prompt Rating Game",
+      description: "Rate prompts as good, almost, or bad to unlock dynamic difficulty",
       color: "from-purple-500 to-purple-600",
     },
     {

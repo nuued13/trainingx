@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Providers } from "@/components/layout/providers";
 import { Toaster } from "react-hot-toast";
 import ComingSoon from "@/components/ComingSoon";
-import { comingSoonConfig, landingOnlyMode } from "@/lib/featureFlags";
+import { comingSoonConfig, landingOnlyMode, IS_DEV } from "@/lib/featureFlags";
 import HomePage from "@/components/pages/Home";
 import "./globals.css";
 
@@ -20,6 +20,16 @@ export const metadata: Metadata = {
   title: "TrainingX.Ai - Universal Prompting for the 21st Century",
   description:
     "Master AI prompting skills with our proven training platform. Built in 2015, trusted for a decade. Start your free assessment today.",
+  ...(IS_DEV && {
+    robots: {
+      index: false,
+      follow: false,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
+    },
+  }),
 };
 
 export default function RootLayout({
@@ -32,8 +42,18 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={bricolageGrotesque.variable}>
+      <head>
+        {IS_DEV && <meta name="robots" content="noindex, nofollow" />}
+      </head>
       <body className="font-sans antialiased">
-        {isComingSoon ? (
+        {IS_DEV ? (
+          <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-4">Development Mode</h1>
+              <p className="text-gray-400">Site hidden when IS_DEV=true</p>
+            </div>
+          </div>
+        ) : isComingSoon ? (
           <ComingSoon />
         ) : landingOnlyEnabled ? (
           <Providers>

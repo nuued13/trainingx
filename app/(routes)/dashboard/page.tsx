@@ -229,7 +229,7 @@ export default function DashboardPage() {
                         <Progress value={((userStatsData.rubric?.tool || 0) / 25) * 100} />
                       </div>
                     </div>
-                    <Link href="/assessment">
+                    <Link href="/quiz">
                       <Button variant="outline" className="w-full">
                         <Target className="mr-2 h-4 w-4" />
                         Retake Assessment
