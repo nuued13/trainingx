@@ -113,10 +113,15 @@ export function PracticeCardDeck({ userId, levelId, onBack }: PracticeCardDeckPr
     setStreak(newStreak);
     setLastScoreChange(pointsEarned);
     setAnsweredCards(prev => new Set([...prev, selectedCard._id]));
-    setJustCompletedCard(selectedCard._id);
     
-    // Clear the animation trigger after animation completes
-    setTimeout(() => setJustCompletedCard(null), 2000);
+    // Delay showing animations until modal closes
+    setTimeout(() => {
+      setJustCompletedCard(selectedCard._id);
+      handleCloseModal();
+      
+      // Clear animation after it completes
+      setTimeout(() => setJustCompletedCard(null), 2000);
+    }, 800); // Small delay to see the answer first
 
     // Update level progress (don't await to prevent UI blocking)
     updateLevelProgress({
@@ -174,7 +179,7 @@ export function PracticeCardDeck({ userId, levelId, onBack }: PracticeCardDeckPr
   const selectedCard = selectedCardIndex !== null && displayItems[selectedCardIndex] ? displayItems[selectedCardIndex] : null;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-emerald-900 via-emerald-800 to-teal-900 p-8">
+    <div className="min-h-screen bg-linear-to-br from-emerald-800 via-emerald-700 to-teal-800 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-6 mb-8">
@@ -184,71 +189,88 @@ export function PracticeCardDeck({ userId, levelId, onBack }: PracticeCardDeckPr
                 onClick={onBack}
                 variant="ghost"
                 size="icon"
-                className="text-emerald-300 hover:bg-white/10"
+                className="text-white/70 hover:text-white hover:bg-white/10"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-              <Brain className="w-10 h-10 text-emerald-300" />
+              <Brain className="w-10 h-10 text-teal-300" />
               <div>
                 <h1 className="text-4xl font-bold text-white">Practice Level</h1>
                 {levelDetails && (
-                  <p className="text-emerald-200 text-sm">{levelDetails.title}</p>
+                  <p className="text-white/70 text-sm">{levelDetails.title}</p>
                 )}
               </div>
             </div>
-            <p className="text-emerald-200 text-lg mb-4">Complete challenges to master your skills</p>
+            <p className="text-white/60 text-lg mb-4">Complete challenges to master your skills</p>
             
             {/* Progress Bar */}
-            <div className="bg-white/10 rounded-full h-3 backdrop-blur-sm overflow-hidden">
+            <div className="bg-black/20 rounded-full h-4 overflow-hidden border border-white/10">
               <motion.div
-                className="bg-linear-to-r from-green-400 to-emerald-500 h-full rounded-full"
+                className="bg-linear-to-r from-teal-400 to-cyan-400 h-full rounded-full shadow-lg shadow-teal-500/50"
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
-            <p className="text-emerald-200 text-sm mt-2">
+            <p className="text-white/60 text-sm mt-2">
               Progress: {answeredCards.size} / {displayItems.length} cards completed
             </p>
           </div>
           
-          {/* Score & Controls */}
+          {/* Game HUD - Compact Horizontal Stats */}
           <div className="flex flex-col gap-3">
-            <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <Award className="w-5 h-5 text-yellow-300" />
-                <span className="text-emerald-200 text-sm font-medium">Score</span>
-              </div>
-              <div className="text-4xl font-bold text-white">
-                {score}
-              </div>
-              {streak > 0 && (
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <Zap className="w-4 h-4 text-orange-300" />
-                  <span className="text-orange-200 text-sm font-medium">
-                    {streak} streak!
-                  </span>
+            {/* Horizontal Stats Bar */}
+            <div className="bg-teal-900/40 backdrop-blur-md rounded-lg p-4 border border-teal-600/30 shadow-2xl shadow-teal-900/20">
+              <div className="flex items-center gap-6">
+                {/* Score */}
+                <div className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-amber-400" />
+                  <div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Score</div>
+                    <div className="text-2xl font-bold text-white">{score}</div>
+                  </div>
                 </div>
-              )}
-              {levelDetails && (
-                <div className="text-emerald-300 text-xs mt-1 opacity-80">
-                  Required Score: {levelDetails.requiredScore}%
+                
+                <div className="h-10 w-px bg-slate-700" />
+                
+                {/* Streak */}
+                <div className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-red-400" />
+                  <div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Streak</div>
+                    <div className="text-2xl font-bold text-white">{streak}x</div>
+                  </div>
                 </div>
-              )}
+                
+                <div className="h-10 w-px bg-slate-700" />
+                
+                {/* Progress */}
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+                  <div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Progress</div>
+                    <div className="text-2xl font-bold text-white">{answeredCards.size}/{displayItems.length}</div>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div className="flex gap-2">
+            {/* Action Buttons - Full Width */}
+            <div className="grid grid-cols-3 gap-2">
               <Button
                 onClick={() => setShowStats(!showStats)}
                 variant="outline"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+                size="sm"
+                className="bg-teal-900/40 backdrop-blur-md border-teal-600/30 text-white hover:text-white hover:bg-teal-800/50 hover:border-teal-500/40 w-full"
               >
-                <BarChart className="w-4 h-4" />
+                <BarChart className="w-4 h-4 mr-2" />
+                Stats
               </Button>
               <Button
                 onClick={handleReset}
                 variant="outline"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+                size="sm"
+                className="bg-teal-900/40 backdrop-blur-md border-teal-600/30 text-white hover:text-white hover:bg-teal-800/50 hover:border-teal-500/40 w-full"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Reset
@@ -256,7 +278,8 @@ export function PracticeCardDeck({ userId, levelId, onBack }: PracticeCardDeckPr
               <Button
                 onClick={handleShuffle}
                 variant="outline"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+                size="sm"
+                className="bg-teal-900/40 backdrop-blur-md border-teal-600/30 text-white hover:text-white hover:bg-teal-800/50 hover:border-teal-500/40 w-full"
               >
                 <Shuffle className="w-4 h-4 mr-2" />
                 Shuffle
@@ -271,7 +294,7 @@ export function PracticeCardDeck({ userId, levelId, onBack }: PracticeCardDeckPr
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="bg-white/10 backdrop-blur-md rounded-lg p-6 mb-6 border border-white/20"
+            className="bg-teal-900/40 backdrop-blur-md rounded-lg p-6 mb-6 border border-teal-600/30 shadow-2xl"
           >
             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <BarChart className="w-5 h-5" />
@@ -332,7 +355,7 @@ export function PracticeCardDeck({ userId, levelId, onBack }: PracticeCardDeckPr
                   whileHover={!isAnswered ? { scale: 1.05, y: -5 } : {}}
                   whileTap={!isAnswered ? { scale: 0.95 } : {}}
                 >
-                  <div className="w-full h-full bg-linear-to-br from-blue-600 via-blue-700 to-blue-800 rounded-lg p-1 shadow-2xl">
+                  <div className="w-full h-full bg-blue-600 rounded-lg p-1 shadow-2xl">
                     <div className="w-full h-full border-4 border-white/30 rounded-md bg-blue-700/50 flex items-center justify-center p-4">
                       <div className="text-center">
                         <div className="grid grid-cols-3 gap-1 opacity-40">

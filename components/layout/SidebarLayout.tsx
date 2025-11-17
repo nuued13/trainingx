@@ -16,10 +16,14 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
       <div className="flex h-screen w-full">
         <AppSidebar />
         <div className="flex flex-col flex-1 overflow-hidden">
-          <header className="flex items-center justify-between p-4 border-b bg-background">
-            <SidebarTrigger data-testid="button-sidebar-toggle" />
+          <header className="flex items-center justify-between px-6 py-3 border-b border-slate-700 bg-slate-800">
+            <SidebarTrigger 
+              data-testid="button-sidebar-toggle" 
+              className="text-slate-400 hover:text-white hover:bg-white/5"
+            />
+            {/* Future: Add user stats here (Level, XP, etc.) */}
           </header>
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto bg-slate-900">
             {children}
           </main>
         </div>

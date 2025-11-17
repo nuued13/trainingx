@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import SpiralTheStudyBuddy from "@/components/common/SpiralTheStudyBuddy";
+import { cn } from "@/lib/utils";
 import {
   Home,
   LayoutDashboard,
@@ -111,26 +112,26 @@ export function AppSidebar() {
   const location = usePathname();
 
   return (
-    <Sidebar>
-      <SidebarHeader>
+    <Sidebar className="bg-slate-800 border-r border-slate-700">
+      <SidebarHeader className="border-b border-slate-700 bg-slate-800">
         <Link href="/" data-testid="sidebar-logo">
-          <div className="flex items-center gap-2 py-3 hover-elevate active-elevate-2 rounded-md cursor-pointer">
+          <div className="flex items-center gap-2 py-3 px-2 hover:bg-white/5 rounded-md cursor-pointer transition-colors">
             <img
               src={logoImage}
               alt="TrainingX.Ai Logo"
               className="h-8 w-auto"
             />
             <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-gradient-from to-gradient-to bg-clip-text text-transparent">
+              <span className="text-xl font-bold text-white">
                 TrainingX.Ai
               </span>
             </div>
           </div>
         </Link>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-slate-800">
         <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-slate-500 text-xs uppercase tracking-wider px-3">Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainItems.map((item) => (
@@ -139,9 +140,13 @@ export function AppSidebar() {
                     asChild
                     isActive={location === item.url}
                     data-testid={`sidebar-link-${item.title.toLowerCase().replace(/\s+/g, "-")}`}
+                    className={cn(
+                      "text-slate-400 hover:text-white hover:bg-white/5 transition-colors",
+                      location === item.url && "bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300"
+                    )}
                   >
                     <Link href={item.url}>
-                      <item.icon />
+                      <item.icon className="w-5 h-5" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -152,7 +157,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Engagement</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-slate-500 text-xs uppercase tracking-wider px-3">Engagement</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {engagementItems.map((item) => (
@@ -161,9 +166,13 @@ export function AppSidebar() {
                     asChild
                     isActive={location === item.url}
                     data-testid={`sidebar-link-${item.title.toLowerCase().replace(/\s+/g, "-")}`}
+                    className={cn(
+                      "text-slate-400 hover:text-white hover:bg-white/5 transition-colors",
+                      location === item.url && "bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300"
+                    )}
                   >
                     <Link href={item.url}>
-                      <item.icon />
+                      <item.icon className="w-5 h-5" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -174,7 +183,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Community</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-slate-500 text-xs uppercase tracking-wider px-3">Community</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {communityItems.map((item) => (
@@ -183,9 +192,13 @@ export function AppSidebar() {
                     asChild
                     isActive={location === item.url}
                     data-testid={`sidebar-link-${item.title.toLowerCase().replace(/\s+/g, "-")}`}
+                    className={cn(
+                      "text-slate-400 hover:text-white hover:bg-white/5 transition-colors",
+                      location === item.url && "bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300"
+                    )}
                   >
                     <Link href={item.url}>
-                      <item.icon />
+                      <item.icon className="w-5 h-5" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -196,7 +209,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>AI Tools</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-slate-500 text-xs uppercase tracking-wider px-3">AI Tools</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {aiItems.map((item) => (
@@ -205,9 +218,13 @@ export function AppSidebar() {
                     asChild
                     isActive={location === item.url}
                     data-testid={`sidebar-link-${item.title.toLowerCase().replace(/\s+/g, "-")}`}
+                    className={cn(
+                      "text-slate-400 hover:text-white hover:bg-white/5 transition-colors",
+                      location === item.url && "bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300"
+                    )}
                   >
                     <Link href={item.url}>
-                      <item.icon />
+                      <item.icon className="w-5 h-5" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>

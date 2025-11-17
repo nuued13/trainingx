@@ -5,9 +5,15 @@ import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Lock, ArrowRight, Sparkles } from "lucide-react";
+import { Lock, ArrowRight, Sparkles, Zap } from "lucide-react";
 import { Id } from "convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DomainSelectionProps {
   userId: Id<"users">;
@@ -32,7 +38,7 @@ export function DomainSelection({ userId, onSelectDomain }: DomainSelectionProps
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header with Progress */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -41,9 +47,20 @@ export function DomainSelection({ userId, onSelectDomain }: DomainSelectionProps
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent">
             Practice Zone
           </h1>
-          <p className="text-xl text-emerald-200/80">
+          <p className="text-xl text-emerald-200/80 mb-6">
             Master AI prompting across every domain
           </p>
+          
+          {/* Progress Indicator */}
+          <div className="inline-block bg-slate-800/50 rounded-lg px-4 py-2 border border-slate-700">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-400" />
+              <span className="text-sm text-slate-300">
+                <span className="text-emerald-300 font-semibold">{specializedDomains.filter((d: any) => d.isUnlocked).length}</span>
+                {" "}of {specializedDomains.length} specialized domains unlocked
+              </span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Starter Domain */}
@@ -61,39 +78,55 @@ export function DomainSelection({ userId, onSelectDomain }: DomainSelectionProps
               </h2>
             </div>
 
-            <Card
-              className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-400/50 hover:border-emerald-400 transition-all cursor-pointer group"
-              onClick={() => onSelectDomain(starterDomain._id, starterDomain.slug)}
+            <motion.div
+              whileHover={{ scale: 1.02, y: -4 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              <CardContent className="p-8">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-5xl">{starterDomain.icon}</span>
-                      <div>
-                        <h3 className="text-2xl font-bold text-white">
-                          {starterDomain.title}
-                        </h3>
-                        <p className="text-emerald-200">
-                          {starterDomain.description}
-                        </p>
+              <Card
+                className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-400/50 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-500/20 transition-all cursor-pointer group"
+                onClick={() => onSelectDomain(starterDomain._id, starterDomain.slug)}
+              >
+                <CardContent className="p-8">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <motion.span 
+                          className="text-5xl"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                        >
+                          {starterDomain.icon}
+                        </motion.span>
+                        <div>
+                          <h3 className="text-2xl font-bold text-white">
+                            {starterDomain.title}
+                          </h3>
+                          <p className="text-emerald-200">
+                            {starterDomain.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 mt-4">
+                        <Badge variant="secondary" className="bg-emerald-500/30 text-emerald-100">
+                          {starterDomain.trackCount} tracks
+                        </Badge>
+                        <Badge variant="secondary" className="bg-teal-500/30 text-teal-100">
+                          Essential for everyone
+                        </Badge>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 mt-4">
-                      <Badge variant="secondary" className="bg-emerald-500/30 text-emerald-100">
-                        {starterDomain.trackCount} tracks
-                      </Badge>
-                      <Badge variant="secondary" className="bg-teal-500/30 text-teal-100">
-                        Essential for everyone
-                      </Badge>
-                    </div>
+                    <motion.div
+                      animate={{ x: 0 }}
+                      whileHover={{ x: 4 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <ArrowRight className="w-6 h-6 text-emerald-300" />
+                    </motion.div>
                   </div>
-
-                  <ArrowRight className="w-6 h-6 text-emerald-300 group-hover:translate-x-2 transition-transform" />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
           </motion.div>
         )}
 
@@ -111,58 +144,81 @@ export function DomainSelection({ userId, onSelectDomain }: DomainSelectionProps
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {specializedDomains.map((domain: any, index: number) => (
-              <motion.div
-                key={domain._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.05 }}
-              >
-                <Card
-                  className={cn(
-                    "h-full transition-all",
-                    domain.isUnlocked
-                      ? "bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700 hover:border-emerald-400 cursor-pointer group"
-                      : "bg-gradient-to-br from-slate-800/30 to-slate-900/30 border-slate-700/50 opacity-60"
-                  )}
-                  onClick={() => domain.isUnlocked && onSelectDomain(domain._id, domain.slug)}
+            <TooltipProvider>
+              {specializedDomains.map((domain: any, index: number) => (
+                <motion.div
+                  key={domain._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + index * 0.05 }}
+                  whileHover={domain.isUnlocked ? { scale: 1.02, y: -4 } : {}}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <span className="text-4xl">{domain.icon}</span>
-                      {!domain.isUnlocked && (
-                        <Lock className="w-5 h-5 text-slate-500" />
-                      )}
-                    </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Card
+                        className={cn(
+                          "h-full transition-all",
+                          domain.isUnlocked
+                            ? "bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/10 cursor-pointer group"
+                            : "bg-gradient-to-br from-slate-800/30 to-slate-900/30 border-slate-700/50 opacity-50 cursor-not-allowed"
+                        )}
+                        onClick={() => domain.isUnlocked && onSelectDomain(domain._id, domain.slug)}
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <motion.span 
+                              className="text-4xl"
+                              whileHover={domain.isUnlocked ? { scale: 1.1 } : {}}
+                            >
+                              {domain.icon}
+                            </motion.span>
+                            {!domain.isUnlocked && (
+                              <Lock className="w-5 h-5 text-slate-600" />
+                            )}
+                          </div>
 
-                    <h3 className="text-xl font-bold text-white mb-2">
-                      {domain.title}
-                    </h3>
-                    <p className="text-slate-400 text-sm mb-4">
-                      {domain.description}
-                    </p>
+                          <h3 className="text-xl font-bold text-white mb-2">
+                            {domain.title}
+                          </h3>
+                          <p className={cn(
+                            "text-sm mb-4",
+                            domain.isUnlocked ? "text-slate-400" : "text-slate-500"
+                          )}>
+                            {domain.description}
+                          </p>
 
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs">
-                        {domain.trackCount} tracks
-                      </Badge>
-                      {domain.isUnlocked && (
-                        <Badge variant="secondary" className="bg-green-500/20 text-green-300 text-xs">
-                          ✨ Unlocked
-                        </Badge>
-                      )}
-                    </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs">
+                              {domain.trackCount} tracks
+                            </Badge>
+                            {domain.isUnlocked && (
+                              <Badge variant="secondary" className="bg-green-500/20 text-green-300 text-xs">
+                                ✨ Unlocked
+                              </Badge>
+                            )}
+                          </div>
 
-                    {domain.isUnlocked && (
-                      <div className="mt-4 flex items-center text-emerald-300 text-sm group-hover:translate-x-1 transition-transform">
-                        <span>Explore</span>
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </div>
+                          {domain.isUnlocked && (
+                            <motion.div 
+                              className="mt-4 flex items-center text-emerald-300 text-sm"
+                              whileHover={{ x: 4 }}
+                            >
+                              <span>Explore</span>
+                              <ArrowRight className="w-4 h-4 ml-1" />
+                            </motion.div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </TooltipTrigger>
+                    {!domain.isUnlocked && (
+                      <TooltipContent className="bg-slate-800 border-slate-700 text-slate-200">
+                        <p className="text-sm">Complete Level 1 to unlock</p>
+                      </TooltipContent>
                     )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                  </Tooltip>
+                </motion.div>
+              ))}
+            </TooltipProvider>
           </div>
         </div>
       </div>
