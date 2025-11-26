@@ -14,6 +14,8 @@ import ComparisonTable from "@/components/landing/ComparisonTable";
 import TrackRecord from "@/components/landing/TrackRecord";
 import FinalCTA from "@/components/landing/FinalCTA";
 import Footer from "@/components/landing/Footer";
+import { TweetSlider } from "../ui/image-auto-slider";
+import PromptToEverything from "../landing/PromptToEverything";
 
 export default function HomePage() {
   return (
@@ -23,7 +25,9 @@ export default function HomePage() {
         <Hero />
         <HowItWorks />
         <WhyThisMatters />
+        <TweetSlider />
         <TrackRecord />
+        <PromptToEverything />
         {/* <PracticeZone /> */}
         {/* <SkillsMastery /> */}
         {/* <AnalyticsCertificates /> */}

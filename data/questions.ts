@@ -1,0 +1,407 @@
+import {
+  Briefcase,
+  Laptop,
+  Rocket,
+  Wrench,
+  Sprout,
+  User,
+  TrendingUp,
+  Award,
+  Zap,
+  MessageSquare,
+  Layers,
+  Circle,
+  Code2,
+  Terminal,
+  BookOpen,
+  MousePointer,
+  Cpu,
+  Palette,
+  Users,
+  Building2,
+  Coffee,
+  MessagesSquare,
+  Hammer,
+  Library,
+  Search,
+  GraduationCap,
+  ShieldCheck,
+  Clock,
+  PieChart,
+  CalendarClock,
+  CalendarDays,
+  Moon,
+  Shuffle,
+  Shield,
+  Scale,
+  Swords,
+  Flame,
+} from "lucide-react";
+
+export interface Option {
+  id: string;
+  value: string;
+  label: string;
+  description?: string;
+  icon: any;
+}
+
+export interface Question {
+  id: string;
+  text: string;
+  category: string;
+  options: Option[];
+}
+
+export const questions: Question[] = [
+  {
+    id: "work_preference",
+    text: "What type of work arrangement appeals to you most?",
+    category: "Work Style",
+    options: [
+      {
+        id: "fulltime",
+        value: "fulltime",
+        label: "Full-time Career",
+        description: "Stable employment with benefits and growth potential",
+        icon: Briefcase,
+      },
+      {
+        id: "freelance",
+        value: "freelance",
+        label: "Freelance & Side Hustles",
+        description: "Flexible projects and gig-based work",
+        icon: Laptop,
+      },
+      {
+        id: "founder",
+        value: "founder",
+        label: "Start a Business",
+        description: "Build and scale your own AI-powered company",
+        icon: Rocket,
+      },
+      {
+        id: "trade",
+        value: "trade",
+        label: "Skilled Trade Work",
+        description: "Specialized AI tasks like prompting, annotation, QA",
+        icon: Wrench,
+      },
+    ],
+  },
+  {
+    id: "career_stage",
+    text: "Where are you in your career journey?",
+    category: "Experience",
+    options: [
+      {
+        id: "entry",
+        value: "entry",
+        label: "Just Starting Out",
+        description: "New to the workforce or changing careers",
+        icon: Sprout,
+      },
+      {
+        id: "early",
+        value: "early",
+        label: "Early Career (1-3 years)",
+        description: "Some professional experience",
+        icon: User,
+      },
+      {
+        id: "mid",
+        value: "mid",
+        label: "Mid-Level (4-7 years)",
+        description: "Established in my field",
+        icon: TrendingUp,
+      },
+      {
+        id: "senior",
+        value: "senior",
+        label: "Senior (8+ years)",
+        description: "Extensive experience and expertise",
+        icon: Award,
+      },
+    ],
+  },
+  {
+    id: "ai_tools_experience",
+    text: "Which AI tools have you used? (Select the one you use most)",
+    category: "AI Experience",
+    options: [
+      {
+        id: "chatgpt_advanced",
+        value: "chatgpt_advanced",
+        label: "ChatGPT (extensively)",
+        description: "Regular daily use, advanced prompting",
+        icon: Zap,
+      },
+      {
+        id: "chatgpt_basic",
+        value: "chatgpt_basic",
+        label: "ChatGPT (occasionally)",
+        description: "Used it a few times, still learning",
+        icon: MessageSquare,
+      },
+      {
+        id: "multiple_tools",
+        value: "multiple_tools",
+        label: "Multiple AI Tools",
+        description: "Claude, Midjourney, GitHub Copilot, etc.",
+        icon: Layers,
+      },
+      {
+        id: "none",
+        value: "none",
+        label: "No AI tools yet",
+        description: "Ready to start learning",
+        icon: Circle,
+      },
+    ],
+  },
+  {
+    id: "coding_ability",
+    text: "What's your coding experience?",
+    category: "Technical Skills",
+    options: [
+      {
+        id: "professional",
+        value: "professional",
+        label: "Professional Developer",
+        description: "I code for a living",
+        icon: Code2,
+      },
+      {
+        id: "intermediate",
+        value: "intermediate",
+        label: "Can Code",
+        description: "Built projects, comfortable with programming",
+        icon: Terminal,
+      },
+      {
+        id: "beginner",
+        value: "beginner",
+        label: "Learning to Code",
+        description: "Know basics, still developing skills",
+        icon: BookOpen,
+      },
+      {
+        id: "none",
+        value: "none",
+        label: "No Coding",
+        description: "Prefer no-code solutions",
+        icon: MousePointer,
+      },
+    ],
+  },
+  {
+    id: "domain_interest",
+    text: "Which area interests you most?",
+    category: "Domain",
+    options: [
+      {
+        id: "technical",
+        value: "technical",
+        label: "Technical & Engineering",
+        description: "Building, automating, and solving technical problems",
+        icon: Cpu,
+      },
+      {
+        id: "creative",
+        value: "creative",
+        label: "Creative & Content",
+        description: "Writing, design, storytelling, and media creation",
+        icon: Palette,
+      },
+      {
+        id: "business",
+        value: "business",
+        label: "Business & Strategy",
+        description: "Growth, operations, product development",
+        icon: Briefcase,
+      },
+      {
+        id: "people",
+        value: "people",
+        label: "People & Communication",
+        description: "Customer success, sales, teaching, support",
+        icon: Users,
+      },
+    ],
+  },
+  {
+    id: "work_environment",
+    text: "What's your ideal work environment?",
+    category: "Culture",
+    options: [
+      {
+        id: "startup",
+        value: "startup",
+        label: "Startup Energy",
+        description: "Fast-paced, lots of ownership, high growth potential",
+        icon: Rocket,
+      },
+      {
+        id: "established",
+        value: "established",
+        label: "Established Company",
+        description: "Structured processes, clear career path, stability",
+        icon: Building2,
+      },
+      {
+        id: "independent",
+        value: "independent",
+        label: "Work Independently",
+        description: "Solo or small team, flexible schedule",
+        icon: Coffee,
+      },
+      {
+        id: "collaborative",
+        value: "collaborative",
+        label: "Highly Collaborative",
+        description: "Team-focused, lots of interaction",
+        icon: MessagesSquare,
+      },
+    ],
+  },
+  {
+    id: "learning_style",
+    text: "How do you prefer to learn new skills?",
+    category: "Learning",
+    options: [
+      {
+        id: "hands_on",
+        value: "hands_on",
+        label: "Hands-on Practice",
+        description: "Jump in and learn by doing",
+        icon: Hammer,
+      },
+      {
+        id: "structured",
+        value: "structured",
+        label: "Structured Courses",
+        description: "Step-by-step guidance and curriculum",
+        icon: Library,
+      },
+      {
+        id: "self_directed",
+        value: "self_directed",
+        label: "Self-Directed Research",
+        description: "Find resources and figure it out myself",
+        icon: Search,
+      },
+      {
+        id: "mentorship",
+        value: "mentorship",
+        label: "Mentorship & Guidance",
+        description: "Learn from experienced professionals",
+        icon: GraduationCap,
+      },
+    ],
+  },
+  {
+    id: "income_priority",
+    text: "What's most important for your income?",
+    category: "Compensation",
+    options: [
+      {
+        id: "stability",
+        value: "stability",
+        label: "Stable Salary",
+        description: "Predictable income, benefits",
+        icon: ShieldCheck,
+      },
+      {
+        id: "upside",
+        value: "upside",
+        label: "High Earning Potential",
+        description: "Willing to take risks for bigger rewards",
+        icon: TrendingUp,
+      },
+      {
+        id: "flexibility",
+        value: "flexibility",
+        label: "Flexible Earnings",
+        description: "Variable income based on projects",
+        icon: Clock,
+      },
+      {
+        id: "equity",
+        value: "equity",
+        label: "Equity & Ownership",
+        description: "Build long-term wealth through ownership",
+        icon: PieChart,
+      },
+    ],
+  },
+  {
+    id: "time_commitment",
+    text: "How much time can you dedicate?",
+    category: "Availability",
+    options: [
+      {
+        id: "fulltime_40",
+        value: "fulltime_40",
+        label: "40+ hours/week",
+        description: "Full-time commitment",
+        icon: CalendarClock,
+      },
+      {
+        id: "parttime_20",
+        value: "parttime_20",
+        label: "20-30 hours/week",
+        description: "Part-time or side project",
+        icon: CalendarDays,
+      },
+      {
+        id: "parttime_10",
+        value: "parttime_10",
+        label: "10-15 hours/week",
+        description: "Evenings and weekends",
+        icon: Moon,
+      },
+      {
+        id: "flexible",
+        value: "flexible",
+        label: "Flexible/Variable",
+        description: "Depends on the opportunity",
+        icon: Shuffle,
+      },
+    ],
+  },
+  {
+    id: "risk_tolerance",
+    text: "How comfortable are you with uncertainty?",
+    category: "Risk",
+    options: [
+      {
+        id: "low",
+        value: "low",
+        label: "Prefer Stability",
+        description: "Want clear expectations and security",
+        icon: Shield,
+      },
+      {
+        id: "moderate",
+        value: "moderate",
+        label: "Some Risk OK",
+        description: "Open to calculated risks",
+        icon: Scale,
+      },
+      {
+        id: "high",
+        value: "high",
+        label: "Embrace Uncertainty",
+        description: "Thrive in ambiguous situations",
+        icon: Swords,
+      },
+      {
+        id: "very_high",
+        value: "very_high",
+        label: "High Risk, High Reward",
+        description: "All-in on big opportunities",
+        icon: Flame,
+      },
+    ],
+  },
+];

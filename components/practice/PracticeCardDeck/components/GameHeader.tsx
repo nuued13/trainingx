@@ -18,29 +18,29 @@ export function GameHeader({ onBack, levelTitle, progress, answeredCount, totalC
           onClick={onBack}
           variant="ghost"
           size="icon"
-          className="text-gray-600 hover:text-gray-900 hover:bg-white/60 rounded-xl"
+          className="text-emerald-300 hover:bg-white/10 rounded-xl"
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <Brain className="w-10 h-10 text-blue-500" />
+        <Brain className="w-10 h-10 text-emerald-300" />
         <div>
-          <h1 className="text-4xl font-bold text-gray-900">Practice Level</h1>
+          <h1 className="text-4xl font-bold text-white">Practice Level</h1>
           {levelTitle && (
-            <p className="text-gray-600 text-sm font-medium">{levelTitle}</p>
+            <p className="text-emerald-200 text-sm font-medium">{levelTitle}</p>
           )}
         </div>
       </div>
-      <p className="text-gray-600 text-lg mb-4 font-medium">Complete challenges to master your skills</p>
+      <p className="text-emerald-200 text-lg mb-4 font-medium">Complete challenges to master your skills</p>
       
-      <div className="bg-white/60 rounded-full h-4 overflow-hidden border-2 border-gray-200 shadow-sm">
+      <div className="bg-white/10 rounded-full h-3 overflow-hidden border border-white/20 backdrop-blur-sm">
         <motion.div
-          className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 h-full rounded-full shadow-lg"
+          className="bg-gradient-to-r from-green-400 to-emerald-500 h-full rounded-full shadow-lg"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.5 }}
         />
       </div>
-      <p className="text-gray-700 text-sm mt-2 font-semibold">
+      <p className="text-emerald-200 text-sm mt-2 font-semibold">
         Progress: {answeredCount} / {totalCount} cards completed
       </p>
     </div>

@@ -33,8 +33,8 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
 
   if (!trackDetails) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#DDF3FE] via-[#E8F5FE] to-[#F0F9FF] flex items-center justify-center">
-        <div className="text-gray-700 text-xl font-semibold">Loading levels...</div>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 flex items-center justify-center">
+        <div className="text-emerald-100 text-xl font-semibold">Loading levels...</div>
       </div>
     );
   }
@@ -45,7 +45,7 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
   const getLevelStatus = () => "unlocked";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#DDF3FE] via-[#E8F5FE] to-[#F0F9FF] p-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
@@ -55,7 +55,7 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
           <Button
             variant="ghost"
             onClick={onBack}
-            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 mb-6 rounded-xl"
+            className="text-emerald-200 hover:text-white hover:bg-white/10 mb-6 rounded-xl"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Tracks
@@ -65,10 +65,10 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
             <div className="flex items-center gap-3 mb-3">
               <span className="text-4xl">{trackDetails.icon}</span>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-white">
                   {trackDetails.title}
                 </h1>
-                <p className="text-gray-700 font-medium">
+                <p className="text-emerald-100 font-medium">
                   {trackDetails.description}
                 </p>
               </div>
@@ -76,14 +76,14 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
 
             {/* Overall Progress */}
             {trackProgress && (
-              <div className="mt-6 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+              <div className="mt-6 bg-white/10 rounded-lg p-4 border border-white/20">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-slate-400">Overall Progress</span>
-                  <span className="text-emerald-300 font-semibold">
+                  <span className="text-sm text-emerald-100">Overall Progress</span>
+                  <span className="text-emerald-200 font-semibold">
                     {trackProgress.percentComplete}%
                   </span>
                 </div>
-                <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/20">
                   <motion.div
                     className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
                     initial={{ width: 0 }}
@@ -91,7 +91,7 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
                     transition={{ duration: 0.5 }}
                   />
                 </div>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-emerald-100/80 mt-2">
                   {trackProgress.totalChallengesCompleted} of {trackProgress.totalChallenges} challenges completed
                 </p>
               </div>
@@ -118,8 +118,8 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
                   className={cn(
                     "transition-all",
                     isLocked
-                      ? "bg-white/40 backdrop-blur-sm border-2 border-gray-200 opacity-60"
-                      : "bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-blue-400 hover:shadow-xl cursor-pointer group"
+                      ? "bg-white/5 backdrop-blur-sm border border-white/10 opacity-60"
+                      : "bg-white/10 backdrop-blur-sm border border-white/20 hover:border-emerald-300 hover:shadow-2xl cursor-pointer group"
                   )}
                   onClick={() => !isLocked && onSelectLevel(level._id)}
                 >
@@ -130,12 +130,12 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
                         className={cn(
                           "flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold",
                           isCompleted
-                            ? "bg-green-100 text-green-700 border-2 border-green-500"
+                            ? "bg-emerald-500/20 text-emerald-100 border-2 border-emerald-300"
                             : isInProgress
-                              ? "bg-blue-100 text-blue-700 border-2 border-blue-500"
+                              ? "bg-blue-500/20 text-blue-100 border-2 border-blue-300"
                               : isLocked
-                                ? "bg-gray-100 text-gray-400 border-2 border-gray-300"
-                                : "bg-purple-100 text-purple-700 border-2 border-purple-500"
+                                ? "bg-white/10 text-emerald-200/60 border-2 border-white/20"
+                                : "bg-emerald-500/10 text-emerald-100 border-2 border-emerald-300"
                         )}
                       >
                         {isLocked ? (
@@ -151,10 +151,10 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-1">
+                            <h3 className="text-xl font-bold text-white mb-1">
                               Level {level.levelNumber}: {level.title}
                             </h3>
-                            <p className="text-gray-700 text-sm font-medium">
+                            <p className="text-emerald-100 text-sm font-medium">
                               {level.description}
                             </p>
                           </div>
@@ -162,16 +162,16 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
 
                         {/* Meta Info */}
                         <div className="flex flex-wrap items-center gap-2 mt-3">
-                          <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs flex items-center gap-1">
+                          <Badge variant="secondary" className="bg-white/10 text-emerald-100 border border-white/20 text-xs flex items-center gap-1">
                             <Target className="w-3 h-3" />
                             {level.challengeCount} challenges
                           </Badge>
-                          <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs flex items-center gap-1">
+                          <Badge variant="secondary" className="bg-white/10 text-emerald-100 border border-white/20 text-xs flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             ~{level.estimatedMinutes} min
                           </Badge>
                           {!isLocked && (
-                            <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs">
+                            <Badge variant="secondary" className="bg-white/10 text-emerald-100 border border-white/20 text-xs">
                               {level.requiredScore}% to unlock next
                             </Badge>
                           )}
@@ -181,12 +181,12 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
                         {!isLocked && level.progress.percentComplete > 0 && (
                           <div className="mt-4">
                             <div className="flex items-center justify-between text-xs mb-1">
-                              <span className="text-slate-400">Progress</span>
-                              <span className="text-emerald-300 font-semibold">
+                              <span className="text-emerald-100">Progress</span>
+                              <span className="text-emerald-200 font-semibold">
                                 {level.progress.percentComplete}%
                               </span>
                             </div>
-                            <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden border border-white/20">
                               <motion.div
                                 className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
                                 initial={{ width: 0 }}
@@ -194,7 +194,7 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
                               />
                             </div>
-                            <p className="text-xs text-slate-500 mt-1">
+                            <p className="text-xs text-emerald-100/80 mt-1">
                               {level.progress.challengesCompleted} of {level.challengeCount} completed
                               {level.progress.averageScore > 0 && ` • ${level.progress.averageScore}% avg score`}
                             </p>
@@ -215,7 +215,7 @@ export function LevelSelection({ userId, trackId, onBack, onSelectLevel }: Level
                             </Badge>
                           )}
                           {isLocked && (
-                            <Badge className="bg-slate-700/50 text-slate-400 border-slate-600/30 text-xs">
+                            <Badge className="bg-white/10 text-emerald-100 border-white/20 text-xs">
                               <Lock className="w-3 h-3 mr-1" />
                               Complete Level {level.levelNumber - 1} to unlock
                             </Badge>

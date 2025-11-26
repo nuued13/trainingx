@@ -86,7 +86,7 @@ export function PracticeCardDeck({ userId, levelId, onBack }: PracticeCardDeckPr
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#DDF3FE] via-[#E8F5FE] to-[#F0F9FF] p-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-wrap items-start justify-between gap-6 mb-8">
           <GameHeader

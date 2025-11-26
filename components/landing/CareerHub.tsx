@@ -59,7 +59,7 @@ export default function CareerHub() {
   ];
 
   return (
-    <AnimatedSection id="careers" className="py-10 pb-20 bg-white">
+    <AnimatedSection id="careers" className="py-20 bg-white">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
@@ -104,7 +104,7 @@ export default function CareerHub() {
           <div className="grid md:grid-cols-2 gap-8">
             {paths.map((path, index) => (
               <Card key={index} className="hover-elevate">
-                <CardContent className="p-8 text-center">
+                <CardContent className="p-4 text-center">
                   <div className="bg-gradient-to-r from-gradient-from to-gradient-to text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-6">
                     {path.icon}
                   </div>

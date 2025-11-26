@@ -30,11 +30,13 @@ export default defineSchema({
     currentLevel: v.number(),
     totalExperience: v.number(),
     learningGoals: v.array(v.string()),
-    preferences: v.optional(v.object({
-      difficulty: v.string(),
-      interests: v.array(v.string()),
-      notifications: v.boolean()
-    }))
+    preferences: v.optional(
+      v.object({
+        difficulty: v.string(),
+        interests: v.array(v.string()),
+        notifications: v.boolean(),
+      })
+    ),
   }).index("by_user", ["userId"]),
 
   // Projects and exercises (generic)
@@ -47,16 +49,20 @@ export default defineSchema({
     tags: v.array(v.string()),
     authorId: v.id("users"),
     isPublished: v.boolean(),
-    steps: v.array(v.object({
-      title: v.string(),
-      content: v.string(),
-      codeExample: v.optional(v.string()),
-      resources: v.array(v.string()),
-      order: v.number()
-    })),
+    steps: v.array(
+      v.object({
+        title: v.string(),
+        content: v.string(),
+        codeExample: v.optional(v.string()),
+        resources: v.array(v.string()),
+        order: v.number(),
+      })
+    ),
     requirements: v.array(v.string()),
-    learningObjectives: v.array(v.string())
-  }).index("by_category", ["category"]).index("by_difficulty", ["difficulty"]),
+    learningObjectives: v.array(v.string()),
+  })
+    .index("by_category", ["category"])
+    .index("by_difficulty", ["difficulty"]),
 
   // Practice Zone projects (from projects-seed.json)
   practiceProjects: defineTable({
@@ -69,25 +75,34 @@ export default defineSchema({
     difficulty: v.number(),
     badge: v.string(),
     steps: v.number(),
-    stepDetails: v.array(v.object({
-      type: v.string(),
-      question: v.string(),
-      options: v.array(v.object({
-        quality: v.string(),
-        text: v.string(),
-        explanation: v.string()
-      }))
-    })),
+    stepDetails: v.array(
+      v.object({
+        type: v.string(),
+        question: v.string(),
+        options: v.array(
+          v.object({
+            quality: v.string(),
+            text: v.string(),
+            explanation: v.string(),
+          })
+        ),
+      })
+    ),
     buildsSkills: v.array(v.string()),
     description: v.string(),
     isAssessment: v.boolean(),
     requiresCompletion: v.optional(v.array(v.string())),
-    examplePrompts: v.optional(v.array(v.object({
-      quality: v.string(),
-      prompt: v.string(),
-      explanation: v.string()
-    })))
-  }).index("by_slug", ["slug"])
+    examplePrompts: v.optional(
+      v.array(
+        v.object({
+          quality: v.string(),
+          prompt: v.string(),
+          explanation: v.string(),
+        })
+      )
+    ),
+  })
+    .index("by_slug", ["slug"])
     .index("by_level", ["level"])
     .index("by_category", ["category"]),
 
@@ -104,8 +119,10 @@ export default defineSchema({
     lastAccessedAt: v.number(),
     completedAt: v.optional(v.number()),
     notes: v.optional(v.string()),
-    timeSpent: v.number()
-  }).index("by_user", ["userId"]).index("by_project", ["projectId"]),
+    timeSpent: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_project", ["projectId"]),
 
   // Assessments and quizzes
   assessments: defineTable({
@@ -116,29 +133,35 @@ export default defineSchema({
     difficulty: v.string(),
     timeLimit: v.optional(v.number()),
     passingScore: v.number(),
-    questions: v.array(v.object({
-      id: v.string(),
-      question: v.string(),
-      type: v.string(),
-      options: v.optional(v.array(v.string())),
-      correctAnswer: v.union(v.string(), v.number(), v.array(v.string())),
-      explanation: v.optional(v.string()),
-      points: v.number()
-    })),
+    questions: v.array(
+      v.object({
+        id: v.string(),
+        question: v.string(),
+        type: v.string(),
+        options: v.optional(v.array(v.string())),
+        correctAnswer: v.union(v.string(), v.number(), v.array(v.string())),
+        explanation: v.optional(v.string()),
+        points: v.number(),
+      })
+    ),
     tags: v.array(v.string()),
-    isActive: v.boolean()
-  }).index("by_category", ["category"]).index("by_type", ["type"]),
+    isActive: v.boolean(),
+  })
+    .index("by_category", ["category"])
+    .index("by_type", ["type"]),
 
   // Assessment attempts and results
   assessmentAttempts: defineTable({
     userId: v.id("users"),
     assessmentId: v.id("assessments"),
-    answers: v.array(v.object({
-      questionId: v.string(),
-      answer: v.any(),
-      isCorrect: v.boolean(),
-      points: v.number()
-    })),
+    answers: v.array(
+      v.object({
+        questionId: v.string(),
+        answer: v.any(),
+        isCorrect: v.boolean(),
+        points: v.number(),
+      })
+    ),
     score: v.number(),
     totalPoints: v.number(),
     percentage: v.number(),
@@ -146,30 +169,63 @@ export default defineSchema({
     startedAt: v.number(),
     completedAt: v.optional(v.number()),
     timeSpent: v.number(),
-    feedback: v.optional(v.string())
-  }).index("by_user", ["userId"]).index("by_assessment", ["assessmentId"]),
+    feedback: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_assessment", ["assessmentId"]),
 
   // AI-powered career matching
   careerMatches: defineTable({
     userId: v.id("users"),
-    matches: v.array(v.object({
-      careerTitle: v.string(),
-      matchScore: v.number(),
-      keySkills: v.array(v.string()),
-      salaryRange: v.optional(v.string()),
-      growthPotential: v.string(),
-      reasons: v.array(v.string())
-    })),
-    skillGapAnalysis: v.array(v.object({
-      skill: v.string(),
-      currentLevel: v.string(),
-      targetLevel: v.string(),
-      importance: v.string()
-    })),
+    matches: v.array(
+      v.object({
+        careerTitle: v.string(),
+        matchScore: v.number(),
+        keySkills: v.array(v.string()),
+        salaryRange: v.optional(v.string()),
+        growthPotential: v.string(),
+        reasons: v.array(v.string()),
+      })
+    ),
+    skillGapAnalysis: v.array(
+      v.object({
+        skill: v.string(),
+        currentLevel: v.string(),
+        targetLevel: v.string(),
+        importance: v.string(),
+      })
+    ),
     recommendedProjects: v.array(v.id("projects")),
     recommendedLearningPath: v.array(v.string()),
     generatedAt: v.number(),
-    aiModel: v.string()
+    aiModel: v.string(),
+  }).index("by_user", ["userId"]),
+
+  // New AI Matching Results (for the new quiz flow)
+  aiMatchingResults: defineTable({
+    userId: v.id("users"),
+    opportunities: v.array(
+      v.object({
+        id: v.string(),
+        title: v.string(),
+        type: v.string(),
+        location: v.string(),
+        salaryRange: v.string(),
+        employmentType: v.string(),
+        seniority: v.string(),
+        description: v.string(),
+        impactHighlights: v.array(v.string()),
+        keyTechnologies: v.array(v.string()),
+        requiredSkills: v.array(v.string()),
+        whyPerfectMatch: v.string(),
+        nextSteps: v.string(),
+        remotePolicy: v.string(),
+        promptScoreMin: v.number(),
+        skillThresholds: v.any(),
+      })
+    ),
+    quizAnswers: v.any(),
+    generatedAt: v.number(),
   }).index("by_user", ["userId"]),
 
   // Custom AI assistants (GPTs)
@@ -185,8 +241,10 @@ export default defineSchema({
     totalRatings: v.number(),
     tags: v.array(v.string()),
     createdAt: v.number(),
-    updatedAt: v.number()
-  }).index("by_creator", ["creatorId"]).index("public", ["isPublic"]),
+    updatedAt: v.number(),
+  })
+    .index("by_creator", ["creatorId"])
+    .index("public", ["isPublic"]),
 
   // Community posts and discussions
   posts: defineTable({
@@ -202,8 +260,11 @@ export default defineSchema({
     isPinned: v.boolean(),
     isLocked: v.boolean(),
     createdAt: v.number(),
-    updatedAt: v.number()
-  }).index("by_category", ["category"]).index("by_author", ["authorId"]).index("latest", ["createdAt"]),
+    updatedAt: v.number(),
+  })
+    .index("by_category", ["category"])
+    .index("by_author", ["authorId"])
+    .index("latest", ["createdAt"]),
 
   // Comments and replies
   comments: defineTable({
@@ -215,8 +276,10 @@ export default defineSchema({
     downvotes: v.number(),
     isEdited: v.boolean(),
     createdAt: v.number(),
-    updatedAt: v.number()
-  }).index("by_post", ["postId"]).index("by_author", ["authorId"]),
+    updatedAt: v.number(),
+  })
+    .index("by_post", ["postId"])
+    .index("by_author", ["authorId"]),
 
   // Real-time chat and support
   chatSessions: defineTable({
@@ -225,8 +288,10 @@ export default defineSchema({
     sessionType: v.string(),
     isActive: v.boolean(),
     createdAt: v.number(),
-    lastActivityAt: v.number()
-  }).index("by_user", ["userId"]).index("active", ["isActive"]),
+    lastActivityAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("active", ["isActive"]),
 
   chatMessages: defineTable({
     sessionId: v.id("chatSessions"),
@@ -234,13 +299,17 @@ export default defineSchema({
     content: v.string(),
     messageType: v.string(),
     isFromAI: v.boolean(),
-    metadata: v.optional(v.object({
-      confidence: v.optional(v.number()),
-      sources: v.optional(v.array(v.string())),
-      relatedProjects: v.optional(v.array(v.id("projects")))
-    })),
-    createdAt: v.number()
-  }).index("by_session", ["sessionId"]).index("by_time", ["createdAt"]),
+    metadata: v.optional(
+      v.object({
+        confidence: v.optional(v.number()),
+        sources: v.optional(v.array(v.string())),
+        relatedProjects: v.optional(v.array(v.id("projects"))),
+      })
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_time", ["createdAt"]),
 
   // Certificates and achievements
   certificates: defineTable({
@@ -253,12 +322,16 @@ export default defineSchema({
     expiryDate: v.optional(v.number()),
     certificateUrl: v.string(),
     verificationCode: v.string(),
-    metadata: v.optional(v.object({
-      projectName: v.optional(v.string()),
-      assessmentName: v.optional(v.string()),
-      score: v.optional(v.number())
-    }))
-  }).index("by_user", ["userId"]).index("by_verification", ["verificationCode"]),
+    metadata: v.optional(
+      v.object({
+        projectName: v.optional(v.string()),
+        assessmentName: v.optional(v.string()),
+        score: v.optional(v.number()),
+      })
+    ),
+  })
+    .index("by_user", ["userId"])
+    .index("by_verification", ["verificationCode"]),
 
   // Learning paths and recommendations
   learningPaths: defineTable({
@@ -274,8 +347,10 @@ export default defineSchema({
     isActive: v.boolean(),
     enrollmentCount: v.number(),
     rating: v.number(),
-    createdAt: v.number()
-  }).index("by_category", ["category"]).index("by_difficulty", ["difficulty"]),
+    createdAt: v.number(),
+  })
+    .index("by_category", ["category"])
+    .index("by_difficulty", ["difficulty"]),
 
   // User enrollments in learning paths
   enrollments: defineTable({
@@ -285,8 +360,10 @@ export default defineSchema({
     completedAt: v.optional(v.number()),
     progress: v.number(),
     currentProject: v.optional(v.id("projects")),
-    status: v.string()
-  }).index("by_user", ["userId"]).index("by_path", ["learningPathId"]),
+    status: v.string(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_path", ["learningPathId"]),
 
   // File storage and assets
   files: defineTable({
@@ -298,8 +375,10 @@ export default defineSchema({
     storageId: v.id("_storage"),
     category: v.string(),
     isPublic: v.boolean(),
-    uploadedAt: v.number()
-  }).index("by_uploader", ["uploadedById"]).index("by_category", ["category"]),
+    uploadedAt: v.number(),
+  })
+    .index("by_uploader", ["uploadedById"])
+    .index("by_category", ["category"]),
 
   // User statistics and progress tracking
   userStats: defineTable({
@@ -325,37 +404,8 @@ export default defineSchema({
       creativity: v.number(),
       collaboration: v.number(),
     }),
-    previousSkills: v.optional(v.object({
-      generative_ai: v.number(),
-      agentic_ai: v.number(),
-      synthetic_ai: v.number(),
-      coding: v.number(),
-      agi_readiness: v.number(),
-      communication: v.number(),
-      logic: v.number(),
-      planning: v.number(),
-      analysis: v.number(),
-      creativity: v.number(),
-      collaboration: v.number(),
-    })),
-    badges: v.optional(v.array(v.string())),
-    completedProjects: v.optional(v.array(v.object({
-      slug: v.string(),
-      completedAt: v.string(),
-      finalScore: v.number(),
-      rubric: v.object({
-        clarity: v.number(),
-        constraints: v.number(),
-        iteration: v.number(),
-        tool: v.number(),
-      }),
-      badgeEarned: v.boolean(),
-      skillsGained: v.array(v.string()),
-    }))),
-    assessmentHistory: v.optional(v.array(v.object({
-      date: v.string(),
-      promptScore: v.number(),
-      skills: v.object({
+    previousSkills: v.optional(
+      v.object({
         generative_ai: v.number(),
         agentic_ai: v.number(),
         synthetic_ai: v.number(),
@@ -367,14 +417,53 @@ export default defineSchema({
         analysis: v.number(),
         creativity: v.number(),
         collaboration: v.number(),
-      }),
-      rubric: v.object({
-        clarity: v.number(),
-        constraints: v.number(),
-        iteration: v.number(),
-        tool: v.number(),
-      }),
-    }))),
+      })
+    ),
+    badges: v.optional(v.array(v.string())),
+    completedProjects: v.optional(
+      v.array(
+        v.object({
+          slug: v.string(),
+          completedAt: v.string(),
+          finalScore: v.number(),
+          rubric: v.object({
+            clarity: v.number(),
+            constraints: v.number(),
+            iteration: v.number(),
+            tool: v.number(),
+          }),
+          badgeEarned: v.boolean(),
+          skillsGained: v.array(v.string()),
+        })
+      )
+    ),
+    assessmentHistory: v.optional(
+      v.array(
+        v.object({
+          date: v.string(),
+          promptScore: v.number(),
+          skills: v.object({
+            generative_ai: v.number(),
+            agentic_ai: v.number(),
+            synthetic_ai: v.number(),
+            coding: v.number(),
+            agi_readiness: v.number(),
+            communication: v.number(),
+            logic: v.number(),
+            planning: v.number(),
+            analysis: v.number(),
+            creativity: v.number(),
+            collaboration: v.number(),
+          }),
+          rubric: v.object({
+            clarity: v.number(),
+            constraints: v.number(),
+            iteration: v.number(),
+            tool: v.number(),
+          }),
+        })
+      )
+    ),
     streak: v.number(),
     lastActiveDate: v.number(),
     assessmentComplete: v.boolean(),
@@ -401,7 +490,8 @@ export default defineSchema({
     postId: v.id("posts"),
     voteType: v.union(v.literal("up"), v.literal("down")),
     createdAt: v.number(),
-  }).index("by_user", ["userId"])
+  })
+    .index("by_user", ["userId"])
     .index("by_post", ["postId"])
     .index("by_user_post", ["userId", "postId"]),
 
@@ -412,12 +502,13 @@ export default defineSchema({
     answers: v.any(),
     results: v.any(),
     completedAt: v.number(),
-  }).index("by_user", ["userId"])
+  })
+    .index("by_user", ["userId"])
     .index("by_type", ["quizType"])
     .index("by_user_type", ["userId", "quizType"]),
 
   // ===== PHASE 1: NEW NORMALIZED SCHEMA (FEATURE FLAGGED) =====
-  
+
   // Practice Domains (Top-level categories)
   practiceDomains: defineTable({
     slug: v.string(),
@@ -550,10 +641,12 @@ export default defineSchema({
     }),
     aiEvaluation: v.object({
       enabled: v.boolean(),
-      modelHints: v.optional(v.object({ 
-        provider: v.string(), 
-        model: v.string() 
-      })),
+      modelHints: v.optional(
+        v.object({
+          provider: v.string(),
+          model: v.string(),
+        })
+      ),
     }),
     recommendedTime: v.number(),
     skills: v.array(v.string()),
@@ -612,26 +705,32 @@ export default defineSchema({
     itemId: v.id("practiceItems"),
     projectId: v.optional(v.id("practiceProjects")),
     response: v.any(),
-    rubricScores: v.optional(v.object({ 
-      clarity: v.number(), 
-      constraints: v.number(), 
-      iteration: v.number(), 
-      tool: v.number() 
-    })),
+    rubricScores: v.optional(
+      v.object({
+        clarity: v.number(),
+        constraints: v.number(),
+        iteration: v.number(),
+        tool: v.number(),
+      })
+    ),
     score: v.number(),
     correct: v.boolean(),
     timeMs: v.number(),
     startedAt: v.number(),
     completedAt: v.number(),
     feedback: v.optional(v.string()),
-    aiFeedback: v.optional(v.object({ 
-      summary: v.string(), 
-      suggestions: v.array(v.string()) 
-    })),
-    metadata: v.optional(v.object({ 
-      mode: v.string(), 
-      difficultyBand: v.string() 
-    })),
+    aiFeedback: v.optional(
+      v.object({
+        summary: v.string(),
+        suggestions: v.array(v.string()),
+      })
+    ),
+    metadata: v.optional(
+      v.object({
+        mode: v.string(),
+        difficultyBand: v.string(),
+      })
+    ),
   })
     .index("by_user", ["userId"])
     .index("by_item", ["itemId"])
@@ -674,8 +773,7 @@ export default defineSchema({
     notifications: v.optional(v.boolean()),
     coachNotes: v.optional(v.string()),
     updatedAt: v.number(),
-  })
-    .index("by_user", ["userId"]),
+  }).index("by_user", ["userId"]),
 
   // Daily Drills & Streaks
   practiceStreaks: defineTable({
@@ -686,8 +784,7 @@ export default defineSchema({
     repairTokens: v.number(),
     totalDrillsCompleted: v.number(),
     updatedAt: v.number(),
-  })
-    .index("by_user", ["userId"]),
+  }).index("by_user", ["userId"]),
 
   practiceDailyDrills: defineTable({
     userId: v.id("users"),
@@ -705,12 +802,14 @@ export default defineSchema({
   // Placement Test
   placementTests: defineTable({
     userId: v.id("users"),
-    items: v.array(v.object({
-      itemId: v.id("practiceItems"),
-      response: v.any(),
-      correct: v.boolean(),
-      timeMs: v.number(),
-    })),
+    items: v.array(
+      v.object({
+        itemId: v.id("practiceItems"),
+        response: v.any(),
+        correct: v.boolean(),
+        timeMs: v.number(),
+      })
+    ),
     initialSkillRatings: v.object({
       generative_ai: v.number(),
       agentic_ai: v.number(),
@@ -724,8 +823,7 @@ export default defineSchema({
     }),
     recommendedTrack: v.string(),
     completedAt: v.number(),
-  })
-    .index("by_user", ["userId"]),
+  }).index("by_user", ["userId"]),
 
   // AI Evaluation Logs (for cost tracking and debugging)
   aiEvaluationLogs: defineTable({
@@ -752,8 +850,7 @@ export default defineSchema({
     description: v.string(),
     updatedAt: v.number(),
     updatedBy: v.id("users"),
-  })
-    .index("by_key", ["key"]),
+  }).index("by_key", ["key"]),
 
   // ===== PHASE 3: CREATOR STUDIO & ENGAGEMENT =====
 
@@ -764,32 +861,40 @@ export default defineSchema({
     title: v.string(),
     description: v.string(),
     content: v.any(), // Draft content structure
-    sourceId: v.optional(v.union(
-      v.id("practiceProjects"),
-      v.id("practiceItems"),
-      v.id("practiceScenarios")
-    )), // For remixes
+    sourceId: v.optional(
+      v.union(
+        v.id("practiceProjects"),
+        v.id("practiceItems"),
+        v.id("practiceScenarios")
+      )
+    ), // For remixes
     status: v.string(), // "draft" | "pending" | "calibrating" | "published" | "rejected" | "archived"
-    validationErrors: v.optional(v.array(v.object({
-      field: v.string(),
-      message: v.string(),
-      severity: v.string(), // "error" | "warning"
-    }))),
+    validationErrors: v.optional(
+      v.array(
+        v.object({
+          field: v.string(),
+          message: v.string(),
+          severity: v.string(), // "error" | "warning"
+        })
+      )
+    ),
     metadata: v.object({
       skills: v.array(v.string()),
       difficulty: v.optional(v.string()),
       estimatedTime: v.optional(v.number()),
       tags: v.array(v.string()),
     }),
-    generationConfig: v.optional(v.object({
-      difficulty: v.string(),
-      topics: v.array(v.string()),
-      questionCount: v.number(),
-      style: v.optional(v.string()),
-      targetAudience: v.optional(v.string()),
-      aiModel: v.string(),
-      generatedAt: v.number(),
-    })),
+    generationConfig: v.optional(
+      v.object({
+        difficulty: v.string(),
+        topics: v.array(v.string()),
+        questionCount: v.number(),
+        style: v.optional(v.string()),
+        targetAudience: v.optional(v.string()),
+        aiModel: v.string(),
+        generatedAt: v.number(),
+      })
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
     submittedAt: v.optional(v.number()),
@@ -864,13 +969,17 @@ export default defineSchema({
     itemIds: v.array(v.id("practiceItems")),
     status: v.string(), // "lobby" | "open" | "active" | "completed" | "expired"
     scores: v.object({}), // Map of userId -> score (stored as strings)
-    rankings: v.optional(v.array(v.object({
-      userId: v.id("users"),
-      score: v.number(),
-      rank: v.number(),
-      correct: v.number(),
-      avgTimeMs: v.number(),
-    }))),
+    rankings: v.optional(
+      v.array(
+        v.object({
+          userId: v.id("users"),
+          score: v.number(),
+          rank: v.number(),
+          correct: v.number(),
+          avgTimeMs: v.number(),
+        })
+      )
+    ),
     startedAt: v.number(),
     completedAt: v.optional(v.number()),
     expiresAt: v.number(),
@@ -887,10 +996,12 @@ export default defineSchema({
     winnerId: v.optional(v.id("users")),
     challengerReady: v.optional(v.boolean()),
     opponentReady: v.optional(v.boolean()),
-    wager: v.optional(v.object({
-      type: v.string(),
-      amount: v.number(),
-    })),
+    wager: v.optional(
+      v.object({
+        type: v.string(),
+        amount: v.number(),
+      })
+    ),
   })
     .index("by_host", ["hostId"])
     .index("by_status", ["status"])
@@ -928,12 +1039,14 @@ export default defineSchema({
     title: v.string(),
     description: v.string(),
     type: v.string(), // "daily" | "weekly" | "seasonal"
-    requirements: v.array(v.object({
-      type: v.string(), // "complete_items" | "win_duels" | "earn_score" | "practice_skill"
-      target: v.any(),
-      progress: v.number(),
-      goal: v.number(),
-    })),
+    requirements: v.array(
+      v.object({
+        type: v.string(), // "complete_items" | "win_duels" | "earn_score" | "practice_skill"
+        target: v.any(),
+        progress: v.number(),
+        goal: v.number(),
+      })
+    ),
     rewards: v.object({
       xp: v.number(),
       badges: v.array(v.string()),
@@ -953,12 +1066,14 @@ export default defineSchema({
   practiceUserQuests: defineTable({
     userId: v.id("users"),
     questId: v.id("practiceQuests"),
-    progress: v.array(v.object({
-      requirementIndex: v.number(),
-      current: v.number(),
-      goal: v.number(),
-      completed: v.boolean(),
-    })),
+    progress: v.array(
+      v.object({
+        requirementIndex: v.number(),
+        current: v.number(),
+        goal: v.number(),
+        completed: v.boolean(),
+      })
+    ),
     status: v.string(), // "in_progress" | "completed" | "claimed"
     startedAt: v.number(),
     completedAt: v.optional(v.number()),
@@ -980,10 +1095,12 @@ export default defineSchema({
     rewards: v.object({
       badges: v.array(v.string()),
       exclusiveContent: v.array(v.string()),
-      leaderboardPrizes: v.array(v.object({
-        rank: v.number(),
-        reward: v.string(),
-      })),
+      leaderboardPrizes: v.array(
+        v.object({
+          rank: v.number(),
+          reward: v.string(),
+        })
+      ),
     }),
     questIds: v.array(v.id("practiceQuests")),
     status: v.string(), // "upcoming" | "active" | "completed"
@@ -1013,11 +1130,13 @@ export default defineSchema({
     referredUserId: v.optional(v.id("users")),
     referralCode: v.string(),
     status: v.string(), // "pending" | "completed" | "rewarded"
-    rewards: v.optional(v.object({
-      referrerXp: v.number(),
-      referredXp: v.number(),
-      unlocks: v.array(v.string()),
-    })),
+    rewards: v.optional(
+      v.object({
+        referrerXp: v.number(),
+        referredXp: v.number(),
+        unlocks: v.array(v.string()),
+      })
+    ),
     createdAt: v.number(),
     completedAt: v.optional(v.number()),
   })

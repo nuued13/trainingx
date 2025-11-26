@@ -137,7 +137,7 @@ export function LevelCompleteModal({
           exit={{ scale: 0.5, opacity: 0, y: 100 }}
           transition={{ type: "spring", damping: 20, stiffness: 200 }}
         >
-          <div className="bg-gradient-to-br from-white via-blue-50 to-purple-50 rounded-3xl shadow-2xl border-4 border-yellow-400 p-8 md:p-12">
+          <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-emerald-900 rounded-3xl shadow-2xl border-4 border-emerald-400 p-8 md:p-12">
             {/* Trophy Icon */}
             <motion.div
               className="flex justify-center mb-6"
@@ -147,17 +147,17 @@ export function LevelCompleteModal({
             >
               <div className="relative">
                 <motion.div
-                  className="absolute inset-0 bg-yellow-400 rounded-full blur-2xl opacity-50"
+                  className="absolute inset-0 bg-emerald-400 rounded-full blur-2xl opacity-50"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <Trophy className="w-24 h-24 text-yellow-400 relative z-10" />
+                <Trophy className="w-24 h-24 text-emerald-200 relative z-10" />
               </div>
             </motion.div>
 
             {/* Title */}
             <motion.h2
-              className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4"
+              className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-emerald-200 via-cyan-200 to-blue-200 bg-clip-text text-transparent mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -166,7 +166,7 @@ export function LevelCompleteModal({
             </motion.h2>
 
             <motion.p
-              className="text-center text-gray-700 text-lg mb-8 font-semibold"
+              className="text-center text-emerald-100 text-lg mb-8 font-semibold"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -202,7 +202,7 @@ export function LevelCompleteModal({
                     {/* Glow effect for filled stars */}
                     {starNum <= stars && (
                       <motion.div
-                        className="absolute inset-0 bg-yellow-400 rounded-full blur-lg opacity-60"
+                        className="absolute inset-0 bg-emerald-300 rounded-full blur-lg opacity-60"
                         animate={{ scale: [1, 1.3, 1] }}
                         transition={{
                           duration: 1.5,
@@ -214,8 +214,8 @@ export function LevelCompleteModal({
                     <Star
                       className={`w-12 h-12 md:w-16 md:h-16 relative z-10 transition-all ${
                         starNum <= stars
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "fill-transparent text-gray-600"
+                          ? "fill-emerald-300 text-emerald-300"
+                          : "fill-transparent text-emerald-700"
                       }`}
                     />
                   </div>
@@ -225,7 +225,7 @@ export function LevelCompleteModal({
 
             {/* Stats */}
             <motion.div
-              className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 mb-8 border-2 border-gray-200 shadow-lg"
+              className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20 shadow-lg"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.2 }}
@@ -233,32 +233,32 @@ export function LevelCompleteModal({
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <div className="bg-amber-100 p-2 rounded-xl">
-                      <Award className="w-5 h-5 text-amber-600" />
+                    <div className="bg-white/10 p-2 rounded-xl border border-white/20">
+                      <Award className="w-5 h-5 text-yellow-300" />
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">{score}</div>
-                  <div className="text-sm text-gray-600 font-semibold">Total Score</div>
+                  <div className="text-3xl font-bold text-white mb-1">{score}</div>
+                  <div className="text-sm text-emerald-100 font-semibold">Total Score</div>
                 </div>
                 <div>
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <div className="bg-green-100 p-2 rounded-xl">
-                      <Zap className="w-5 h-5 text-green-600" />
+                    <div className="bg-white/10 p-2 rounded-xl border border-white/20">
+                      <Zap className="w-5 h-5 text-green-300" />
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">
+                  <div className="text-3xl font-bold text-white mb-1">
                     {correctAnswers}/{totalCards}
                   </div>
-                  <div className="text-sm text-gray-600 font-semibold">Correct</div>
+                  <div className="text-sm text-emerald-100 font-semibold">Correct</div>
                 </div>
                 <div>
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <div className="bg-yellow-100 p-2 rounded-xl">
-                      <Star className="w-5 h-5 text-yellow-600 fill-yellow-600" />
+                    <div className="bg-white/10 p-2 rounded-xl border border-white/20">
+                      <Star className="w-5 h-5 text-emerald-200 fill-emerald-200" />
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">{percentage.toFixed(0)}%</div>
-                  <div className="text-sm text-gray-600 font-semibold">Accuracy</div>
+                  <div className="text-3xl font-bold text-white mb-1">{percentage.toFixed(0)}%</div>
+                  <div className="text-sm text-emerald-100 font-semibold">Accuracy</div>
                 </div>
               </div>
             </motion.div>
@@ -273,7 +273,7 @@ export function LevelCompleteModal({
               <Button
                 onClick={onPlayAgain}
                 size="lg"
-                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-lg py-6 shadow-lg hover:shadow-xl transition-all rounded-2xl"
+                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-700 hover:from-green-600 hover:to-emerald-800 text-white font-bold text-lg py-6 shadow-lg hover:shadow-xl transition-all rounded-2xl"
               >
                 <RotateCcw className="w-5 h-5 mr-2" />
                 Play Again
@@ -282,7 +282,7 @@ export function LevelCompleteModal({
                 onClick={onGoBack}
                 size="lg"
                 variant="outline"
-                className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300 hover:border-gray-400 font-bold text-lg py-6 rounded-2xl shadow-md"
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-lg py-6 rounded-2xl shadow-md"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Go Back

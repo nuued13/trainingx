@@ -27,8 +27,8 @@ export function TrackSelection({ userId, domainId, onBack, onSelectTrack }: Trac
 
   if (!tracks) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#DDF3FE] via-[#E8F5FE] to-[#F0F9FF] flex items-center justify-center">
-        <div className="text-gray-700 text-xl font-semibold">Loading tracks...</div>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 flex items-center justify-center">
+        <div className="text-emerald-100 text-xl font-semibold">Loading tracks...</div>
       </div>
     );
   }
@@ -47,7 +47,7 @@ export function TrackSelection({ userId, domainId, onBack, onSelectTrack }: Trac
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#DDF3FE] via-[#E8F5FE] to-[#F0F9FF] p-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 p-8">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
@@ -57,17 +57,17 @@ export function TrackSelection({ userId, domainId, onBack, onSelectTrack }: Trac
           <Button
             variant="ghost"
             onClick={onBack}
-            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 mb-6 rounded-xl"
+            className="text-emerald-200 hover:text-white hover:bg-white/10 mb-6 rounded-xl"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Domains
           </Button>
 
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-4xl font-bold text-white mb-2">
               Choose Your Track
             </h1>
-            <p className="text-gray-700 font-medium">
+            <p className="text-emerald-100 font-medium">
               Select a learning path to begin your journey
             </p>
           </div>
@@ -87,7 +87,7 @@ export function TrackSelection({ userId, domainId, onBack, onSelectTrack }: Trac
                 transition={{ delay: index * 0.1 }}
               >
                 <Card
-                  className="bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-blue-400 hover:shadow-xl transition-all cursor-pointer group"
+                  className="bg-white/10 backdrop-blur-sm border border-white/20 hover:border-emerald-300 hover:shadow-2xl transition-all cursor-pointer group"
                   onClick={() => onSelectTrack(track._id, track.slug)}
                 >
                   <CardContent className="p-6">
@@ -99,14 +99,14 @@ export function TrackSelection({ userId, domainId, onBack, onSelectTrack }: Trac
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                            <h3 className="text-2xl font-bold text-white mb-1">
                               {track.title}
                             </h3>
-                            <p className="text-gray-700 font-medium">
+                            <p className="text-emerald-100 font-medium">
                               {track.description}
                             </p>
                           </div>
-                          <ArrowRight className="w-6 h-6 text-blue-600 group-hover:translate-x-2 transition-transform flex-shrink-0" />
+                          <ArrowRight className="w-6 h-6 text-emerald-200 group-hover:translate-x-2 transition-transform flex-shrink-0" />
                         </div>
 
                         {/* Meta Info */}
@@ -117,13 +117,13 @@ export function TrackSelection({ userId, domainId, onBack, onSelectTrack }: Trac
                           >
                             {track.difficulty}
                           </Badge>
-                          <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs">
+                          <Badge variant="secondary" className="bg-white/10 text-emerald-100 border border-white/20 text-xs">
                             {track.levelCount} levels
                           </Badge>
-                          <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs">
+                          <Badge variant="secondary" className="bg-white/10 text-emerald-100 border border-white/20 text-xs">
                             {track.totalChallenges} challenges
                           </Badge>
-                          <Badge variant="secondary" className="bg-slate-700/50 text-slate-300 text-xs flex items-center gap-1">
+                          <Badge variant="secondary" className="bg-white/10 text-emerald-100 border border-white/20 text-xs flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             ~{track.estimatedHours}h
                           </Badge>
@@ -133,12 +133,12 @@ export function TrackSelection({ userId, domainId, onBack, onSelectTrack }: Trac
                         {hasProgress && (
                           <div className="mt-4">
                             <div className="flex items-center justify-between text-sm mb-2">
-                              <span className="text-slate-400">Your Progress</span>
-                              <span className="text-emerald-300 font-semibold">
+                              <span className="text-emerald-100">Your Progress</span>
+                              <span className="text-emerald-200 font-semibold">
                                 {track.progress.percentComplete}%
                               </span>
                             </div>
-                            <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/20">
                               <motion.div
                                 className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
                                 initial={{ width: 0 }}
@@ -146,7 +146,7 @@ export function TrackSelection({ userId, domainId, onBack, onSelectTrack }: Trac
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
                               />
                             </div>
-                            <p className="text-xs text-slate-500 mt-1">
+                            <p className="text-xs text-emerald-100/80 mt-1">
                               {track.progress.totalChallengesCompleted} of {track.totalChallenges} challenges completed
                             </p>
                           </div>

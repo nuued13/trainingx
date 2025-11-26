@@ -17,11 +17,14 @@ const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 const useNextjsLocation = () => {
   const pathname = usePathname();
   const router = useRouter();
-  
-  const setLocation = useCallback((to: string) => {
-    router.push(to);
-  }, [router]);
-  
+
+  const setLocation = useCallback(
+    (to: string) => {
+      router.push(to);
+    },
+    [router]
+  );
+
   return [pathname, setLocation] as [string, (path: string) => void];
 };
 
@@ -43,14 +46,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <Router hook={useNextjsLocation}>
           <AuthContextProvider>
             <UserStatsProvider>
-              <WizardContextProvider>
-                {children}
-              </WizardContextProvider>
+              <WizardContextProvider>{children}</WizardContextProvider>
             </UserStatsProvider>
           </AuthContextProvider>
         </Router>
       </ConvexAuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }

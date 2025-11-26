@@ -49,12 +49,12 @@ export function PracticeCard({
         whileHover={!isAnswered ? { scale: 1.05, y: -5 } : {}}
         whileTap={!isAnswered ? { scale: 0.95 } : {}}
       >
-        <div className="w-full h-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl p-1 shadow-lg hover:shadow-2xl transition-shadow">
-          <div className="w-full h-full border-4 border-white rounded-xl bg-white flex items-center justify-center p-4">
+        <div className="w-full h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-lg p-1 shadow-2xl transition-shadow">
+          <div className="w-full h-full border-4 border-white/30 rounded-md bg-blue-700/50 flex items-center justify-center p-4">
             <div className="text-center">
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-3 gap-1.5 opacity-60">
                 {[...Array(9)].map((_, i) => (
-                  <div key={i} className="w-3 h-3 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-30" />
+                  <div key={i} className="w-3 h-3 bg-white/50 rounded-full" />
                 ))}
               </div>
             </div>

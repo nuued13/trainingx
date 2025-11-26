@@ -11,48 +11,48 @@ export function StatsCards({ stats }: StatsCardsProps) {
 
   return (
     <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <Card>
+      <Card className="bg-white/10 border border-white/20 text-white">
         <CardContent className="px-3 flex items-center justify-between">
           <div>
-            <div className="text-sm text-gray-600 mb-1">Prompt Score</div>
-            <div className="ml-1 text-2xl font-bold bg-gradient-to-r from-gradient-from to-gradient-to bg-clip-text text-transparent">
+            <div className="text-sm text-emerald-100 mb-1">Prompt Score</div>
+            <div className="ml-1 text-2xl font-bold text-white">
               {stats.promptScore}
             </div>
           </div>
-          <Target className="h-8 w-8 text-gradient-from" />
+          <Target className="h-8 w-8 text-emerald-200" />
         </CardContent>
       </Card>
-      <Card>
+      <Card className="bg-white/10 border border-white/20 text-white">
         <CardContent className="px-3 flex items-center justify-between">
           <div>
-            <div className="text-sm text-gray-600 mb-1">
+            <div className="text-sm text-emerald-100 mb-1">
               Challenges Complete
             </div>
-            <div className="ml-1 text-2xl font-bold">
+            <div className="ml-1 text-2xl font-bold text-white">
               {(stats.completedProjects || []).length}
             </div>
           </div>
-          <CheckCircle className="h-8 w-8 text-green-500" />
+          <CheckCircle className="h-8 w-8 text-emerald-200" />
         </CardContent>
       </Card>
-      <Card>
+      <Card className="bg-white/10 border border-white/20 text-white">
         <CardContent className="px-3 flex items-center justify-between">
           <div>
-            <div className="text-sm text-gray-600 mb-1">Badges Earned</div>
-            <div className="ml-1 text-2xl font-bold">{unlockedBadgeCount}</div>
+            <div className="text-sm text-emerald-100 mb-1">Badges Earned</div>
+            <div className="ml-1 text-2xl font-bold text-white">{unlockedBadgeCount}</div>
           </div>
-          <Trophy className="h-8 w-8 text-amber-500" />
+          <Trophy className="h-8 w-8 text-yellow-300" />
         </CardContent>
       </Card>
-      <Card>
+      <Card className="bg-white/10 border border-white/20 text-white">
         <CardContent className="px-3 flex items-center justify-between">
           <div>
-            <div className="text-sm text-gray-600 mb-1">Weekly Minutes</div>
-            <div className="ml-1 text-2xl font-bold">
+            <div className="text-sm text-emerald-100 mb-1">Weekly Minutes</div>
+            <div className="ml-1 text-2xl font-bold text-white">
               {stats.weeklyPracticeMinutes || 0}
             </div>
           </div>
-          <Clock className="h-8 w-8 text-blue-500" />
+          <Clock className="h-8 w-8 text-emerald-200" />
         </CardContent>
       </Card>
     </section>

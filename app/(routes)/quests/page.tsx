@@ -1,238 +1,209 @@
 "use client";
 
+import { SidebarLayout as Layout } from "@/components/layout/SidebarLayout";
+import { Target, Zap, Calendar, CheckCircle2, Lock } from "lucide-react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "convex/_generated/api";
-import { useAuth } from "@/contexts/AuthContextProvider";
-import { SidebarLayout } from "@/components/layout/SidebarLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Trophy, Clock, Target, CheckCircle } from "lucide-react";
 
-export default function QuestsPage() {
-  const { user } = useAuth();
-  const activeQuests = useQuery(api.quests.getActiveQuests, {});
-  const userQuests = useQuery(
-    api.quests.getUserQuests,
-    user?._id ? { userId: user._id as any } : "skip"
-  );
-  const startQuest = useMutation(api.quests.startQuest);
-  const claimRewards = useMutation(api.quests.claimQuestRewards);
-  const [loading, setLoading] = useState<string | null>(null);
+interface Quest {
+  id: number;
+  title: string;
+  description: string;
+  progress: number;
+  total: number;
+  reward: number;
+  type: "daily" | "weekly";
+  claimed: boolean;
+}
 
-  const handleStartQuest = async (questId: any) => {
-    if (!user?._id) return;
-    setLoading(questId);
-    try {
-      await startQuest({ userId: user._id as any, questId });
-    } catch (error) {
-      console.error("Failed to start quest:", error);
-    } finally {
-      setLoading(null);
-    }
+export default function Quests() {
+  const [quests, setQuests] = useState<Quest[]>([
+    {
+      id: 1,
+      title: "Daily Learner",
+      description: "Complete 1 lesson today",
+      progress: 1,
+      total: 1,
+      reward: 50,
+      type: "daily",
+      claimed: false,
+    },
+    {
+      id: 2,
+      title: "Perfect Streak",
+      description: "Get 5 answers correct in a row",
+      progress: 3,
+      total: 5,
+      reward: 20,
+      type: "daily",
+      claimed: false,
+    },
+    {
+      id: 3,
+      title: "Weekly Warrior",
+      description: "Earn 500 XP this week",
+      progress: 350,
+      total: 500,
+      reward: 100,
+      type: "weekly",
+      claimed: false,
+    },
+    {
+      id: 4,
+      title: "Prompt Engineer",
+      description: "Complete the 'Basics' Unit",
+      progress: 2,
+      total: 5,
+      reward: 200,
+      type: "weekly",
+      claimed: false,
+    },
+  ]);
+
+  const handleClaim = (id: number) => {
+    setQuests(quests.map((q) => (q.id === id ? { ...q, claimed: true } : q)));
   };
 
-  const handleClaimRewards = async (userQuestId: any) => {
-    if (!user?._id) return;
-    setLoading(userQuestId);
-    try {
-      await claimRewards({ userId: user._id as any, userQuestId });
-    } catch (error) {
-      console.error("Failed to claim rewards:", error);
-    } finally {
-      setLoading(null);
-    }
-  };
-
-  const inProgressQuests = userQuests?.filter(uq => uq.status === "in_progress") || [];
-  const completedQuests = userQuests?.filter(uq => uq.status === "completed") || [];
-  const startedQuestIds = new Set(userQuests?.map(uq => uq.questId) || []);
+  const DailyQuests = quests.filter((q) => q.type === "daily");
+  const WeeklyQuests = quests.filter((q) => q.type === "weekly");
 
   return (
-    <SidebarLayout>
-      <div className="bg-gray-50 min-h-full">
-        <div className="container mx-auto px-4 py-6 space-y-8">
-          <header className="space-y-2">
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-amber-500" />
-              Quests
-            </h1>
-            <p className="text-gray-600">
-              Complete challenges to earn XP, badges, and unlock exclusive content
-            </p>
-          </header>
+    <Layout>
+      <div className="mb-8 text-center pt-8">
+        <h1 className="text-3xl font-heading font-bold text-primary flex items-center justify-center gap-2 mb-2">
+          <Target className="w-8 h-8 fill-current" /> Quests
+        </h1>
+        <p className="text-muted-foreground">
+          Complete challenges to earn extra rewards!
+        </p>
+      </div>
 
-          {/* In Progress Quests */}
-          {inProgressQuests.length > 0 && (
-            <section className="space-y-4">
-              <h2 className="text-2xl font-bold">In Progress</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                {inProgressQuests.map((userQuest) => {
-                  const quest = userQuest.quest;
-                  if (!quest) return null;
+      <div className="space-y-8 pb-20 px-4 max-w-4xl mx-auto">
+        {/* Daily Section */}
+        <section>
+          <h2 className="text-xl font-heading font-bold mb-4 flex items-center gap-2 text-amber-500">
+            <Zap className="w-6 h-6 fill-current" /> Daily Quests
+          </h2>
+          <div className="grid gap-4">
+            {DailyQuests.map((quest) => (
+              <QuestCard
+                key={quest.id}
+                quest={quest}
+                onClaim={() => handleClaim(quest.id)}
+              />
+            ))}
+          </div>
+        </section>
 
-                  const totalProgress = userQuest.progress.reduce((sum, p) => sum + p.current, 0);
-                  const totalGoal = userQuest.progress.reduce((sum, p) => sum + p.goal, 0);
-                  const percentage = totalGoal > 0 ? (totalProgress / totalGoal) * 100 : 0;
+        {/* Weekly Section */}
+        <section>
+          <h2 className="text-xl font-heading font-bold mb-4 flex items-center gap-2 text-purple-500">
+            <Calendar className="w-6 h-6 fill-current" /> Weekly Challenges
+          </h2>
+          <div className="grid gap-4">
+            {WeeklyQuests.map((quest) => (
+              <QuestCard
+                key={quest.id}
+                quest={quest}
+                onClaim={() => handleClaim(quest.id)}
+              />
+            ))}
+          </div>
+        </section>
+      </div>
+    </Layout>
+  );
+}
 
-                  return (
-                    <Card key={userQuest._id}>
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{quest.title}</CardTitle>
-                          <Badge variant="secondary">
-                            {quest.type}
-                          </Badge>
-                        </div>
-                        <CardDescription>{quest.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium">Progress</span>
-                            <span className="text-sm text-gray-600">
-                              {Math.round(percentage)}%
-                            </span>
-                          </div>
-                          <Progress value={percentage} />
-                        </div>
+function QuestCard({ quest, onClaim }: { quest: Quest; onClaim: () => void }) {
+  const isCompleted = quest.progress >= quest.total;
+  const percent = (quest.progress / quest.total) * 100;
 
-                        <div className="space-y-2">
-                          {userQuest.progress.map((prog, idx) => (
-                            <div key={idx} className="flex items-center justify-between text-sm">
-                              <span className="text-gray-700">
-                                {quest.requirements[idx]?.type.replace(/_/g, ' ')}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">
-                                  {prog.current}/{prog.goal}
-                                </span>
-                                {prog.completed && (
-                                  <CheckCircle className="h-4 w-4 text-green-500" />
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn(
+        "bg-card border-2 border-border rounded-3xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 transition-all",
+        quest.claimed
+          ? "opacity-60 grayscale-[0.5]"
+          : "hover:scale-[1.02] shadow-sm"
+      )}
+    >
+      {/* Icon Placeholder */}
+      <div
+        className={cn(
+          "w-16 h-16 rounded-2xl flex items-center justify-center shrink-0",
+          quest.type === "daily"
+            ? "bg-amber-100 text-amber-600"
+            : "bg-purple-100 text-purple-600"
+        )}
+      >
+        {quest.type === "daily" ? (
+          <Zap className="w-8 h-8 fill-current" />
+        ) : (
+          <Target className="w-8 h-8" />
+        )}
+      </div>
 
-                        <div className="pt-2 border-t">
-                          <div className="text-sm text-gray-600">
-                            Rewards: {quest.rewards.xp} XP
-                            {quest.rewards.badges.length > 0 && 
-                              ` + ${quest.rewards.badges.length} badge(s)`
-                            }
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+      <div className="flex-1 space-y-2">
+        <div className="flex justify-between items-start">
+          <h3 className="font-bold text-lg">{quest.title}</h3>
+          <span className="text-sm font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100 flex items-center gap-1">
+            💎 {quest.reward}
+          </span>
+        </div>
 
-          {/* Completed Quests */}
-          {completedQuests.length > 0 && (
-            <section className="space-y-4">
-              <h2 className="text-2xl font-bold">Completed</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                {completedQuests.map((userQuest) => {
-                  const quest = userQuest.quest;
-                  if (!quest) return null;
+        <p className="text-muted-foreground text-sm font-medium">
+          {quest.description}
+        </p>
 
-                  return (
-                    <Card key={userQuest._id} className="border-green-200 bg-green-50">
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{quest.title}</CardTitle>
-                          <Badge className="bg-green-600">Complete</Badge>
-                        </div>
-                        <CardDescription>{quest.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Button 
-                          onClick={() => handleClaimRewards(userQuest._id)}
-                          disabled={loading === userQuest._id || userQuest.status === "claimed"}
-                          className="w-full"
-                        >
-                          {userQuest.status === "claimed" ? "Claimed" : "Claim Rewards"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* Available Quests */}
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold">Available Quests</h2>
-            {!activeQuests || activeQuests.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Target className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-600">No active quests available</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2">
-                {activeQuests.map((quest) => {
-                  const isStarted = startedQuestIds.has(quest._id);
-                  const daysLeft = Math.ceil((quest.endDate - Date.now()) / (1000 * 60 * 60 * 24));
-
-                  return (
-                    <Card key={quest._id} className={isStarted ? "opacity-50" : ""}>
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{quest.title}</CardTitle>
-                          <Badge variant="outline">
-                            {quest.type}
-                          </Badge>
-                        </div>
-                        <CardDescription>{quest.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <div className="text-sm font-semibold">Requirements:</div>
-                          {quest.requirements.map((req, idx) => (
-                            <div key={idx} className="text-sm text-gray-700">
-                              • {req.type.replace(/_/g, ' ')}: {req.goal}
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="pt-2 border-t space-y-2">
-                          <div className="text-sm">
-                            <span className="font-semibold">Rewards:</span> {quest.rewards.xp} XP
-                            {quest.rewards.badges.length > 0 && 
-                              `, ${quest.rewards.badges.join(', ')}`
-                            }
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Clock className="h-4 w-4" />
-                            <span>{daysLeft} days left</span>
-                          </div>
-                        </div>
-
-                        <Button 
-                          onClick={() => handleStartQuest(quest._id)}
-                          disabled={isStarted || loading === quest._id}
-                          className="w-full"
-                        >
-                          {isStarted ? "Already Started" : "Start Quest"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </section>
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider">
+            <span>Progress</span>
+            <span>
+              {quest.progress} / {quest.total}
+            </span>
+          </div>
+          <div className="h-4 bg-muted rounded-full overflow-hidden border border-border/50">
+            <motion.div
+              className={cn(
+                "h-full rounded-full",
+                quest.type === "daily" ? "bg-amber-400" : "bg-purple-400"
+              )}
+              initial={{ width: 0 }}
+              animate={{ width: `${percent}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            />
+          </div>
         </div>
       </div>
-    </SidebarLayout>
+
+      <div className="sm:ml-2 pt-2 sm:pt-0">
+        {quest.claimed ? (
+          <button
+            disabled
+            className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold bg-muted text-muted-foreground border-2 border-transparent flex items-center justify-center gap-2"
+          >
+            <CheckCircle2 className="w-5 h-5" /> Claimed
+          </button>
+        ) : isCompleted ? (
+          <button
+            onClick={onClaim}
+            className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold bg-green-500 text-white border-b-4 border-green-700 active:border-b-0 active:translate-y-1 transition-all animate-pulse flex items-center justify-center gap-2 shadow-lg shadow-green-200"
+          >
+            Claim
+          </button>
+        ) : (
+          <button
+            disabled
+            className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold bg-muted text-muted-foreground border-2 border-border/50 flex items-center justify-center gap-2 opacity-50"
+          >
+            <Lock className="w-4 h-4" /> Locked
+          </button>
+        )}
+      </div>
+    </motion.div>
   );
 }

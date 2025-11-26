@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Providers } from "@/components/layout/providers";
 import { Toaster } from "react-hot-toast";
@@ -14,7 +14,21 @@ const bricolageGrotesque = Bricolage_Grotesque({
   display: "swap",
 });
 
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
 export const dynamic = "force-dynamic";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#000000",
+};
 
 export const metadata: Metadata = {
   title: "TrainingX.Ai - Universal Prompting for the 21st Century",
@@ -41,7 +55,10 @@ export default function RootLayout({
   const landingOnlyEnabled = landingOnlyMode.enabled;
 
   return (
-    <html lang="en" className={bricolageGrotesque.variable}>
+    <html
+      lang="en"
+      className={`${bricolageGrotesque.variable} ${spaceGrotesk.variable}`}
+    >
       <head>
         {IS_DEV && <meta name="robots" content="noindex, nofollow" />}
       </head>
