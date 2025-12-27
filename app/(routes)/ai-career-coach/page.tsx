@@ -20,6 +20,10 @@ import {
   TrendingUp,
   Target,
   Lightbulb,
+  Lock,
+  CheckCircle2,
+  MapPin,
+  Clock,
 } from "lucide-react";
 
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
@@ -91,13 +95,203 @@ type Opportunity = {
   nextSteps: string[];
 };
 
+type RoadmapStep = {
+  id: string;
+  title: string;
+  type: "track" | "project" | "external" | "milestone";
+  description?: string;
+  link?: string;
+  estimatedHours: number;
+  skillsGained?: string[];
+  isRequired: boolean;
+};
+
+type RoadmapPhase = {
+  id: string;
+  title: string;
+  duration: string;
+  description?: string;
+  status: "locked" | "current" | "completed";
+  steps: RoadmapStep[];
+  milestones: string[];
+};
+
+type Roadmap = {
+  goalTitle: string;
+  estimatedTime: string;
+  hoursPerWeek: number;
+  phases: RoadmapPhase[];
+  nextAction: {
+    title: string;
+    link?: string;
+    cta: string;
+  };
+};
+
 type Message = {
   role: "user" | "assistant";
   content: string;
   opportunities?: Opportunity[];
   extractedSkills?: string[];
+  roadmap?: Roadmap;
   timestamp: number;
 };
+
+// Duolingo-style Roadmap View Component
+function RoadmapView({ roadmap }: { roadmap: Roadmap }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-gradient-to-br from-violet-50 to-indigo-50 rounded-2xl border-2 border-violet-200 overflow-hidden"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-violet-500 to-purple-600 p-4 text-white">
+        <div className="flex items-center gap-2 mb-1">
+          <MapPin className="h-4 w-4" />
+          <span className="text-xs font-semibold uppercase tracking-wide opacity-90">
+            Your Path To
+          </span>
+        </div>
+        <h3 className="text-xl font-bold">{roadmap.goalTitle}</h3>
+        <div className="flex items-center gap-4 mt-2 text-sm opacity-90">
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {roadmap.estimatedTime}
+          </span>
+          <span>{roadmap.hoursPerWeek} hrs/week</span>
+        </div>
+      </div>
+
+      {/* Phases */}
+      <div className="p-4 space-y-4">
+        {roadmap.phases.map((phase, phaseIndex) => (
+          <div
+            key={phase.id}
+            className={`rounded-xl border-2 transition-all ${
+              phase.status === "locked"
+                ? "bg-slate-100 border-slate-200 opacity-60"
+                : phase.status === "current"
+                  ? "bg-white border-violet-300 shadow-md"
+                  : "bg-green-50 border-green-200"
+            }`}
+          >
+            {/* Phase Header */}
+            <div className="p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {phase.status === "locked" ? (
+                  <div className="w-6 h-6 rounded-full bg-slate-300 flex items-center justify-center">
+                    <Lock className="h-3 w-3 text-slate-500" />
+                  </div>
+                ) : phase.status === "completed" ? (
+                  <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                    <CheckCircle2 className="h-4 w-4 text-white" />
+                  </div>
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-violet-500 flex items-center justify-center text-white text-xs font-bold">
+                    {phaseIndex + 1}
+                  </div>
+                )}
+                <div>
+                  <h4 className="font-bold text-slate-800">{phase.title}</h4>
+                  <p className="text-xs text-slate-500">{phase.duration}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Steps (only show for non-locked phases) */}
+            {phase.status !== "locked" && (
+              <div className="px-3 pb-3">
+                <div className="flex items-center gap-2 overflow-x-auto py-2">
+                  {phase.steps.map((step, stepIndex) => (
+                    <div
+                      key={step.id}
+                      className="flex items-center gap-1 flex-shrink-0"
+                    >
+                      {/* Step Node */}
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                          step.type === "milestone"
+                            ? "bg-yellow-100 border-yellow-400"
+                            : "bg-violet-100 border-violet-300"
+                        }`}
+                        title={step.title}
+                      >
+                        {step.type === "track" && (
+                          <Target className="h-4 w-4 text-violet-600" />
+                        )}
+                        {step.type === "project" && (
+                          <Lightbulb className="h-4 w-4 text-violet-600" />
+                        )}
+                        {step.type === "milestone" && (
+                          <CheckCircle2 className="h-4 w-4 text-yellow-600" />
+                        )}
+                        {step.type === "external" && (
+                          <ChevronRight className="h-4 w-4 text-violet-600" />
+                        )}
+                      </div>
+                      {/* Connector */}
+                      {stepIndex < phase.steps.length - 1 && (
+                        <div className="w-4 h-0.5 bg-violet-300" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Step Labels */}
+                <div className="mt-2 space-y-1">
+                  {phase.steps.slice(0, 3).map((step) => (
+                    <div
+                      key={step.id}
+                      className="text-xs text-slate-600 flex items-center gap-2"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-violet-400" />
+                      {step.title}
+                      {step.estimatedHours && (
+                        <span className="text-slate-400">
+                          ({step.estimatedHours}h)
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  {phase.steps.length > 3 && (
+                    <div className="text-xs text-violet-600 font-medium">
+                      +{phase.steps.length - 3} more steps
+                    </div>
+                  )}
+                </div>
+
+                {/* Milestones */}
+                {phase.milestones?.length > 0 && (
+                  <div className="mt-3 p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div className="text-xs font-semibold text-yellow-700 mb-1">
+                      🏆 Milestone
+                    </div>
+                    <div className="text-sm text-yellow-800">
+                      {phase.milestones[0]}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* CTA */}
+      {roadmap.nextAction && (
+        <div className="p-4 pt-0">
+          <Link href={roadmap.nextAction.link || "/practice"}>
+            <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white">
+              {roadmap.nextAction.cta}
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
+        </div>
+      )}
+    </motion.div>
+  );
+}
 
 function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
   const [expanded, setExpanded] = useState(false);
@@ -322,6 +516,9 @@ function MessageBubble({ message }: { message: Message }) {
             </div>
           </div>
         )}
+
+        {/* Roadmap */}
+        {message.roadmap && <RoadmapView roadmap={message.roadmap} />}
       </div>
     </motion.div>
   );
@@ -392,12 +589,12 @@ export default function AICareerCoachPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const chat = useAction(api.careerCoach.chat);
+  const chat = useAction(api.careerCoach.index.chat);
   const storedConversation = useQuery(
-    api.careerCoach.getConversation,
+    api.careerCoach.db.getConversation,
     userId ? {} : "skip"
   );
-  const clearConversation = useMutation(api.careerCoach.clearConversation);
+  const clearConversation = useMutation(api.careerCoach.db.clearConversation);
 
   // Load existing conversation
   useEffect(() => {
@@ -447,6 +644,7 @@ export default function AICareerCoachPage() {
         content: response.message || "I found some opportunities for you!",
         opportunities: response.opportunities,
         extractedSkills: response.extractedSkills,
+        roadmap: response.roadmap,
         timestamp: Date.now(),
       };
 
@@ -500,7 +698,7 @@ export default function AICareerCoachPage() {
                 Please sign in to access the AI Career Coach and get
                 personalized recommendations.
               </p>
-              <Link href="/login">
+              <Link href="/auth">
                 <Button className="w-full">Sign In</Button>
               </Link>
             </CardContent>

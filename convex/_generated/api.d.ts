@@ -16,7 +16,11 @@ import type * as analytics from "../analytics.js";
 import type * as assessmentGrading from "../assessmentGrading.js";
 import type * as assessments from "../assessments.js";
 import type * as auth from "../auth.js";
-import type * as careerCoach from "../careerCoach.js";
+import type * as careerCoach_db from "../careerCoach/db.js";
+import type * as careerCoach_index from "../careerCoach/index.js";
+import type * as careerCoach_opportunities from "../careerCoach/opportunities.js";
+import type * as careerCoach_roadmap from "../careerCoach/roadmap.js";
+import type * as careerCoach_schemas from "../careerCoach/schemas.js";
 import type * as certificates from "../certificates.js";
 import type * as creatorStudio from "../creatorStudio.js";
 import type * as customGPTs from "../customGPTs.js";
@@ -33,9 +37,9 @@ import type * as http from "../http.js";
 import type * as itemTemplates from "../itemTemplates.js";
 import type * as leaderboard from "../leaderboard.js";
 import type * as messages from "../messages.js";
+import type * as migrations from "../migrations.js";
 import type * as migrations_backfillDuelMembers from "../migrations/backfillDuelMembers.js";
 import type * as migrations_cleanOldDuels from "../migrations/cleanOldDuels.js";
-import type * as migrations from "../migrations.js";
 import type * as moderation from "../moderation.js";
 import type * as otp_ResendOTP from "../otp/ResendOTP.js";
 import type * as otp_TwilioOTP from "../otp/TwilioOTP.js";
@@ -81,14 +85,6 @@ import type {
   FunctionReference,
 } from "convex/server";
 
-/**
- * A utility for referencing Convex functions in your app's API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = api.myModule.myFunction;
- * ```
- */
 declare const fullApi: ApiFromModules<{
   adaptiveEngine: typeof adaptiveEngine;
   aiEvaluation: typeof aiEvaluation;
@@ -98,7 +94,11 @@ declare const fullApi: ApiFromModules<{
   assessmentGrading: typeof assessmentGrading;
   assessments: typeof assessments;
   auth: typeof auth;
-  careerCoach: typeof careerCoach;
+  "careerCoach/db": typeof careerCoach_db;
+  "careerCoach/index": typeof careerCoach_index;
+  "careerCoach/opportunities": typeof careerCoach_opportunities;
+  "careerCoach/roadmap": typeof careerCoach_roadmap;
+  "careerCoach/schemas": typeof careerCoach_schemas;
   certificates: typeof certificates;
   creatorStudio: typeof creatorStudio;
   customGPTs: typeof customGPTs;
@@ -115,9 +115,9 @@ declare const fullApi: ApiFromModules<{
   itemTemplates: typeof itemTemplates;
   leaderboard: typeof leaderboard;
   messages: typeof messages;
+  migrations: typeof migrations;
   "migrations/backfillDuelMembers": typeof migrations_backfillDuelMembers;
   "migrations/cleanOldDuels": typeof migrations_cleanOldDuels;
-  migrations: typeof migrations;
   moderation: typeof moderation;
   "otp/ResendOTP": typeof otp_ResendOTP;
   "otp/TwilioOTP": typeof otp_TwilioOTP;
@@ -157,14 +157,30 @@ declare const fullApi: ApiFromModules<{
   userStatsUtils: typeof userStatsUtils;
   users: typeof users;
 }>;
-declare const fullApiWithMounts: typeof fullApi;
 
+/**
+ * A utility for referencing Convex functions in your app's public API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
 export declare const api: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "public">
 >;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
 export declare const internal: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "internal">
 >;
 

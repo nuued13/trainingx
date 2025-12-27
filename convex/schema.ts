@@ -1317,6 +1317,7 @@ export default defineSchema({
           )
         ),
         extractedSkills: v.optional(v.array(v.string())),
+        roadmap: v.optional(v.any()), // Roadmap structure from AI SDK
         timestamp: v.number(),
       })
     ),

@@ -13,6 +13,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.88",
     "@convex-dev/auth": "^0.0.90",
     "@elevenlabs/react": "^0.8.1",
     "@hookform/resolvers": "^5.2.2",
@@ -51,6 +52,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-backend-wasm": "^4.22.0",
     "@types/three": "^0.180.0",
+    "ai": "^5.0.116",
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -65,8 +67,10 @@
     "next": "16.0.10",
     "next-themes": "^0.4.6",
     "nsfwjs": "^4.2.1",
+    "onborda": "^1.2.5",
     "openai": "^6.7.0",
     "oslo": "^1.2.1",
+    "posthog-js": "^1.309.1",
     "react": "19.2.0",
     "react-colorful": "^5.6.1",
     "react-confetti": "^6.4.0",

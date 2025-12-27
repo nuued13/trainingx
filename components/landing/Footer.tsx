@@ -10,9 +10,9 @@ export default function Footer() {
       { label: "Assessments", href: "#" },
     ],
     Company: [
-      { label: "About Us", href: "#track-record" },
-      { label: "Our Story", href: "#track-record" },
-      { label: "Team", href: "#track-record" },
+      { label: "About Us", href: "/about" },
+      { label: "Our Story", href: "/about" },
+      { label: "Team", href: "/about" },
       { label: "Careers", href: "#careers" },
     ],
     // Resources: [

@@ -24,7 +24,7 @@ export default function Navigation() {
         { label: "Features", href: "#how-it-works" },
         { label: "Practice Zone", href: "#practice-zone" },
         { label: "Careers", href: "#careers" },
-        { label: "About", href: "#track-record" },
+        { label: "About", href: "/about" },
       ];
 
   return (

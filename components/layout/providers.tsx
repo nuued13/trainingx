@@ -10,6 +10,7 @@ import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import { Router } from "wouter";
 import { usePathname, useRouter } from "next/navigation";
+import { PostHogProvider } from "@/lib/posthog";
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -43,13 +44,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ConvexAuthProvider client={convex}>
-        <Router hook={useNextjsLocation}>
-          <AuthContextProvider>
-            <UserStatsProvider>
-              <WizardContextProvider>{children}</WizardContextProvider>
-            </UserStatsProvider>
-          </AuthContextProvider>
-        </Router>
+        <PostHogProvider>
+          <Router hook={useNextjsLocation}>
+            <AuthContextProvider>
+              <UserStatsProvider>
+                <WizardContextProvider>{children}</WizardContextProvider>
+              </UserStatsProvider>
+            </AuthContextProvider>
+          </Router>
+        </PostHogProvider>
       </ConvexAuthProvider>
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
