@@ -34,7 +34,9 @@ export function MultiPlayerGameplay({ roomId }: MultiPlayerGameplayProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | number | null>(
+    null
+  );
   const [showFeedback, setShowFeedback] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [startTime, setStartTime] = useState<number>(Date.now());
@@ -122,8 +124,22 @@ export function MultiPlayerGameplay({ roomId }: MultiPlayerGameplayProps) {
 
   const currentItem = items[currentItemIndex];
 
-  // Debug: log item structure to see why question is missing
-  console.log("Current item:", currentItem);
+  // Skip to first unanswered item if needed
+  if (
+    currentItem &&
+    userAttempts.some((a) => a.itemId === currentItem._id) &&
+    !showFeedback
+  ) {
+    const firstUnansweredIndex = items.findIndex(
+      (item) => !userAttempts.some((a) => a.itemId === item._id)
+    );
+    if (
+      firstUnansweredIndex !== -1 &&
+      firstUnansweredIndex !== currentItemIndex
+    ) {
+      setCurrentItemIndex(firstUnansweredIndex);
+    }
+  }
 
   if (!currentItem) {
     return (
@@ -168,26 +184,48 @@ export function MultiPlayerGameplay({ roomId }: MultiPlayerGameplayProps) {
 
       if (isRateType) {
         // Rate logic
-        const answer = selectedAnswer as string; // "bad", "almost", "good"
+        const answer = selectedAnswer as string | null;
         const correctAnswer = currentItem.params?.correctAnswer;
-        correct = answer === correctAnswer;
 
-        // Match useGameState scoring
-        if (correct) {
-          score = 100; // Base score
-        } else if (answer === "almost" || correctAnswer === "almost") {
-          score = 25; // Partial credit logic could go here, keeping simple for now
-        } else {
+        // Handle timeout (no selection)
+        if (!answer) {
+          correct = false;
           score = 0;
+          response = { answer: "timeout", timedOut: true };
+        } else {
+          correct = answer === correctAnswer;
+          // Match useGameState scoring
+          if (correct) {
+            const seconds = (Date.now() - startTime) / 1000;
+            const timeBonus = seconds < 5 ? 5 : seconds < 10 ? 2 : 0;
+            const streakBonus = Math.floor(streak / 3) * 2;
+            score = 10 + timeBonus + streakBonus;
+          } else if (answer === "almost" || correctAnswer === "almost") {
+            score = 0;
+          } else {
+            score = -5;
+          }
+          response = { answer };
         }
-        response = { answer };
       } else {
         // Choose logic
-        const answerIndex = selectedAnswer as number;
-        const selectedOption = answerIndex >= 0 ? options[answerIndex] : null;
-        correct = selectedOption?.quality === "good";
-        score = correct ? 100 : 0;
-        response = { optionIndex: answerIndex };
+        const answerIndex = selectedAnswer as number | null;
+
+        // Handle timeout (no selection)
+        if (
+          answerIndex === null ||
+          answerIndex === undefined ||
+          answerIndex < 0
+        ) {
+          correct = false;
+          score = 0;
+          response = { optionIndex: -1, timedOut: true };
+        } else {
+          const selectedOption = options[answerIndex];
+          correct = selectedOption?.quality === "good";
+          score = correct ? 10 : -5;
+          response = { optionIndex: answerIndex };
+        }
       }
 
       await submitAttempt({
@@ -400,35 +438,53 @@ export function MultiPlayerGameplay({ roomId }: MultiPlayerGameplayProps) {
             {isRateType ? (
               // RATE TYPE (Bad/Almost/Good)
               <div className="flex gap-3">
-                {[
-                  { val: "bad", label: "Bad", emoji: "😔", color: "red" },
-                  {
-                    val: "almost",
-                    label: "Almost",
-                    emoji: "🤔",
-                    color: "yellow",
-                  },
-                  { val: "good", label: "Good", emoji: "🎯", color: "green" },
-                ].map((opt) => {
-                  const isSelected = selectedAnswer === opt.val;
-                  return (
-                    <motion.button
-                      key={opt.val}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleSelectAnswer(opt.val)}
-                      disabled={showFeedback || submitting}
-                      className={`flex-1 p-6 rounded-xl font-bold text-lg shadow-lg border-2 transition-all ${
-                        isSelected
-                          ? `bg-${opt.color}-500 border-${opt.color}-700 text-white`
-                          : `bg-white border-${opt.color}-200 text-${opt.color}-600 hover:bg-${opt.color}-50`
-                      } ${showFeedback ? "opacity-50 cursor-not-allowed" : ""}`}
-                    >
-                      <span className="text-2xl block mb-2">{opt.emoji}</span>
-                      {opt.label}
-                    </motion.button>
-                  );
-                })}
+                {/* Bad Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSelectAnswer("bad")}
+                  disabled={showFeedback || submitting}
+                  className={`flex-1 p-6 rounded-xl font-bold text-lg shadow-lg border-2 transition-all ${
+                    selectedAnswer === "bad"
+                      ? "bg-red-500 border-red-700 text-white"
+                      : "bg-white border-red-200 text-red-600 hover:bg-red-50"
+                  } ${showFeedback ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <span className="text-2xl block mb-2">😔</span>
+                  Bad
+                </motion.button>
+
+                {/* Almost Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSelectAnswer("almost")}
+                  disabled={showFeedback || submitting}
+                  className={`flex-1 p-6 rounded-xl font-bold text-lg shadow-lg border-2 transition-all ${
+                    selectedAnswer === "almost"
+                      ? "bg-yellow-400 border-yellow-600 text-yellow-900"
+                      : "bg-white border-yellow-200 text-yellow-600 hover:bg-yellow-50"
+                  } ${showFeedback ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <span className="text-2xl block mb-2">🤔</span>
+                  Almost
+                </motion.button>
+
+                {/* Good Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSelectAnswer("good")}
+                  disabled={showFeedback || submitting}
+                  className={`flex-1 p-6 rounded-xl font-bold text-lg shadow-lg border-2 transition-all ${
+                    selectedAnswer === "good"
+                      ? "bg-green-500 border-green-700 text-white"
+                      : "bg-white border-green-200 text-green-600 hover:bg-green-50"
+                  } ${showFeedback ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <span className="text-2xl block mb-2">🎯</span>
+                  Good
+                </motion.button>
               </div>
             ) : (
               // CHOOSE TYPE (Options list)

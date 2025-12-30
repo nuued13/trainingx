@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { mutation, query, action } from "./_generated/server";
 import { api } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import OpenAI from "openai";
+import { callAI } from "./lib/ai";
 
 export const generateAIMatches = action({
   args: {
@@ -14,10 +14,6 @@ export const generateAIMatches = action({
     }),
   },
   handler: async (ctx, { quizAnswers, userProfile }) => {
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
     const systemPrompt = `You are an expert AI career advisor. Based on the user's quiz responses and profile, generate 5 highly personalized AI career opportunities that perfectly match their preferences, skills, and goals.
 
 Each opportunity should be unique, specific, and actionable. Include a mix of types based on their preferences (full-time careers, freelance gigs, business ideas, or specialized trades).
@@ -70,31 +66,29 @@ User's Current Profile:
 - Skills: ${JSON.stringify(userProfile?.skills || {})}
 Generate 5 personalized AI career opportunities and 10-12 focused skill suggestions for this user.`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+    // Use centralized AI gateway - automatically logs cost, tokens, latency
+    const response = await callAI<{
+      opportunities: any[];
+      skillSuggestions?: any[];
+    }>(ctx, {
+      feature: "matching",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
       temperature: 0.8,
-      response_format: { type: "json_object" },
+      jsonMode: true,
     });
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error("No response from AI");
-    }
-
-    const parsed = JSON.parse(content);
+    const parsed = response.data;
     const opportunities = parsed.opportunities || parsed;
     const skillSuggestions =
       parsed.skillSuggestions ||
-      parsed.skills ||
-      parsed.skill_suggestions ||
+      (parsed as any).skills ||
+      (parsed as any).skill_suggestions ||
       [];
 
     // Save the results if user is authenticated
-    // We check identity existence here to avoid calling mutation unnecessarily
     const identity = await ctx.auth.getUserIdentity();
     if (identity) {
       await ctx.runMutation(api.aiMatching.saveAIMatches, {
@@ -112,9 +106,7 @@ Generate 5 personalized AI career opportunities and 10-12 focused skill suggesti
       opportunities: Array.isArray(opportunities)
         ? opportunities
         : [opportunities],
-      skillSuggestions: Array.isArray(skillSuggestions)
-        ? skillSuggestions
-        : [],
+      skillSuggestions: Array.isArray(skillSuggestions) ? skillSuggestions : [],
     };
   },
 });

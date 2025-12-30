@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import {
   LayoutDashboard,
   Users,
@@ -22,6 +24,7 @@ import {
   SidebarProvider,
   SidebarInset,
 } from "@/components/ui/sidebar";
+import { AccessDenied } from "./AccessDenied";
 
 const adminItems = [
   {
@@ -48,29 +51,42 @@ const adminItems = [
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isAdmin = useQuery(api.admin.checkAdminAccess);
+
+  // Loading state
+  if (isAdmin === undefined) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  // Not authorized
+  if (!isAdmin) {
+    return <AccessDenied />;
+  }
 
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <Sidebar className="border-r border-border/50">
-          <SidebarHeader>
+        <Sidebar className="border-r border-border/50 w-[200px]">
+          <SidebarHeader className="bg-white">
             <Link href="/admin">
               <div className="flex items-center gap-2 py-3 px-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-red-600">
+                {/* <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-gradient-from to-gradient-to">
                   <Shield className="h-4 w-4 text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold">Admin Panel</span>
-                  <span className="text-xs text-muted-foreground">
-                    TrainingX
-                  </span>
+                </div> */}
+                <div className="flex items-center gap-2">
+                  <img src="/logo.webp" className="h-14" alt="logo" />
+                  {/* <span className="text-lg font-bold">Admin Panel</span> */}
                 </div>
               </div>
             </Link>
           </SidebarHeader>
-          <SidebarContent>
+          <SidebarContent className="bg-white">
             <SidebarGroup>
-              <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+              <SidebarGroupLabel>Admin Dashboard</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {adminItems.map((item) => (

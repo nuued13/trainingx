@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { api } from "convex/_generated/api";
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { DuelLobby } from "@/components/duels/DuelLobby";
-import { MultiPlayerGameplay } from "@/components/duels/MultiPlayerGameplay";
+import { DuelCardDeck } from "@/components/duels/DuelCardDeck";
 import { Id } from "convex/_generated/dataModel";
 import { useAuth } from "@/contexts/AuthContextProvider";
 
@@ -27,15 +27,20 @@ export default function DuelGameplayPage() {
     if (isInvite && roomDetails?.room && user?._id && !hasJoined) {
       const room = roomDetails.room;
       // Only join if not already a participant and room is in lobby
-      if (room.status === "lobby" && !room.participants.includes(user._id as any)) {
+      if (
+        room.status === "lobby" &&
+        !room.participants.includes(user._id as any)
+      ) {
         joinRoom({
           userId: user._id as any,
           roomId,
-        }).then(() => {
-          setHasJoined(true);
-        }).catch(err => {
-          console.error("Failed to join room:", err);
-        });
+        })
+          .then(() => {
+            setHasJoined(true);
+          })
+          .catch((err) => {
+            console.error("Failed to join room:", err);
+          });
       }
     }
   }, [isInvite, roomDetails, user, hasJoined, joinRoom, roomId]);
@@ -43,10 +48,10 @@ export default function DuelGameplayPage() {
   if (!roomDetails) {
     return (
       <SidebarLayout>
-        <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-gray-900 to-gray-800">
-          <div className="text-white text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <p>Loading room...</p>
+        <div className="flex items-center justify-center min-h-screen bg-slate-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-slate-600 font-medium">Loading duel...</p>
           </div>
         </div>
       </SidebarLayout>
@@ -59,20 +64,20 @@ export default function DuelGameplayPage() {
   if (room.status === "lobby") {
     return (
       <SidebarLayout>
-        <DuelLobby 
-          roomId={roomId} 
+        <DuelLobby
+          roomId={roomId}
           onStart={() => {
             // Lobby will handle the transition to active
-          }} 
+          }}
         />
       </SidebarLayout>
     );
   }
 
-  // Show multi-player gameplay
+  // Show card-based gameplay (same UI as Practice Zone!)
   return (
     <SidebarLayout>
-      <MultiPlayerGameplay roomId={roomId} />
+      <DuelCardDeck roomId={roomId} />
     </SidebarLayout>
   );
 }

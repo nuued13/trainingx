@@ -171,10 +171,10 @@ export default function AboutPage() {
                 <Link href="/quiz">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-[#0074b9] to-[#46bc61] text-white hover:opacity-90 font-bold py-8 px-12 text-lg rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0"
+                    className="bg-gradient-to-r from-[#0074b9] to-[#46bc61] text-white hover:opacity-90 font-bold py-6 w-[250px] text-lg rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0"
                   >
                     Start Your Pathway
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <ArrowRight className="ml-0 h-5 w-5" />
                   </Button>
                 </Link>
               </motion.div>
@@ -525,7 +525,7 @@ export default function AboutPage() {
                 <Link href="/quiz">
                   <Button
                     size="lg"
-                    className="bg-white text-slate-950 hover:bg-blue-50 font-bold py-8 px-12 text-xl rounded-full shadow-[0_0_50px_-15px_rgba(255,255,255,0.5)] border-2 border-transparent hover:border-blue-300 transition-all duration-300"
+                    className="bg-white text-slate-950 hover:bg-blue-50 font-bold py-6 w-[270px] text-xl rounded-full shadow-[0_0_50px_-15px_rgba(255,255,255,0.5)] border-2 border-transparent hover:border-blue-300 transition-all duration-300"
                   >
                     Find Your Direction
                     <ArrowRight className="ml-2 h-6 w-6" />

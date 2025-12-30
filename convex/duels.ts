@@ -29,15 +29,19 @@ export const createRoom = mutation({
 
       const levelIds = levels.map((l) => l._id);
 
-      // Get items from these levels
+      // Get items from these levels - ONLY rate type (Bad/Almost/Good format)
       const trackItems = await ctx.db
         .query("practiceItems")
         .withIndex("by_status", (q) => q.eq("status", "live"))
         .collect();
 
-      // Filter to items that belong to this track's levels
+      // Filter to items that belong to this track's levels AND are rate type AND have a prompt
       const filteredItems = trackItems.filter(
-        (item) => item.levelId && levelIds.includes(item.levelId)
+        (item) =>
+          item.levelId &&
+          levelIds.includes(item.levelId) &&
+          item.type === "rate" && // Only rate type items (Bad/Almost/Good)
+          item.params?.prompt // Must have a prompt to display
       );
 
       // Shuffle and select
@@ -46,7 +50,7 @@ export const createRoom = mutation({
 
       if (selectedItems.length < itemCount) {
         throw new Error(
-          `Not enough practice items for this topic. Found ${selectedItems.length}, need ${itemCount}.`
+          `Not enough rate-type practice items for this topic. Found ${selectedItems.length}, need ${itemCount}.`
         );
       }
     } else {
@@ -61,27 +65,41 @@ export const createRoom = mutation({
           ? userSkills.reduce((sum, s) => sum + s.rating, 0) / userSkills.length
           : 1500;
 
+      // Get only rate type items (Bad/Almost/Good format)
       const allItems = await ctx.db
         .query("practiceItems")
         .withIndex("by_status", (q) => q.eq("status", "live"))
         .collect();
 
-      const suitableItems = allItems
+      // Filter to only rate type items that have a prompt
+      const rateItems = allItems.filter(
+        (item) => item.type === "rate" && item.params?.prompt
+      );
+
+      const suitableItems = rateItems
         .map((item) => ({
           item,
           eloDiff: Math.abs(item.elo - avgElo),
         }))
-        .filter(({ eloDiff }) => eloDiff < 100)
+        .filter(({ eloDiff }) => eloDiff < 300) // Increased range for rate items
         .sort((a, b) => a.eloDiff - b.eloDiff)
-        .slice(0, Math.min(itemCount * 2, 20));
+        .slice(0, Math.min(itemCount * 3, 30));
 
       const shuffled = suitableItems.sort(() => Math.random() - 0.5);
       selectedItems = shuffled.slice(0, itemCount).map(({ item }) => item._id);
 
       if (selectedItems.length < itemCount) {
-        throw new Error(
-          `Not enough practice items available. Need at least ${itemCount} items.`
-        );
+        // If not enough within ELO range, just get any rate items
+        const fallbackItems = rateItems.sort(() => Math.random() - 0.5);
+        selectedItems = fallbackItems
+          .slice(0, itemCount)
+          .map((item) => item._id);
+
+        if (selectedItems.length < itemCount) {
+          throw new Error(
+            `Not enough rate-type practice items available. Found ${rateItems.length}, need ${itemCount}.`
+          );
+        }
       }
     }
 

@@ -8,6 +8,7 @@ import TimelineSection from "@/components/landing/TimelineSection";
 import SkillsOpportunityHub from "@/components/landing/SkillsOpportunityHub";
 import TrainersOrganizationsRevamp from "@/components/landing/TrainersOrganizationsRevamp";
 import ComparisonSection from "@/components/landing/ComparisonSection";
+import AffiliateProgram from "@/components/landing/AffiliateProgram";
 import FinalCTA from "@/components/landing/FinalCTA";
 import Footer from "@/components/landing/Footer";
 import { TweetSlider } from "../ui/image-auto-slider";
@@ -30,6 +31,8 @@ export default function HomePage() {
         <TrainersOrganizationsRevamp />
         <ComparisonSection />
         {/* </div> */}
+
+        <AffiliateProgram />
 
         <FinalCTA />
       </main>

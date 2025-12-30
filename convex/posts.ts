@@ -18,10 +18,7 @@ export const getPosts = query({
         .order("desc")
         .take(limit);
     } else {
-      posts = await ctx.db
-        .query("posts")
-        .order("desc")
-        .take(limit);
+      posts = await ctx.db.query("posts").order("desc").take(limit);
     }
 
     // Enrich posts with author information
@@ -30,10 +27,13 @@ export const getPosts = query({
         const author = await ctx.db.get(post.authorId);
         return {
           ...post,
-          author: author && "name" in author ? {
-            name: author.name || "Anonymous",
-            image: "image" in author ? author.image : undefined,
-          } : null,
+          author:
+            author && "name" in author
+              ? {
+                  name: author.name || "Anonymous",
+                  image: "image" in author ? author.image : undefined,
+                }
+              : null,
         };
       })
     );
@@ -101,10 +101,15 @@ export const votePost = mutation({
     // Check if user already voted
     const existingVote = await ctx.db
       .query("postVotes")
-      .withIndex("by_user_post", (q) => 
+      .withIndex("by_user_post", (q) =>
         q.eq("userId", userId).eq("postId", postId)
       )
       .first();
+
+    // Track how votes change for author stats
+    let upvoteDelta = 0;
+    let downvoteDelta = 0;
+    let scoreDelta = 0;
 
     if (existingVote) {
       // If same vote type, remove vote (toggle off)
@@ -114,6 +119,14 @@ export const votePost = mutation({
           upvotes: voteType === "up" ? post.upvotes - 1 : post.upvotes,
           downvotes: voteType === "down" ? post.downvotes - 1 : post.downvotes,
         });
+        // Removing the vote - reverse the effect
+        if (voteType === "up") {
+          upvoteDelta = -1;
+          scoreDelta = -1;
+        } else {
+          downvoteDelta = -1;
+          scoreDelta = 1; // Removing a downvote is positive
+        }
       } else {
         // Change vote type
         await ctx.db.patch(existingVote._id, {
@@ -122,8 +135,19 @@ export const votePost = mutation({
         });
         await ctx.db.patch(postId, {
           upvotes: voteType === "up" ? post.upvotes + 1 : post.upvotes - 1,
-          downvotes: voteType === "down" ? post.downvotes + 1 : post.downvotes - 1,
+          downvotes:
+            voteType === "down" ? post.downvotes + 1 : post.downvotes - 1,
         });
+        // Changing vote: +1 for new type, -1 for old type
+        if (voteType === "up") {
+          upvoteDelta = 1;
+          downvoteDelta = -1;
+          scoreDelta = 2; // From -1 to +1
+        } else {
+          upvoteDelta = -1;
+          downvoteDelta = 1;
+          scoreDelta = -2; // From +1 to -1
+        }
       }
     } else {
       // New vote
@@ -137,31 +161,43 @@ export const votePost = mutation({
         upvotes: voteType === "up" ? post.upvotes + 1 : post.upvotes,
         downvotes: voteType === "down" ? post.downvotes + 1 : post.downvotes,
       });
+      // New vote
+      if (voteType === "up") {
+        upvoteDelta = 1;
+        scoreDelta = 1;
+      } else {
+        downvoteDelta = 1;
+        scoreDelta = -1;
+      }
     }
 
-    // Update post author's community score
-    const authorStats = await ctx.db
-      .query("userStats")
-      .withIndex("by_user", (q) => q.eq("userId", post.authorId))
-      .first();
+    // Update post author's community score (only if there's a change)
+    if (scoreDelta !== 0 || upvoteDelta !== 0 || downvoteDelta !== 0) {
+      const authorStats = await ctx.db
+        .query("userStats")
+        .withIndex("by_user", (q) => q.eq("userId", post.authorId))
+        .first();
 
-    if (authorStats) {
-      const scoreChange = voteType === "up" ? 1 : -1;
-      const communityActivity = {
-        ...authorStats.communityActivity,
-        upvotesReceived: voteType === "up"
-          ? authorStats.communityActivity.upvotesReceived + 1
-          : authorStats.communityActivity.upvotesReceived,
-        downvotesReceived: voteType === "down"
-          ? authorStats.communityActivity.downvotesReceived + 1
-          : authorStats.communityActivity.downvotesReceived,
-        communityScore: authorStats.communityActivity.communityScore + scoreChange,
-      };
+      if (authorStats) {
+        const communityActivity = {
+          ...authorStats.communityActivity,
+          upvotesReceived: Math.max(
+            0,
+            authorStats.communityActivity.upvotesReceived + upvoteDelta
+          ),
+          downvotesReceived: Math.max(
+            0,
+            authorStats.communityActivity.downvotesReceived + downvoteDelta
+          ),
+          communityScore:
+            authorStats.communityActivity.communityScore + scoreDelta,
+        };
 
-      await ctx.db.patch(authorStats._id, {
-        communityActivity,
-        ...nextLeaderboardFields(authorStats, { communityActivity }),
-      });
+        await ctx.db.patch(authorStats._id, {
+          communityActivity,
+          ...nextLeaderboardFields(authorStats, { communityActivity }),
+        });
+      }
     }
 
     return postId;
@@ -177,12 +213,36 @@ export const getUserVote = query({
   handler: async (ctx, { postId, userId }) => {
     const vote = await ctx.db
       .query("postVotes")
-      .withIndex("by_user_post", (q) => 
+      .withIndex("by_user_post", (q) =>
         q.eq("userId", userId).eq("postId", postId)
       )
       .first();
 
     return vote?.voteType || null;
+  },
+});
+
+// Get user's votes for multiple posts (batch query)
+export const getUserVotes = query({
+  args: {
+    postIds: v.array(v.id("posts")),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, { postIds, userId }) => {
+    const votes = await Promise.all(
+      postIds.map(async (postId) => {
+        const vote = await ctx.db
+          .query("postVotes")
+          .withIndex("by_user_post", (q) =>
+            q.eq("userId", userId).eq("postId", postId)
+          )
+          .first();
+        return { postId, voteType: vote?.voteType || null };
+      })
+    );
+
+    // Return as a map for easy lookup
+    return Object.fromEntries(votes.map((v) => [v.postId, v.voteType]));
   },
 });
 
@@ -204,10 +264,12 @@ export const getComments = query({
         const author = await ctx.db.get(comment.authorId);
         return {
           ...comment,
-          author: author ? {
-            name: author.name || "Anonymous",
-            image: author.image,
-          } : null,
+          author: author
+            ? {
+                name: author.name || "Anonymous",
+                image: author.image,
+              }
+            : null,
         };
       })
     );
@@ -260,5 +322,65 @@ export const incrementViewCount = mutation({
     });
 
     return postId;
+  },
+});
+
+// Delete a post (only by owner)
+export const deletePost = mutation({
+  args: {
+    postId: v.id("posts"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, { postId, userId }) => {
+    const post = await ctx.db.get(postId);
+    if (!post) throw new Error("Post not found");
+
+    // Verify ownership
+    if (post.authorId !== userId) {
+      throw new Error("You can only delete your own posts");
+    }
+
+    // Delete all comments on this post
+    const comments = await ctx.db
+      .query("comments")
+      .withIndex("by_post", (q) => q.eq("postId", postId))
+      .collect();
+
+    for (const comment of comments) {
+      await ctx.db.delete(comment._id);
+    }
+
+    // Delete all votes on this post
+    const votes = await ctx.db
+      .query("postVotes")
+      .withIndex("by_post", (q) => q.eq("postId", postId))
+      .collect();
+
+    for (const vote of votes) {
+      await ctx.db.delete(vote._id);
+    }
+
+    // Update user stats - decrement posts created
+    const userStats = await ctx.db
+      .query("userStats")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+
+    if (userStats) {
+      const communityActivity = {
+        ...userStats.communityActivity,
+        postsCreated: Math.max(0, userStats.communityActivity.postsCreated - 1),
+        communityScore: userStats.communityActivity.communityScore - 5, // Remove the +5 points from creating
+      };
+
+      await ctx.db.patch(userStats._id, {
+        communityActivity,
+      });
+    }
+
+    // Delete the post
+    await ctx.db.delete(postId);
+
+    return { success: true };
   },
 });

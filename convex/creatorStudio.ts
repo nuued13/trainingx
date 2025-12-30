@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { mutation, query, action, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
+import { callAI } from "./lib/ai";
 
 // Validation rules for content
 type ValidationError = {
@@ -72,7 +73,10 @@ function validateDraft(content: any, type: string): ValidationError[] {
       }
     }
 
-    if (content.itemType === "prompt-draft" || content.itemType === "prompt-surgery") {
+    if (
+      content.itemType === "prompt-draft" ||
+      content.itemType === "prompt-surgery"
+    ) {
       if (!content.rubric || !content.rubric.weights) {
         errors.push({
           field: "rubric",
@@ -106,11 +110,13 @@ export const createDraft = mutation({
     title: v.string(),
     description: v.string(),
     content: v.any(),
-    sourceId: v.optional(v.union(
-      v.id("practiceProjects"),
-      v.id("practiceItems"),
-      v.id("practiceScenarios")
-    )),
+    sourceId: v.optional(
+      v.union(
+        v.id("practiceProjects"),
+        v.id("practiceItems"),
+        v.id("practiceScenarios")
+      )
+    ),
     metadata: v.object({
       skills: v.array(v.string()),
       difficulty: v.optional(v.string()),
@@ -138,7 +144,8 @@ export const createDraft = mutation({
       content: args.content,
       sourceId: args.sourceId,
       status: "draft",
-      validationErrors: validationErrors.length > 0 ? validationErrors : undefined,
+      validationErrors:
+        validationErrors.length > 0 ? validationErrors : undefined,
       metadata: args.metadata,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -155,12 +162,14 @@ export const updateDraft = mutation({
     title: v.optional(v.string()),
     description: v.optional(v.string()),
     content: v.optional(v.any()),
-    metadata: v.optional(v.object({
-      skills: v.array(v.string()),
-      difficulty: v.optional(v.string()),
-      estimatedTime: v.optional(v.number()),
-      tags: v.array(v.string()),
-    })),
+    metadata: v.optional(
+      v.object({
+        skills: v.array(v.string()),
+        difficulty: v.optional(v.string()),
+        estimatedTime: v.optional(v.number()),
+        tags: v.array(v.string()),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -185,7 +194,8 @@ export const updateDraft = mutation({
       ...(args.description && { description: args.description }),
       ...(args.content && { content: args.content }),
       ...(args.metadata && { metadata: args.metadata }),
-      validationErrors: validationErrors.length > 0 ? validationErrors : undefined,
+      validationErrors:
+        validationErrors.length > 0 ? validationErrors : undefined,
       updatedAt: Date.now(),
     });
 
@@ -213,7 +223,9 @@ export const submitDraft = mutation({
 
     // Run validation
     const validationErrors = validateDraft(draft.content, draft.type);
-    const blockingErrors = validationErrors.filter(e => e.severity === "error");
+    const blockingErrors = validationErrors.filter(
+      (e) => e.severity === "error"
+    );
 
     if (blockingErrors.length > 0) {
       await ctx.db.patch(args.draftId, {
@@ -430,12 +442,6 @@ export const generateQuestionsWithAI = action({
     }),
   },
   handler: async (ctx, args): Promise<{ questions: GeneratedQuestion[] }> => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("OpenAI API key not configured");
-    }
-
-    const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
     const config = args.config as GenerationConfig;
 
     // Validate inputs
@@ -449,59 +455,49 @@ export const generateQuestionsWithAI = action({
 
     const systemPrompt = buildGenerationPrompt(config);
 
-    try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`,
+    // Use centralized AI gateway - automatically logs cost, tokens, latency
+    const response = await callAI<{ questions: any[] }>(ctx, {
+      feature: "creator_studio",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: `Generate ${config.questionCount} practice questions for AI prompting education.`,
         },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { 
-              role: "user", 
-              content: `Generate ${config.questionCount} practice questions for AI prompting education.` 
-            },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.8, // Higher for creativity
-        }),
-      });
+      ],
+      temperature: 0.8,
+      jsonMode: true,
+    });
 
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`OpenAI API error: ${response.statusText} - ${error}`);
-      }
+    // Validate and normalize the generated questions
+    const questions = normalizeGeneratedQuestions(
+      response.data.questions,
+      config
+    );
 
-      const data = await response.json();
-      const result = JSON.parse(data.choices[0].message.content);
-
-      // Validate and normalize the generated questions
-      const questions = normalizeGeneratedQuestions(result.questions, config);
-
-      return { questions };
-    } catch (error) {
-      console.error("AI generation error:", error);
-      throw new Error(`Failed to generate questions: ${error instanceof Error ? error.message : String(error)}`);
-    }
+    return { questions };
   },
 });
 
 // Build the generation prompt based on config
 function buildGenerationPrompt(config: GenerationConfig): string {
   const difficultyGuide = {
-    beginner: "Simple, foundational concepts. Clear scenarios with obvious solutions.",
-    intermediate: "Moderate complexity. Requires understanding of multiple concepts.",
-    advanced: "Complex, nuanced scenarios. Requires deep understanding and strategic thinking.",
+    beginner:
+      "Simple, foundational concepts. Clear scenarios with obvious solutions.",
+    intermediate:
+      "Moderate complexity. Requires understanding of multiple concepts.",
+    advanced:
+      "Complex, nuanced scenarios. Requires deep understanding and strategic thinking.",
     mixed: "Vary difficulty across questions, from beginner to advanced.",
   };
 
   const styleGuide = {
-    technical: "Focus on technical implementation, coding scenarios, and system design.",
-    creative: "Emphasize creative applications, content generation, and artistic use cases.",
-    business: "Business contexts, productivity, decision-making, and professional scenarios.",
+    technical:
+      "Focus on technical implementation, coding scenarios, and system design.",
+    creative:
+      "Emphasize creative applications, content generation, and artistic use cases.",
+    business:
+      "Business contexts, productivity, decision-making, and professional scenarios.",
     general: "Mix of various contexts and applications.",
   };
 
@@ -548,7 +544,9 @@ Each question should be evaluable on these dimensions:
         "iteration": "<What iteration looks like>",
         "tool": "<What good tool usage looks like>"
       },
-      "hints": ["<hint1>", "<hint2>", "<hint3>"]${config.itemType === "multiple-choice" ? `,
+      "hints": ["<hint1>", "<hint2>", "<hint3>"]${
+        config.itemType === "multiple-choice"
+          ? `,
       "options": [
         {
           "quality": "good",
@@ -565,7 +563,9 @@ Each question should be evaluable on these dimensions:
           "text": "<Incorrect option>",
           "explanation": "<Why this is wrong>"
         }
-      ]` : ""}
+      ]`
+          : ""
+      }
     }
   ]
 }
@@ -597,8 +597,12 @@ function normalizeGeneratedQuestions(
       throw new Error(`Question ${index + 1}: Missing or invalid text`);
     }
 
-    if (!q.difficulty || !["beginner", "intermediate", "advanced"].includes(q.difficulty)) {
-      q.difficulty = config.difficulty === "mixed" ? "intermediate" : config.difficulty;
+    if (
+      !q.difficulty ||
+      !["beginner", "intermediate", "advanced"].includes(q.difficulty)
+    ) {
+      q.difficulty =
+        config.difficulty === "mixed" ? "intermediate" : config.difficulty;
     }
 
     if (!Array.isArray(q.topics) || q.topics.length === 0) {
@@ -606,7 +610,8 @@ function normalizeGeneratedQuestions(
     }
 
     if (!q.expectedApproach) {
-      q.expectedApproach = "Provide a clear, well-structured response addressing the scenario.";
+      q.expectedApproach =
+        "Provide a clear, well-structured response addressing the scenario.";
     }
 
     if (!q.evaluationCriteria) {
@@ -625,7 +630,9 @@ function normalizeGeneratedQuestions(
     // Validate options for multiple-choice
     if (config.itemType === "multiple-choice") {
       if (!Array.isArray(q.options) || q.options.length < 2) {
-        throw new Error(`Question ${index + 1}: Multiple-choice requires at least 2 options`);
+        throw new Error(
+          `Question ${index + 1}: Multiple-choice requires at least 2 options`
+        );
       }
 
       q.options = q.options.map((opt: any) => ({
@@ -712,12 +719,6 @@ export const regenerateQuestion = action({
     previousQuestion: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<{ question: GeneratedQuestion }> => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("OpenAI API key not configured");
-    }
-
-    const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
     const config = { ...args.config, questionCount: 1 } as GenerationConfig;
 
     const systemPrompt = buildGenerationPrompt(config);
@@ -725,36 +726,22 @@ export const regenerateQuestion = action({
       ? `Generate 1 new practice question. Make it different from this previous question:\n\n${args.previousQuestion}`
       : `Generate 1 practice question for AI prompting education.`;
 
-    try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.9, // Higher for more variation
-        }),
-      });
+    // Use centralized AI gateway - automatically logs cost, tokens, latency
+    const response = await callAI<{ questions: any[] }>(ctx, {
+      feature: "creator_studio",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 0.9,
+      jsonMode: true,
+    });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.statusText}`);
-      }
+    const questions = normalizeGeneratedQuestions(
+      response.data.questions,
+      config
+    );
 
-      const data = await response.json();
-      const result = JSON.parse(data.choices[0].message.content);
-
-      const questions = normalizeGeneratedQuestions(result.questions, config);
-
-      return { question: questions[0] };
-    } catch (error) {
-      throw new Error(`Failed to regenerate question: ${error instanceof Error ? error.message : String(error)}`);
-    }
+    return { question: questions[0] };
   },
 });

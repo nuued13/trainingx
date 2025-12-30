@@ -82,8 +82,12 @@ export default function AdminDashboard() {
           <h2 className="mb-4 text-lg font-semibold">Signups (Last 30 Days)</h2>
           {signupTrend === undefined ? (
             <div className="h-48 animate-pulse rounded bg-muted" />
-          ) : signupTrend.length === 0 ? (
-            <p className="text-muted-foreground">No signup data available</p>
+          ) : !signupTrend || signupTrend.length === 0 ? (
+            <div className="flex h-48 items-center justify-center">
+              <p className="text-muted-foreground">
+                No signups in the last 30 days
+              </p>
+            </div>
           ) : (
             <div className="flex h-48 items-end gap-1">
               {signupTrend.map((day, i) => {
@@ -96,8 +100,8 @@ export default function AdminDashboard() {
                     title={`${day.date}: ${day.count} signups`}
                   >
                     <div
-                      className="w-full rounded-t bg-gradient-to-t from-blue-600 to-blue-400 transition-all hover:from-blue-500 hover:to-blue-300"
-                      style={{ height: `${Math.max(height, 4)}%` }}
+                      className="w-full rounded-t bg-gradient-to-t from-gradient-from to-gradient-to transition-all hover:opacity-80"
+                      style={{ height: `${Math.max(height, 8)}%` }}
                     />
                     <div className="absolute -top-8 left-1/2 hidden -translate-x-1/2 rounded bg-foreground px-2 py-1 text-xs text-background group-hover:block">
                       {day.count}
@@ -115,7 +119,7 @@ export default function AdminDashboard() {
             href="/admin/users"
             className="rounded-xl border bg-card p-6 transition-colors hover:bg-muted/50"
           >
-            <Users className="mb-2 h-8 w-8 text-blue-500" />
+            <Users className="mb-2 h-8 w-8 text-[#0074B9]" />
             <h3 className="font-semibold">Manage Users</h3>
             <p className="text-sm text-muted-foreground">
               Search, view details, and analyze user activity
@@ -125,7 +129,7 @@ export default function AdminDashboard() {
             href="/admin/content"
             className="rounded-xl border bg-card p-6 transition-colors hover:bg-muted/50"
           >
-            <TrendingUp className="mb-2 h-8 w-8 text-green-500" />
+            <TrendingUp className="mb-2 h-8 w-8 text-[#46BC61]" />
             <h3 className="font-semibold">Content Health</h3>
             <p className="text-sm text-muted-foreground">
               Monitor item performance and find problems
@@ -135,7 +139,7 @@ export default function AdminDashboard() {
             href="/admin/ai-costs"
             className="rounded-xl border bg-card p-6 transition-colors hover:bg-muted/50"
           >
-            <DollarSign className="mb-2 h-8 w-8 text-orange-500" />
+            <DollarSign className="mb-2 h-8 w-8 text-[#0074B9]" />
             <h3 className="font-semibold">AI Costs</h3>
             <p className="text-sm text-muted-foreground">
               Track spending and optimize AI usage

@@ -1,20 +1,13 @@
 /**
  * Assessment Prompt Grading
- * Uses the unified AI service to grade prompt writing questions
+ * Uses the centralized AI gateway (convex/lib/ai.ts) for:
+ * - Automatic cost tracking
+ * - Unified logging to aiLogs table
  */
 
 import { v } from "convex/values";
 import { action } from "./_generated/server";
-import {
-  getAIConfig,
-  chat,
-  chatWithRetry,
-  parseJSON,
-  calculateCost,
-  type AIConfig,
-  type AIMessage,
-  type AIProvider,
-} from "./aiService";
+import { callAI } from "./lib/ai";
 
 export interface PromptGradingResult {
   score: number; // 0-100
@@ -54,12 +47,8 @@ export const gradePrompt = action({
         ),
       })
     ),
-    provider: v.optional(v.string()), // "openai" | "gemini" | "anthropic"
   },
   handler: async (ctx, args): Promise<PromptGradingResult> => {
-    // Get AI config, allowing override via args
-    const config = getAIConfig(args.provider as AIProvider | undefined);
-
     const systemPrompt = buildGradingPrompt(
       args.question,
       args.promptGoal,
@@ -67,32 +56,19 @@ export const gradePrompt = action({
       args.rubric
     );
 
-    const messages: AIMessage[] = [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: `User's prompt:\n\n${args.userPrompt}` },
-    ];
+    // Use centralized AI gateway - automatically logs cost, tokens, latency
+    const response = await callAI<PromptGradingResult>(ctx, {
+      feature: "assessment",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `User's prompt:\n\n${args.userPrompt}` },
+      ],
+      temperature: 0.3,
+      maxTokens: 1024,
+      jsonMode: true,
+    });
 
-    try {
-      const response = await chatWithRetry(config, messages, {
-        temperature: 0.3,
-        maxTokens: 1024,
-        jsonMode: config.provider === "openai",
-      });
-
-      const result = parseJSON<any>(response.content);
-
-      return normalizeGradingResult(result, args.rubric);
-    } catch (error) {
-      console.error("AI grading failed:", error);
-      // Return a fallback score
-      return {
-        score: 70,
-        rubricScores: {},
-        feedback: "Unable to grade automatically. Default score applied.",
-        strengths: [],
-        improvements: ["Please review manually"],
-      };
-    }
+    return normalizeGradingResult(response.data, args.rubric);
   },
 });
 
@@ -102,24 +78,17 @@ export const gradePrompt = action({
 export const runPrompt = action({
   args: {
     prompt: v.string(),
-    provider: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<string> => {
-    const config = getAIConfig(args.provider as AIProvider | undefined);
+    // Use centralized AI gateway - automatically logs cost, tokens, latency
+    const response = await callAI<string>(ctx, {
+      feature: "assessment",
+      messages: [{ role: "user", content: args.prompt }],
+      temperature: 0.7,
+      maxTokens: 500,
+    });
 
-    const messages: AIMessage[] = [{ role: "user", content: args.prompt }];
-
-    try {
-      const response = await chat(config, messages, {
-        temperature: 0.7,
-        maxTokens: 500,
-      });
-
-      return response.content;
-    } catch (error) {
-      console.error("Prompt run failed:", error);
-      throw new Error("Failed to run prompt. Please try again.");
-    }
+    return response.raw;
   },
 });
 

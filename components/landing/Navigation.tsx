@@ -19,6 +19,7 @@ export default function Navigation() {
         { label: "Matching", href: "/matching" },
         // { label: "Portfolio", href: "/portfolio" },
         { label: "Assessment", href: "/assessment" },
+        { label: "About", href: "/about" },
       ]
     : [
         { label: "Features", href: "#how-it-works" },

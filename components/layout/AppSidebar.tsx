@@ -72,11 +72,11 @@ const engagementItems = [
     url: "/duels",
     icon: Swords,
   },
-  {
-    title: "Quests",
-    url: "/quests",
-    icon: Target,
-  },
+  // {
+  //   title: "Quests",
+  //   url: "/quests",
+  //   icon: Target,
+  // },
   // {
   //   title: "Creator Studio",
   //   url: "/creator",

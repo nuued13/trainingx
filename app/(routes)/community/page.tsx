@@ -14,6 +14,7 @@ import {
   Send,
   Share2,
   Sparkles,
+  Trash2,
   TrendingUp,
   Users,
   Zap,
@@ -33,6 +34,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -149,6 +160,23 @@ function formatTimestamp(timestamp: number): string {
   if (minutes < 60) return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
   if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
   return `${days} day${days !== 1 ? "s" : ""} ago`;
+}
+
+// Compute author level based on their total upvotes (proxy for reputation)
+function getAuthorLevel(upvotes: number): string {
+  if (upvotes >= 100) return "Community Champion";
+  if (upvotes >= 50) return "Top Contributor";
+  if (upvotes >= 25) return "Active Helper";
+  if (upvotes >= 10) return "Rising Voice";
+  if (upvotes >= 5) return "Contributor";
+  return "Member";
+}
+
+// Get author badge based on upvotes
+function getAuthorBadge(upvotes: number): string {
+  if (upvotes >= 100) return "⭐ Champion";
+  if (upvotes >= 50) return "🌟 Top";
+  return "";
 }
 
 function CommentSection({
@@ -272,17 +300,37 @@ function PostCard({
   post,
   userVote,
   onVote,
+  onDelete,
   currentUserId,
 }: {
   post: CommunityPost;
   userVote: "up" | "down" | null;
   onVote: (postId: string, voteType: "up" | "down") => void;
+  onDelete: (postId: string) => void;
   currentUserId?: string;
 }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const { toast } = useToast();
   const netScore = post.upvotes - post.downvotes;
   const isCurrentUser = post.authorId === currentUserId;
+
+  const handleShare = async () => {
+    const postUrl = `${window.location.origin}/community?post=${post._id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: post.title,
+          url: postUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(postUrl);
+        toast({ title: "Link copied to clipboard!" });
+      }
+    } catch {
+      // User cancelled or share failed, ignore
+    }
+  };
 
   return (
     <div className="group relative overflow-hidden rounded-3xl border-2 border-b-[6px] border-slate-200 bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
@@ -432,10 +480,23 @@ function PostCard({
             variant="ghost"
             size="sm"
             className="text-slate-400 hover:text-slate-600 rounded-xl h-10 w-10 p-0"
+            onClick={handleShare}
             data-testid={`button-share-${post._id}`}
           >
             <Share2 className="h-5 w-5 stroke-3" />
           </Button>
+
+          {isCurrentUser && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl h-10 w-10 p-0"
+              onClick={() => onDelete(post._id)}
+              data-testid={`button-delete-${post._id}`}
+            >
+              <Trash2 className="h-5 w-5 stroke-3" />
+            </Button>
+          )}
         </div>
       </div>
       {showComments && (
@@ -453,6 +514,7 @@ export default function Community() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const mediaRef = useRef<MediaItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const nsfwModelRef = useRef<any>(null);
@@ -465,10 +527,20 @@ export default function Community() {
     limit: 50,
   });
 
+  // Fetch user votes for all visible posts
+  const postIds = (postsData || []).map((p) => p._id);
+  const userVotes = useQuery(
+    api.posts.getUserVotes,
+    user?._id && postIds.length > 0
+      ? { postIds: postIds as any, userId: user._id as any }
+      : "skip"
+  );
+
   const { userStats } = useUserStats();
 
   const createPostMutation = useMutation(api.posts.createPost);
   const votePostMutation = useMutation(api.posts.votePost);
+  const deletePostMutation = useMutation(api.posts.deletePost);
 
   useEffect(() => {
     mediaRef.current = mediaItems;
@@ -842,6 +914,35 @@ export default function Community() {
     }
   };
 
+  const handleDelete = async (postId: string) => {
+    if (!user?._id) return;
+    setPostToDelete(postId);
+  };
+
+  const confirmDelete = async () => {
+    if (!user?._id || !postToDelete) return;
+
+    try {
+      await deletePostMutation({
+        postId: postToDelete as Id<"posts">,
+        userId: user._id as Id<"users">,
+      });
+
+      toast({
+        title: "Post deleted",
+        description: "Your post has been removed",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete post",
+        variant: "destructive",
+      });
+    } finally {
+      setPostToDelete(null);
+    }
+  };
+
   const handleCreatePost = async () => {
     if (!user?._id || !postTitle.trim() || !postContent.trim()) return;
 
@@ -867,7 +968,7 @@ export default function Community() {
 
       toast({
         title: "Post Created!",
-        description: "+10 points for creating a post!",
+        description: "+5 points for creating a post!",
       });
     } catch (error) {
       toast({
@@ -886,8 +987,8 @@ export default function Community() {
     author: {
       name: post.author?.name || "Anonymous",
       avatar: post.author?.image,
-      level: "Member",
-      badge: "",
+      level: getAuthorLevel(post.upvotes),
+      badge: getAuthorBadge(post.upvotes),
     },
     content: post.content,
     title: post.title,
@@ -1065,8 +1166,9 @@ export default function Community() {
                 <PostCard
                   key={post._id}
                   post={post}
-                  userVote={null}
+                  userVote={(userVotes?.[post._id] as "up" | "down") || null}
                   onVote={handleVote}
+                  onDelete={handleDelete}
                   currentUserId={user?._id}
                 />
               ))
@@ -1199,6 +1301,34 @@ export default function Community() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={!!postToDelete}
+        onOpenChange={(open) => !open && setPostToDelete(null)}
+      >
+        <AlertDialogContent className="rounded-3xl border-2 border-slate-200">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-slate-800">
+              Delete Post?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600">
+              This action cannot be undone. This will permanently delete your
+              post and remove all associated comments and votes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl font-bold">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SidebarLayout>
   );
 }

@@ -53,26 +53,16 @@ export default function AdminAICosts() {
             ))}
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-4 md:grid-cols-3">
             <StatsCard
               title="Total Spend"
-              value={`$${costData?.totalCost.toFixed(2) || "0.00"}`}
+              value={`$${costData?.totalCost?.toFixed(2) || "0.00"}`}
               icon={DollarSign}
             />
             <StatsCard
-              title="Evaluations"
-              value={costData?.totalEvaluations.toLocaleString() || 0}
+              title="AI Calls"
+              value={costData?.totalCalls?.toLocaleString() || 0}
               icon={Zap}
-            />
-            <StatsCard
-              title="Cost per Eval"
-              value={`$${costData?.avgCostPerEval.toFixed(4) || "0.0000"}`}
-              icon={TrendingUp}
-            />
-            <StatsCard
-              title="Avg Latency"
-              value={`${costData?.avgLatencyMs || 0}ms`}
-              icon={Clock}
             />
             <StatsCard
               title="Success Rate"
@@ -88,7 +78,9 @@ export default function AdminAICosts() {
           {isLoading ? (
             <div className="h-48 animate-pulse rounded bg-muted" />
           ) : costData?.costByDay.length === 0 ? (
-            <p className="text-muted-foreground">No cost data available</p>
+            <div className="flex h-48 items-center justify-center">
+              <p className="text-muted-foreground">No spend data yet</p>
+            </div>
           ) : (
             <div className="flex h-48 items-end gap-1">
               {costData?.costByDay.map((day) => {
@@ -103,7 +95,7 @@ export default function AdminAICosts() {
                     title={`${day.date}: $${day.cost.toFixed(2)}`}
                   >
                     <div
-                      className="w-full rounded-t bg-gradient-to-t from-orange-600 to-orange-400 transition-all hover:from-orange-500 hover:to-orange-300"
+                      className="w-full rounded-t bg-gradient-to-t from-gradient-from to-gradient-to transition-all hover:opacity-80"
                       style={{ height: `${Math.max(height, 4)}%` }}
                     />
                     <div className="absolute -top-8 left-1/2 hidden -translate-x-1/2 rounded bg-foreground px-2 py-1 text-xs text-background group-hover:block">
@@ -146,7 +138,7 @@ export default function AdminAICosts() {
                     </div>
                     <div className="h-3 overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                        className="h-full bg-gradient-to-r from-gradient-from to-gradient-to"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -156,6 +148,46 @@ export default function AdminAICosts() {
             </div>
           )}
         </div>
+
+        {/* Cost by Feature (NEW!) */}
+        {costData?.costByFeature && costData.costByFeature.length > 0 && (
+          <div className="rounded-xl border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">By Feature</h2>
+            <div className="space-y-4">
+              {costData.costByFeature.map(
+                (item: {
+                  feature: string;
+                  cost: number;
+                  count: number;
+                  tokens: number;
+                }) => {
+                  const percentage =
+                    costData.totalCost > 0
+                      ? (item.cost / costData.totalCost) * 100
+                      : 0;
+                  return (
+                    <div key={item.feature}>
+                      <div className="mb-1 flex justify-between text-sm">
+                        <span className="font-medium capitalize">
+                          {item.feature.replace(/_/g, " ")}
+                        </span>
+                        <span className="text-muted-foreground">
+                          ${item.cost.toFixed(2)} ({item.count} calls)
+                        </span>
+                      </div>
+                      <div className="h-3 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full bg-gradient-to-r from-gradient-from to-gradient-to"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Token Usage */}
         {costData && costData.totalTokens > 0 && (

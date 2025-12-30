@@ -1,14 +1,14 @@
 import { v } from "convex/values";
 import { mutation, query, action } from "./_generated/server";
 import { api } from "./_generated/api";
-import OpenAI from "openai";
+import { callAI } from "./lib/ai";
 
 export const getCustomGPTs = query({
   args: {
     userId: v.optional(v.id("users")),
     isPublic: v.optional(v.boolean()),
     category: v.optional(v.string()),
-    limit: v.optional(v.number())
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const limit = Math.min(Math.max(args.limit ?? 50, 1), 200);
@@ -36,7 +36,9 @@ export const getCustomGPTs = query({
       filtered = filtered.filter((gpt) => gpt.category === args.category);
     }
 
-    return filtered.sort((a, b) => b._creationTime - a._creationTime).slice(0, limit);
+    return filtered
+      .sort((a, b) => b._creationTime - a._creationTime)
+      .slice(0, limit);
   },
 });
 
@@ -114,10 +116,12 @@ export const deleteCustomGPT = mutation({
 export const chatWithCustomGPT = action({
   args: {
     gptId: v.id("customAssistants"),
-    messages: v.array(v.object({
-      role: v.union(v.literal("user"), v.literal("assistant")),
-      content: v.string(),
-    })),
+    messages: v.array(
+      v.object({
+        role: v.union(v.literal("user"), v.literal("assistant")),
+        content: v.string(),
+      })
+    ),
   },
   handler: async (ctx, { gptId, messages }): Promise<{ message: string }> => {
     const gpt = await ctx.runQuery(api.customGPTs.getCustomGPT, { gptId });
@@ -125,40 +129,26 @@ export const chatWithCustomGPT = action({
       throw new Error("Custom GPT not found");
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
-    const systemMessage: { role: "system"; content: string } = {
-      role: "system",
-      content: gpt.systemPrompt || gpt.description,
-    };
-
-    const formattedMessages: Array<{
-      role: "system" | "user" | "assistant";
-      content: string;
-    }> = [
-      systemMessage,
+    // Build messages with system prompt
+    const formattedMessages = [
+      { role: "system" as const, content: gpt.systemPrompt || gpt.description },
       ...messages.map((msg) => ({
         role: msg.role as "user" | "assistant",
         content: msg.content,
       })),
     ];
 
-    const response: OpenAI.Chat.Completions.ChatCompletion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+    // Use centralized AI gateway - automatically logs cost, tokens, latency
+    const response = await callAI<string>(ctx, {
+      feature: "custom_gpt",
       messages: formattedMessages,
+      metadata: { gptId },
     });
-
-    const assistantMessage: string | null | undefined = response.choices[0]?.message?.content;
-    if (!assistantMessage) {
-      throw new Error("No response from AI");
-    }
 
     // Update usage count
     await ctx.runMutation(api.customGPTs.updateUsageCount, { gptId });
 
-    return { message: assistantMessage };
+    return { message: response.raw };
   },
 });
 

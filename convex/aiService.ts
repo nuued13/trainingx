@@ -1,7 +1,12 @@
 /**
- * Unified AI Service
+ * @deprecated Use convex/lib/ai.ts instead
+ *
+ * This file is deprecated. All new AI calls should use the centralized
+ * AI gateway at convex/lib/ai.ts which provides automatic cost tracking,
+ * token logging, and latency monitoring.
+ *
+ * Legacy: Unified AI Service
  * Supports OpenAI, Anthropic, and Google Gemini
- * Used for prompt evaluation, assessment grading, and general AI tasks
  */
 
 export type AIProvider = "openai" | "anthropic" | "gemini";

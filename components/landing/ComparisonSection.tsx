@@ -54,12 +54,12 @@ export default function ComparisonSection() {
         <div className="relative">
           {/* Mobile: Card View */}
           <div className="md:hidden space-y-4">
-            <ComparisonCard
+            {/* <ComparisonCard
               icon={History}
               feature="Track Record"
               ourVal="10 years experience"
               others="Others: 1-2 years / New"
-            />
+            /> */}
             <ComparisonCard
               icon={RefreshCcw}
               feature="Content Updates"
@@ -114,7 +114,7 @@ export default function ComparisonSection() {
                   </tr>
                 </thead>
                 <tbody>
-                  <ComparisonRow
+                  {/* <ComparisonRow
                     feature="Track Record"
                     ourVal="10 years"
                     ourIcon={History}
@@ -122,10 +122,10 @@ export default function ComparisonSection() {
                     comp2="1-2 yrs"
                     comp3="New"
                     comp3Bad
-                  />
+                  /> */}
                   <ComparisonRow
                     feature="Content Updates"
-                    ourVal="Daily fresh"
+                    ourVal="Dynamic"
                     ourIcon={RefreshCcw}
                     comp1="Static"
                     comp2="Static"

@@ -1,19 +1,35 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 // Admin email allowlist - simple access control
 const ADMIN_EMAILS = [
   "derrick@trainingx.ai",
+  "mzafar611@gmail.com", // ← Replace with your email!
   // Add more admin emails here
 ];
 
-async function requireAdmin(ctx: any) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity?.email || !ADMIN_EMAILS.includes(identity.email)) {
-    throw new Error("Unauthorized: Admin access required");
-  }
-  return identity;
+async function requireAdmin(ctx: any): Promise<boolean> {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) return false;
+
+  const user = await ctx.db.get(userId);
+  if (!user?.email) return false;
+
+  return ADMIN_EMAILS.includes(user.email);
 }
+
+async function isAdmin(ctx: any): Promise<boolean> {
+  return await requireAdmin(ctx);
+}
+
+// Check if current user has admin access (returns boolean, doesn't throw)
+export const checkAdminAccess = query({
+  args: {},
+  handler: async (ctx) => {
+    return await isAdmin(ctx);
+  },
+});
 
 // ============================================
 // DASHBOARD STATS
@@ -22,7 +38,8 @@ async function requireAdmin(ctx: any) {
 export const getDashboardStats = query({
   args: {},
   handler: async (ctx) => {
-    await requireAdmin(ctx);
+    const hasAccess = await requireAdmin(ctx);
+    if (!hasAccess) return null;
 
     const now = Date.now();
     const oneDayAgo = now - 24 * 60 * 60 * 1000;
@@ -84,7 +101,8 @@ export const getDashboardStats = query({
 export const getSignupTrend = query({
   args: { days: v.optional(v.number()) },
   handler: async (ctx, { days = 30 }) => {
-    await requireAdmin(ctx);
+    const hasAccess = await requireAdmin(ctx);
+    if (!hasAccess) return null;
 
     const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
     const users = await ctx.db
@@ -121,7 +139,8 @@ export const listUsers = query({
     ctx,
     { search, sortBy = "recent", limit = 50, offset = 0 }
   ) => {
-    await requireAdmin(ctx);
+    const hasAccess = await requireAdmin(ctx);
+    if (!hasAccess) return null;
 
     let users = await ctx.db.query("users").collect();
 
@@ -182,7 +201,8 @@ export const listUsers = query({
 export const getUserDetail = query({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
-    await requireAdmin(ctx);
+    const hasAccess = await requireAdmin(ctx);
+    if (!hasAccess) return null;
 
     const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
@@ -258,7 +278,8 @@ export const getUserDetail = query({
 export const getContentHealth = query({
   args: {},
   handler: async (ctx) => {
-    await requireAdmin(ctx);
+    const hasAccess = await requireAdmin(ctx);
+    if (!hasAccess) return null;
 
     const items = await ctx.db
       .query("practiceItems")
@@ -299,7 +320,8 @@ export const getContentHealth = query({
 export const getProblemItems = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, { limit = 20 }) => {
-    await requireAdmin(ctx);
+    const hasAccess = await requireAdmin(ctx);
+    if (!hasAccess) return null;
 
     const items = await ctx.db
       .query("practiceItems")
@@ -374,31 +396,49 @@ export const getProblemItems = query({
 export const getAICostStats = query({
   args: { days: v.optional(v.number()) },
   handler: async (ctx, { days = 30 }) => {
-    await requireAdmin(ctx);
+    const hasAccess = await requireAdmin(ctx);
+    if (!hasAccess) return null;
 
     const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-    const logs = await ctx.db
+
+    // Get logs from both tables (old and new)
+    const oldLogs = await ctx.db
       .query("aiEvaluationLogs")
       .filter((q) => q.gte(q.field("createdAt"), cutoff))
       .collect();
 
-    const totalCost = logs.reduce((sum, log) => sum + (log.cost || 0), 0);
-    const totalTokens = logs.reduce(
+    const newLogs = await ctx.db
+      .query("aiLogs")
+      .filter((q) => q.gte(q.field("createdAt"), cutoff))
+      .collect();
+
+    // Normalize old logs to new format
+    const normalizedOldLogs = oldLogs.map((log) => ({
+      ...log,
+      feature: "evaluation", // Old logs were only from evaluations
+    }));
+
+    // Combine all logs
+    const allLogs = [...normalizedOldLogs, ...newLogs];
+
+    const totalCost = allLogs.reduce((sum, log) => sum + (log.cost || 0), 0);
+    const totalTokens = allLogs.reduce(
       (sum, log) => sum + (log.totalTokens || 0),
       0
     );
     const avgLatency =
-      logs.length > 0
-        ? logs.reduce((sum, log) => sum + (log.latencyMs || 0), 0) / logs.length
+      allLogs.length > 0
+        ? allLogs.reduce((sum, log) => sum + (log.latencyMs || 0), 0) /
+          allLogs.length
         : 0;
     const successRate =
-      logs.length > 0
-        ? (logs.filter((log) => log.success).length / logs.length) * 100
+      allLogs.length > 0
+        ? (allLogs.filter((log) => log.success).length / allLogs.length) * 100
         : 100;
 
     // Cost by day
     const byDay: Record<string, number> = {};
-    for (const log of logs) {
+    for (const log of allLogs) {
       const date = new Date(log.createdAt).toISOString().split("T")[0];
       byDay[date] = (byDay[date] || 0) + (log.cost || 0);
     }
@@ -408,7 +448,7 @@ export const getAICostStats = query({
 
     // Cost by provider
     const byProvider: Record<string, { count: number; cost: number }> = {};
-    for (const log of logs) {
+    for (const log of allLogs) {
       const provider = log.provider || "unknown";
       if (!byProvider[provider]) byProvider[provider] = { count: 0, cost: 0 };
       byProvider[provider].count++;
@@ -422,18 +462,41 @@ export const getAICostStats = query({
       })
     );
 
+    // Cost by feature (NEW!)
+    const byFeature: Record<
+      string,
+      { count: number; cost: number; tokens: number }
+    > = {};
+    for (const log of allLogs) {
+      const feature = log.feature || "unknown";
+      if (!byFeature[feature])
+        byFeature[feature] = { count: 0, cost: 0, tokens: 0 };
+      byFeature[feature].count++;
+      byFeature[feature].cost += log.cost || 0;
+      byFeature[feature].tokens += log.totalTokens || 0;
+    }
+    const costByFeature = Object.entries(byFeature)
+      .map(([feature, data]) => ({
+        feature,
+        count: data.count,
+        cost: Math.round(data.cost * 100) / 100,
+        tokens: data.tokens,
+      }))
+      .sort((a, b) => b.cost - a.cost); // Sort by cost descending
+
     return {
-      totalEvaluations: logs.length,
+      totalCalls: allLogs.length,
       totalCost: Math.round(totalCost * 100) / 100,
       totalTokens,
-      avgCostPerEval:
-        logs.length > 0
-          ? Math.round((totalCost / logs.length) * 1000) / 1000
+      avgCostPerCall:
+        allLogs.length > 0
+          ? Math.round((totalCost / allLogs.length) * 10000) / 10000
           : 0,
       avgLatencyMs: Math.round(avgLatency),
-      successRate: Math.round(successRate),
+      successRate: Math.round(successRate * 10) / 10,
       costByDay,
       costByProvider,
+      costByFeature,
     };
   },
 });

@@ -869,6 +869,7 @@ export default defineSchema({
   }).index("by_user", ["userId"]),
 
   // AI Evaluation Logs (for cost tracking and debugging)
+  // DEPRECATED: Use aiLogs instead for new features
   aiEvaluationLogs: defineTable({
     attemptId: v.id("practiceAttempts"),
     provider: v.string(), // "openai" | "anthropic"
@@ -885,6 +886,41 @@ export default defineSchema({
     .index("by_attempt", ["attemptId"])
     .index("by_provider", ["provider"])
     .index("by_date", ["createdAt"]),
+
+  // Centralized AI Logs (for ALL AI calls across the platform)
+  aiLogs: defineTable({
+    // What feature made this call
+    feature: v.string(), // "evaluation", "career_coach", "creator_studio", "custom_gpt", "matching"
+
+    // Provider info
+    provider: v.string(), // "openai" | "anthropic"
+    model: v.string(),
+
+    // Token usage
+    promptTokens: v.number(),
+    completionTokens: v.number(),
+    totalTokens: v.number(),
+
+    // Cost and performance
+    cost: v.number(),
+    latencyMs: v.number(),
+
+    // Status
+    success: v.boolean(),
+    errorMessage: v.optional(v.string()),
+
+    // Context (optional)
+    userId: v.optional(v.id("users")),
+    attemptId: v.optional(v.id("practiceAttempts")),
+    metadata: v.optional(v.any()),
+
+    createdAt: v.number(),
+  })
+    .index("by_feature", ["feature", "createdAt"])
+    .index("by_provider", ["provider", "createdAt"])
+    .index("by_user", ["userId", "createdAt"])
+    .index("by_date", ["createdAt"])
+    .index("by_success", ["success", "createdAt"]),
 
   // Feature Flags
   featureFlags: defineTable({

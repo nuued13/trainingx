@@ -462,7 +462,7 @@ export default function CustomGPTsPage() {
             open={!!chatGPT}
             onOpenChange={(open) => !open && setChatGPT(null)}
           >
-            <DialogContent className="max-w-2xl h-[600px] flex flex-col p-0 overflow-hidden rounded-3xl border-2 border-slate-200">
+            <DialogContent className="max-w-2xl h-[600px] flex flex-col p-0 overflow-scroll rounded-3xl border-2 border-slate-200">
               <DialogHeader className="p-6 pb-4 border-b-2 border-slate-100 bg-slate-50/50">
                 <DialogTitle className="flex items-center gap-3 text-xl font-extrabold text-slate-800">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-500">

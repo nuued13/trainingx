@@ -299,19 +299,17 @@ export function DuelArena() {
                         Your Score
                       </div>
                       <div className="text-2xl font-black text-blue-500">
-                        {duel.challengerScore}
+                        {duel.scores?.[user?._id as string] || 0}
                       </div>
                     </div>
-                    {duel.opponentScore !== undefined && (
-                      <div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
-                          Opponent
-                        </div>
-                        <div className="text-2xl font-black text-red-500">
-                          {duel.opponentScore}
-                        </div>
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                        Players
                       </div>
-                    )}
+                      <div className="text-2xl font-black text-slate-600">
+                        {duel.participants?.length || 0}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <JuicyButton asChild className="h-12 px-6">
@@ -400,12 +398,14 @@ export function DuelArena() {
                     </h3>
                     <span
                       className={`rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-wide ${
-                        duel.winnerId
+                        duel.rankings && duel.rankings.length > 0
                           ? "bg-purple-100 text-purple-600"
                           : "bg-slate-100 text-slate-500"
                       }`}
                     >
-                      {duel.winnerId ? "Completed" : "Draw"}
+                      {duel.rankings && duel.rankings.length > 0
+                        ? "Completed"
+                        : "In Progress"}
                     </span>
                   </div>
                   <p className="text-sm font-medium text-slate-500 mb-4">
@@ -415,41 +415,54 @@ export function DuelArena() {
                   <div className="flex items-center gap-6">
                     <div>
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
-                        Final Score
+                        Your Score
                       </div>
-                      <div className="flex items-baseline gap-2">
+                      <div className="text-2xl font-black text-slate-700">
+                        {duel.rankings?.find((r) => r.userId === user?._id)
+                          ?.score ||
+                          duel.scores?.[user?._id as string] ||
+                          0}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                        Rank
+                      </div>
+                      <div className="flex items-baseline gap-1">
                         <span className="text-2xl font-black text-slate-700">
-                          {duel.challengerScore}
+                          #
+                          {duel.rankings?.find((r) => r.userId === user?._id)
+                            ?.rank || "-"}
                         </span>
                         <span className="text-sm font-bold text-slate-400">
-                          vs
-                        </span>
-                        <span className="text-2xl font-black text-slate-700">
-                          {duel.opponentScore || 0}
+                          of {duel.participants?.length || 0}
                         </span>
                       </div>
                     </div>
-                    {duel.winnerId && (
-                      <div
-                        className={`flex items-center gap-2 font-bold ${
-                          duel.winnerId === duel.challengerId
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        {duel.winnerId === duel.challengerId ? (
-                          <>
-                            <Trophy className="h-5 w-5 stroke-3" />
-                            Victory!
-                          </>
-                        ) : (
-                          <>
-                            <Target className="h-5 w-5 stroke-3" />
-                            Defeat
-                          </>
-                        )}
-                      </div>
-                    )}
+                    {(() => {
+                      const userRank = duel.rankings?.find(
+                        (r) => r.userId === user?._id
+                      )?.rank;
+                      if (!userRank) return null;
+                      const isWinner = userRank === 1;
+                      return (
+                        <div
+                          className={`flex items-center gap-2 font-bold ${isWinner ? "text-green-500" : "text-slate-500"}`}
+                        >
+                          {isWinner ? (
+                            <>
+                              <Trophy className="h-5 w-5 stroke-3" />
+                              Victory!
+                            </>
+                          ) : userRank <= 3 ? (
+                            <>
+                              <Target className="h-5 w-5 stroke-3" />
+                              Top 3
+                            </>
+                          ) : null}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
                 <JuicyButton asChild variant="secondary" className="h-12 px-6">
