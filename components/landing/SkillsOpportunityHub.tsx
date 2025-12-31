@@ -59,7 +59,7 @@ export default function SkillsOpportunityHub() {
             </span>
           </motion.div>
 
-          <motion.h1
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -70,7 +70,7 @@ export default function SkillsOpportunityHub() {
             <span className="bg-linear-to-r from-gradient-from to-gradient-to bg-clip-text text-transparent block md:inline">
               Opportunity Hub
             </span>
-          </motion.h1>
+          </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -414,7 +414,7 @@ function PathCard({
 
         <div className="flex items-center justify-between mt-auto">
           <span
-            className={`text-sm font-bold tracking-wide uppercase ${featured ? style.label : "text-slate-400"}`}
+            className={`text-sm font-bold tracking-wide uppercase ${featured ? style.label : "text-slate-600"}`}
           >
             {featured ? "Recommended" : "Self-Paced"}
           </span>

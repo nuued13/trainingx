@@ -142,6 +142,8 @@ export default function Hero() {
           fill
           className="object-cover"
           priority
+          fetchPriority="high"
+          sizes="100vw"
         />
       </div>
 

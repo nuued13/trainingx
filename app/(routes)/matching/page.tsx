@@ -341,10 +341,10 @@ const SkillHighlights = ({ skills }: { skills: SkillSuggestion[] }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
     >
-      <Card className="overflow-hidden border-none bg-white shadow-lg shadow-primary/10">
-        <CardContent className="relative p-6 md:p-8 space-y-6">
+      <Card className="p-0 overflow-hidden border-none bg-white shadow-lg shadow-primary/10">
+        <CardContent className="relative p-6 md:p-8">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-indigo-50 to-primary/5 opacity-80" />
-          <div className="relative flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="mb-6 relative flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-3">
               <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                 <Sparkles className="h-5 w-5" />

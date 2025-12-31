@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
@@ -10,6 +10,7 @@ import { MCQQuestion } from "./questions/MCQ";
 import { PromptWriteQuestion } from "./questions/PromptWrite";
 import { AssessmentResults } from "./Results";
 import { CertificateView } from "./Certificate";
+import { AlertTriangle } from "lucide-react";
 
 type AssessmentPhase = "prep" | "questions" | "results" | "certificate";
 
@@ -34,15 +35,20 @@ export function Assessment({ userId, domainId, onBack }: AssessmentProps) {
     certificateId?: Id<"domainCertificates">;
   } | null>(null);
 
+  // Anti-cheat state
+  const [tabSwitchWarning, setTabSwitchWarning] = useState<number>(0);
+  const [showWarningBanner, setShowWarningBanner] = useState(false);
+
   // All queries at the top level (following React hooks rules)
   const assessment = useQuery(api.domainAssessments.getByDomain, { domainId });
   const canTake = useQuery(
     api.domainAssessments.canTake,
     assessment ? { userId, assessmentId: assessment._id } : "skip"
   );
+  // Use attempt-specific questions when we have an attemptId (randomized subset)
   const questions = useQuery(
-    api.domainAssessments.getQuestions,
-    assessment ? { assessmentId: assessment._id } : "skip"
+    api.domainAssessments.getQuestionsForAttempt,
+    attemptId ? { attemptId } : "skip"
   );
   const certificate = useQuery(api.certificates.getByDomain, {
     userId,
@@ -55,6 +61,7 @@ export function Assessment({ userId, domainId, onBack }: AssessmentProps) {
   const startAttempt = useMutation(api.domainAssessments.startAttempt);
   const submitAnswer = useMutation(api.domainAssessments.submitAnswer);
   const completeAttempt = useMutation(api.domainAssessments.completeAttempt);
+  const trackTabSwitch = useMutation(api.domainAssessments.trackTabSwitch);
 
   // Actions
   const runPromptAction = useAction(api.assessmentGrading.runPrompt);
@@ -68,6 +75,36 @@ export function Assessment({ userId, domainId, onBack }: AssessmentProps) {
       setPhase("certificate");
     }
   }, [certificate]);
+
+  // Anti-cheat: Tab visibility monitoring
+  useEffect(() => {
+    if (phase !== "questions" || !attemptId) return;
+
+    const handleVisibilityChange = async () => {
+      if (document.hidden) {
+        // User switched away from tab
+        try {
+          const result = await trackTabSwitch({ attemptId });
+          setTabSwitchWarning(result.tabSwitchCount);
+          setShowWarningBanner(true);
+
+          // Auto-hide warning after 5 seconds
+          setTimeout(() => setShowWarningBanner(false), 5000);
+
+          if (result.flagged) {
+            // 3 strikes - auto-complete with penalty
+            console.warn("Assessment flagged for review due to tab switching");
+          }
+        } catch (error) {
+          console.error("Failed to track tab switch:", error);
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [phase, attemptId, trackTabSwitch]);
 
   // Handle starting the assessment
   const handleStart = useCallback(async () => {
@@ -219,41 +256,56 @@ export function Assessment({ userId, domainId, onBack }: AssessmentProps) {
       const currentQuestion = questions[currentQuestionIndex];
 
       return (
-        <QuestionWrapper
-          questionNumber={currentQuestionIndex + 1}
-          totalQuestions={questions.length}
-          timeRemaining={timeRemaining}
-          onTimeUp={handleTimeUp}
-        >
-          {currentQuestion.type === "mcq" ||
-          currentQuestion.type === "multi-select" ? (
-            <MCQQuestion
-              scenario={currentQuestion.scenario}
-              question={currentQuestion.question}
-              options={currentQuestion.options || []}
-              onSubmit={(selectedId, isCorrect) =>
-                handleAnswer(selectedId, isCorrect)
-              }
-            />
-          ) : currentQuestion.type === "prompt-write" ||
-            currentQuestion.type === "prompt-fix" ? (
-            <PromptWriteQuestion
-              scenario={currentQuestion.scenario}
-              question={currentQuestion.question}
-              promptGoal={currentQuestion.promptGoal || ""}
-              onSubmit={(prompt) => handleAnswer(prompt, true, 80)} // AI would grade this
-              onRunPrompt={runPrompt}
-            />
-          ) : currentQuestion.type === "image-prompt" ? (
-            <PromptWriteQuestion
-              scenario={currentQuestion.scenario}
-              question={currentQuestion.question}
-              promptGoal={currentQuestion.promptGoal || ""}
-              isImagePrompt
-              onSubmit={(prompt) => handleAnswer(prompt, true, 80)} // AI would grade this
-            />
-          ) : null}
-        </QuestionWrapper>
+        <>
+          {/* Anti-cheat warning banner */}
+          {showWarningBanner && (
+            <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-white px-4 py-3 flex items-center justify-center gap-3 shadow-lg animate-in fade-in slide-in-from-top duration-300">
+              <AlertTriangle className="w-5 h-5" />
+              <span className="font-bold">
+                Warning: Tab switching detected ({tabSwitchWarning}/3).
+                {tabSwitchWarning >= 3
+                  ? " Your attempt has been flagged for review."
+                  : " Please stay on this page."}
+              </span>
+            </div>
+          )}
+
+          <QuestionWrapper
+            questionNumber={currentQuestionIndex + 1}
+            totalQuestions={questions.length}
+            timeRemaining={timeRemaining}
+            onTimeUp={handleTimeUp}
+          >
+            {currentQuestion.type === "mcq" ||
+            currentQuestion.type === "multi-select" ? (
+              <MCQQuestion
+                scenario={currentQuestion.scenario}
+                question={currentQuestion.question}
+                options={currentQuestion.options || []}
+                onSubmit={(selectedId, isCorrect) =>
+                  handleAnswer(selectedId, isCorrect)
+                }
+              />
+            ) : currentQuestion.type === "prompt-write" ||
+              currentQuestion.type === "prompt-fix" ? (
+              <PromptWriteQuestion
+                scenario={currentQuestion.scenario}
+                question={currentQuestion.question}
+                promptGoal={currentQuestion.promptGoal || ""}
+                onSubmit={(prompt) => handleAnswer(prompt, true, 80)} // AI would grade this
+                onRunPrompt={runPrompt}
+              />
+            ) : currentQuestion.type === "image-prompt" ? (
+              <PromptWriteQuestion
+                scenario={currentQuestion.scenario}
+                question={currentQuestion.question}
+                promptGoal={currentQuestion.promptGoal || ""}
+                isImagePrompt
+                onSubmit={(prompt) => handleAnswer(prompt, true, 80)} // AI would grade this
+              />
+            ) : null}
+          </QuestionWrapper>
+        </>
       );
 
     case "results":

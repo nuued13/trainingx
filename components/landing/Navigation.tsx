@@ -95,6 +95,9 @@ export default function Navigation() {
             className="md:hidden p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             data-testid="button-mobile-menu"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
           >
             {isMenuOpen ? (
               <X className="h-6 w-6 stroke-white" />
@@ -106,7 +109,10 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div
+            id="mobile-navigation"
+            className="md:hidden py-4 border-t border-gray-200"
+          >
             <div className="flex flex-col space-y-4">
               {navItems.map((item) =>
                 item.href.startsWith("#") ? (

@@ -92,7 +92,7 @@ export default function ComparisonSection() {
               <table className="w-full min-w-[800px] text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-100">
-                    <th className="p-8 w-1/4 text-slate-400 font-medium uppercase tracking-wider text-sm">
+                    <th className="p-8 w-1/4 text-slate-600 font-medium uppercase tracking-wider text-sm">
                       Feature
                     </th>
                     <th className="p-0 w-1/4 relative group">
@@ -285,14 +285,14 @@ function ComparisonCard({
           <Icon className="w-6 h-6" />
         </div>
         <div className="grow">
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">
+          <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-1">
             {feature}
-          </h4>
+          </h3>
           <div className="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
             {ourVal}
             <CheckCircle2 className="w-5 h-5 text-emerald-500" />
           </div>
-          <div className="text-sm text-slate-400 font-medium bg-slate-50 p-2 rounded-lg inline-block">
+          <div className="text-sm text-slate-600 font-medium bg-slate-50 p-2 rounded-lg inline-block">
             {others}
           </div>
         </div>

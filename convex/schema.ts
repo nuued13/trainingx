@@ -1288,6 +1288,8 @@ export default defineSchema({
     startedAt: v.number(),
     completedAt: v.optional(v.number()),
     timeSpent: v.number(), // in seconds
+    // NEW: Store the specific questions selected for this attempt (randomized)
+    questionIds: v.optional(v.array(v.id("domainAssessmentQuestions"))),
     answers: v.array(
       v.object({
         questionId: v.id("domainAssessmentQuestions"),
@@ -1305,6 +1307,9 @@ export default defineSchema({
     totalScore: v.number(), // 0-100
     passed: v.boolean(),
     attemptNumber: v.number(),
+    // NEW: Anti-cheat tracking
+    tabSwitchCount: v.optional(v.number()),
+    flaggedForReview: v.optional(v.boolean()),
   })
     .index("by_user", ["userId"])
     .index("by_assessment", ["assessmentId"])

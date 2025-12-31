@@ -18,7 +18,7 @@ export const getByDomain = query({
   },
 });
 
-// Get questions for an assessment
+// Get questions for an assessment (ADMIN USE - returns all questions in pool)
 export const getQuestions = query({
   args: { assessmentId: v.id("domainAssessments") },
   handler: async (ctx, args) => {
@@ -31,6 +31,35 @@ export const getQuestions = query({
       .collect();
 
     return questions.sort((a, b) => a.order - b.order);
+  },
+});
+
+// Get questions for a specific attempt (returns only the randomized subset in order)
+export const getQuestionsForAttempt = query({
+  args: { attemptId: v.id("domainAssessmentAttempts") },
+  handler: async (ctx, args) => {
+    const attempt = await ctx.db.get(args.attemptId);
+    if (!attempt) throw new Error("Attempt not found");
+
+    // If no questionIds stored (legacy), fall back to all questions
+    if (!attempt.questionIds || attempt.questionIds.length === 0) {
+      const questions = await ctx.db
+        .query("domainAssessmentQuestions")
+        .withIndex("by_assessment", (q) =>
+          q.eq("assessmentId", attempt.assessmentId)
+        )
+        .filter((q) => q.eq(q.field("status"), "live"))
+        .collect();
+      return questions.sort((a, b) => a.order - b.order);
+    }
+
+    // Fetch questions by their IDs (preserving order from questionIds)
+    const questions = await Promise.all(
+      attempt.questionIds.map((id) => ctx.db.get(id))
+    );
+
+    // Filter out any nulls (deleted questions)
+    return questions.filter((q): q is NonNullable<typeof q> => q !== null);
   },
 });
 
@@ -164,7 +193,26 @@ export const isUnlocked = query({
 
 // ===== MUTATIONS =====
 
-// Start a new assessment attempt
+// Assessment config (inline for Convex - mirrors lib/assessment-config.ts)
+const ASSESSMENT_CONFIG = {
+  questionTypes: [
+    { type: "mcq", count: 10 },
+    { type: "prompt-write", count: 3 },
+    { type: "prompt-fix", count: 2 },
+  ],
+};
+
+// Fisher-Yates shuffle
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// Start a new assessment attempt with randomized questions
 export const startAttempt = mutation({
   args: {
     userId: v.id("users"),
@@ -184,19 +232,53 @@ export const startAttempt = mutation({
 
     const attemptNumber = attempts.length + 1;
 
-    // Create attempt
+    // ===== NEW: Randomized Question Selection =====
+    // Fetch all live questions for this assessment
+    const allQuestions = await ctx.db
+      .query("domainAssessmentQuestions")
+      .withIndex("by_assessment", (q) =>
+        q.eq("assessmentId", args.assessmentId)
+      )
+      .filter((q) => q.eq(q.field("status"), "live"))
+      .collect();
+
+    // Group questions by type
+    const questionsByType: Record<string, typeof allQuestions> = {};
+    for (const q of allQuestions) {
+      if (!questionsByType[q.type]) {
+        questionsByType[q.type] = [];
+      }
+      questionsByType[q.type].push(q);
+    }
+
+    // Select random questions based on config
+    const selectedQuestionIds: (typeof allQuestions)[0]["_id"][] = [];
+    for (const typeConfig of ASSESSMENT_CONFIG.questionTypes) {
+      const pool = questionsByType[typeConfig.type] || [];
+      const shuffled = shuffleArray(pool);
+      const selected = shuffled.slice(0, typeConfig.count);
+      selectedQuestionIds.push(...selected.map((q) => q._id));
+    }
+
+    // Shuffle the final order so question types are mixed
+    const finalQuestionIds = shuffleArray(selectedQuestionIds);
+
+    // Create attempt with the locked-in question set
     const attemptId = await ctx.db.insert("domainAssessmentAttempts", {
       userId: args.userId,
       assessmentId: args.assessmentId,
       startedAt: Date.now(),
       timeSpent: 0,
+      questionIds: finalQuestionIds, // NEW: Store the randomized questions
       answers: [],
       totalScore: 0,
       passed: false,
       attemptNumber,
+      tabSwitchCount: 0, // NEW: Anti-cheat tracking
+      flaggedForReview: false,
     });
 
-    return { attemptId, attemptNumber };
+    return { attemptId, attemptNumber, questionCount: finalQuestionIds.length };
   },
 });
 
@@ -298,6 +380,31 @@ function generateVerificationCode(): string {
   }
   return code;
 }
+
+// ===== ANTI-CHEAT =====
+
+// Track tab switch events (called from frontend)
+export const trackTabSwitch = mutation({
+  args: {
+    attemptId: v.id("domainAssessmentAttempts"),
+  },
+  handler: async (ctx, args) => {
+    const attempt = await ctx.db.get(args.attemptId);
+    if (!attempt) throw new Error("Attempt not found");
+    if (attempt.completedAt)
+      return { tabSwitchCount: attempt.tabSwitchCount ?? 0, flagged: false };
+
+    const newCount = (attempt.tabSwitchCount ?? 0) + 1;
+    const shouldFlag = newCount >= 3; // 3 strikes
+
+    await ctx.db.patch(args.attemptId, {
+      tabSwitchCount: newCount,
+      flaggedForReview: shouldFlag,
+    });
+
+    return { tabSwitchCount: newCount, flagged: shouldFlag };
+  },
+});
 
 // ===== ADMIN MUTATIONS =====
 

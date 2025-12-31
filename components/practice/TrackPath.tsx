@@ -41,9 +41,9 @@ export function TrackPath({
   onSelectAssessment,
 }: TrackPathProps) {
   return (
-    <div className="relative flex flex-col items-center py-8">
+    <div className="relative flex flex-col items-center py-8 gap-4">
       {/* Connecting line */}
-      <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-slate-200 -translate-x-1/2 z-0" />
+      <div className="absolute left-1/2 top-8 bottom-8 w-1 bg-slate-200 -translate-x-1/2 z-0" />
 
       {/* Track nodes */}
       {tracks.map((track, index) => {
@@ -60,7 +60,7 @@ export function TrackPath({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="relative z-10 mb-4"
+            className="relative z-10"
           >
             <TrackNodeComponent
               track={track}

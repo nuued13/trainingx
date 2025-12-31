@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const bgImg = "/images/dark_cybernetic_grid_background.png";
+const bgImg = "/images/dark_cybernetic_grid_background.webp";
 
 const SCENARIOS = [
   {
@@ -20,7 +20,7 @@ const SCENARIOS = [
     prompt: "Design a fintech dashboard dark mode...",
     category: "App Generator",
     title: "Nexus Finance",
-    imageSrc: "/images/futuristic_mobile_app_interface_dashboard.png",
+    imageSrc: "/images/futuristic_mobile_app_interface_dashboard.webp",
     icon: Smartphone,
     color: "from-blue-500 to-cyan-500",
   },
@@ -29,7 +29,7 @@ const SCENARIOS = [
     prompt: "Create a sci-fi movie poster on Mars...",
     category: "Movie Maker",
     title: "The Red Horizon",
-    imageSrc: "/images/cinematic_sci-fi_movie_poster.png",
+    imageSrc: "/images/cinematic_sci-fi_movie_poster.webp",
     icon: Film,
     color: "from-red-500 to-orange-500",
   },
@@ -38,7 +38,7 @@ const SCENARIOS = [
     prompt: "Generate a sneaker product advertisement...",
     category: "Ad Studio",
     title: "Velocity X-1",
-    imageSrc: "/images/sleek_sneaker_product_advertisement.png",
+    imageSrc: "/images/sleek_sneaker_product_advertisement.webp",
     icon: Megaphone,
     color: "from-purple-500 to-pink-500",
   },
@@ -47,7 +47,7 @@ const SCENARIOS = [
     prompt: "Write a blog layout about minimalism...",
     category: "Blog Engine",
     title: "The Art of Less",
-    imageSrc: "/images/modern_editorial_blog_layout.png",
+    imageSrc: "/images/modern_editorial_blog_layout.webp",
     icon: Type,
     color: "from-gray-500 to-white",
   },
@@ -56,7 +56,7 @@ const SCENARIOS = [
     prompt: "Render abstract neon 3D art...",
     category: "Graphic Suite",
     title: "Neon Dreams",
-    imageSrc: "/images/abstract_digital_art_3d_render.png",
+    imageSrc: "/images/abstract_digital_art_3d_render.webp",
     icon: Palette,
     color: "from-green-500 to-emerald-500",
   },
@@ -135,13 +135,13 @@ export default function PromptToEverything() {
               The Era of Generative Everything
             </span>
           </div>
-          <h1 className="font-display text-[44px]/12 sm:text-5xl md:text-7xl font-black tracking-tight mb-6 text-white drop-shadow-2xl">
+          <h2 className="font-display text-[44px]/12 sm:text-5xl md:text-7xl font-black tracking-tight mb-6 text-white drop-shadow-2xl">
             Your Prompting Skills <br />
             {/* <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00f2ea] via-white to-[#cc33ff] animate-gradient-x"> */}
             <span className="bg-linear-to-r from-gradient-from to-gradient-to bg-clip-text text-transparent animate-gradient-x">
               Infinite Creation.
             </span>
-          </h1>
+          </h2>
           <p className="text-lg md:text-xl text-[hsl(215,20%,65%)] font-light max-w-2xl mx-auto leading-relaxed">
             In 2025, the barrier between idea and reality is a single sentence.
             Experience the unified engine that powers apps, movies, ads, and

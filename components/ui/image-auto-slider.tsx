@@ -108,9 +108,9 @@ export const TweetSlider = () => {
                     alt={`Tweet screenshot ${(index % images.length) + 1}`}
                     width={500}
                     height={500}
+                    sizes="(max-width: 768px) 80vw, (max-width: 1200px) 45vw, 500px"
+                    quality={100}
                     className="w-full h-full object-contain tweet-image rounded-xl"
-                    unoptimized
-                    priority={index < images.length}
                   />
                 </div>
               ))}

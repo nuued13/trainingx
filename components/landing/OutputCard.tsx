@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
+import Image from "next/image";
 
 interface OutputCardProps {
   title: string;
@@ -36,10 +37,13 @@ export function OutputCard({
     >
       {/* Image Background */}
       <div className="absolute inset-0 z-0">
-        <img
+        <Image
           src={imageSrc}
           alt={title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          fill
+          sizes="(max-width: 768px) 90vw, (max-width: 1024px) 40vw, 20vw"
+          quality={100}
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent" />
       </div>

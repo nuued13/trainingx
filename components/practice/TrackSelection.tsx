@@ -69,31 +69,30 @@ export function TrackSelection({
 
   return (
     <div className="min-h-full bg-slate-50 pb-12">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="text-slate-500 hover:text-slate-800 hover:bg-slate-100 mt-4 ml-4 rounded-xl font-bold"
         >
-          <Button
-            variant="ghost"
-            onClick={onBack}
-            className="text-slate-500 hover:text-slate-800 hover:bg-slate-100 mb-6 rounded-xl font-bold"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Domains
-          </Button>
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Back to Domains
+        </Button>
 
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">
-              Your Learning Path
-            </h1>
-            <p className="text-lg font-medium text-slate-500">
-              Complete all tracks to unlock the Domain Assessment
-            </p>
-          </div>
-        </motion.div>
-
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">
+            Your Learning Path
+          </h1>
+          <p className="text-lg font-medium text-slate-500">
+            Complete all tracks to unlock the Domain Assessment
+          </p>
+        </div>
+      </motion.div>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Duolingo-style Track Path */}
         <TrackPath
           tracks={tracks}

@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, MapPin } from "lucide-react";
+import Image from "next/image";
 
 export default function Footer() {
   const footerLinks = {
@@ -45,7 +45,13 @@ export default function Footer() {
               TrainingX.Ai
             </div> */}
           <div className="flex items-center space-x-8">
-            <img src="/logo.webp" className="w-20 mb-4" />
+            <Image
+              src="/logo.webp"
+              alt="TrainingX.Ai logo"
+              width={80}
+              height={80}
+              className="w-20 mb-4"
+            />
             <p className="text-gray-400 mb-6 max-w-md">
               Universal Prompting for the 21st Century. Master AI skills with
               our proven 10-year track record and join the AI economy.

@@ -190,7 +190,7 @@ function FeatureTile({
         </div>
         {visual}
       </div>
-      <h4 className="text-lg font-bold text-slate-900 mb-2">{title}</h4>
+      <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
       <p className="text-sm text-slate-500 leading-relaxed font-medium">
         {desc}
       </p>
