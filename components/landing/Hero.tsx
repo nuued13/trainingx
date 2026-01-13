@@ -192,7 +192,7 @@ export default function Hero() {
 
           <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
             From confused beginner to certified prompt engineer, with real
-            practice, real feedback, and real career paths.
+            practice, real feedback, and real success pathways
           </p>
 
           {/* <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">

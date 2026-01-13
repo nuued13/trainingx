@@ -21,7 +21,7 @@ export default function Navigation() {
         { label: "Practice", href: "/practice" },
         { label: "Matching", href: "/matching" },
         // { label: "Portfolio", href: "/portfolio" },
-        { label: "Assessment", href: "/quiz" },
+        // { label: "Assessment", href: "/quiz" },
         { label: "About", href: "/about" },
       ]
     : [
