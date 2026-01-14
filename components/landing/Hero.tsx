@@ -235,7 +235,7 @@ export default function Hero() {
                 className="bg-white text-black border border-white font-semibold py-6 w-full lg:w-[300px] hover:bg-white/90"
                 data-testid="button-take-assessment"
               >
-                Discover Your Path
+                Discover Your Success Pathway
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
