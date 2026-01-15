@@ -13,6 +13,7 @@ export default defineSchema({
     phoneVerificationTime: v.optional(v.number()),
     age: v.optional(v.number()),
     gender: v.optional(v.string()),
+    needsProfileCompletion: v.optional(v.boolean()),
     isAnonymous: v.optional(v.boolean()),
     // Custom field.
     favoriteColor: v.optional(v.string()),

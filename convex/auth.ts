@@ -47,6 +47,15 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         },
       },
       profile(profile) {
+        const id =
+          typeof profile.sub === "string"
+            ? profile.sub
+            : typeof profile.id === "string"
+              ? profile.id
+              : null;
+        if (!id) {
+          throw new Error("Google profile is missing an id");
+        }
         const email =
           typeof profile.email === "string"
             ? normalizeEmail(profile.email)
@@ -56,6 +65,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         const emailVerified =
           profile.email_verified === true || legacyVerified === true;
         return {
+          id,
           email,
           emailVerified,
           name: profile.name,
@@ -125,4 +135,13 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     }),
     Anonymous,
   ],
+  callbacks: {
+    async afterUserCreatedOrUpdated(ctx, { userId, existingUserId, type, provider }) {
+      const isOAuth =
+        type === "oauth" || provider.type === "oauth" || provider.type === "oidc";
+      if (existingUserId === null && isOAuth) {
+        await ctx.db.patch(userId, { needsProfileCompletion: true });
+      }
+    },
+  },
 });

@@ -19,6 +19,43 @@ export const viewer = query({
   },
 });
 
+export const completeProfile = mutation({
+  args: {
+    name: v.string(),
+    age: v.number(),
+    gender: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Unauthenticated");
+
+    const name = args.name.trim();
+    const gender = args.gender.trim();
+    const age = Math.floor(args.age);
+    const allowedGenders = new Set([
+      "female",
+      "male",
+      "prefer-not-to-say",
+      "other",
+    ]);
+
+    if (!name) throw new Error("Name is required");
+    if (!Number.isFinite(age) || age <= 0) {
+      throw new Error("Age must be a positive number");
+    }
+    if (!allowedGenders.has(gender)) {
+      throw new Error("Invalid gender");
+    }
+
+    await ctx.db.patch(userId, {
+      name,
+      age,
+      gender,
+      needsProfileCompletion: false,
+    });
+  },
+});
+
 export const generateUploadUrl = mutation(async (ctx) => {
   return await ctx.storage.generateUploadUrl();
 });
@@ -425,6 +462,36 @@ export const updateName = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
     await ctx.db.patch(userId, { name });
+  },
+});
+
+export const updateProfile = mutation({
+  args: {
+    name: v.optional(v.string()),
+    age: v.optional(v.number()),
+  },
+  handler: async (ctx, { name, age }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const updates: { name?: string; age?: number } = {};
+
+    if (typeof name === "string") {
+      const trimmedName = name.trim();
+      if (!trimmedName) throw new Error("Name is required");
+      updates.name = trimmedName;
+    }
+
+    if (typeof age === "number") {
+      const normalizedAge = Math.floor(age);
+      if (!Number.isFinite(normalizedAge) || normalizedAge <= 0) {
+        throw new Error("Age must be a positive number");
+      }
+      updates.age = normalizedAge;
+    }
+
+    if (Object.keys(updates).length === 0) return;
+    await ctx.db.patch(userId, updates);
   },
 });
 

@@ -24,7 +24,9 @@ import { GameHeader } from "./components/GameHeader";
 import { GameHUD } from "./components/GameHUD";
 import { IntermediateCardModal } from "./components/IntermediateCardModal";
 import { LevelCompleteModal } from "./components/LevelCompleteModal";
+import { PracticeCard } from "./components/PracticeCard";
 import { motion } from "framer-motion";
+import { Check, Pencil, RotateCcw } from "lucide-react";
 
 interface IntermediatePracticeCardDeckProps {
   userId: Id<"users">;
@@ -237,96 +239,36 @@ export function IntermediatePracticeCardDeck({
           {cardsToDisplay.map((card, index) => {
             const isCompleted = state.completedCards.has(card._id);
             const isUnderstood = state.understoodCards.has(card._id);
-            const needsPractice = state.needsPracticeCards.has(card._id);
+            const isRevision =
+              !!card.params.brokenPrompt || track === "iteration";
+
+            // Determine status icon and color
+            let statusIcon: React.ReactNode = (
+              <Check className="w-5 h-5 stroke-[3px]" />
+            );
+            let statusColorClass = "bg-green-500";
+
+            if (isRevision) {
+              statusIcon = <Pencil className="w-5 h-5 stroke-[3px]" />;
+              statusColorClass = "bg-blue-500";
+            } else if (!isUnderstood && isCompleted) {
+              statusIcon = <RotateCcw className="w-5 h-5 stroke-[3px]" />;
+              statusColorClass = "bg-amber-500";
+            }
 
             return (
-              <motion.div
+              <PracticeCard
                 key={card._id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{
-                  opacity: 1,
-                  scale: state.isShuffling ? 0.95 : 1,
-                  rotate: state.isShuffling ? Math.random() * 4 - 2 : 0,
-                }}
-                transition={{ delay: index * 0.02 }}
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
+                card={card}
+                index={index}
+                isAnswered={isCompleted}
+                isShuffling={state.isShuffling}
+                showAnimation={state.justCompletedCard === card._id}
+                lastScoreChange={isUnderstood ? 100 : 50}
                 onClick={() => handleCardClick(index)}
-                className={`
-                  relative aspect-[3/4] rounded-2xl cursor-pointer
-                  border-2 border-b-[6px] transition-all
-                  ${
-                    isCompleted
-                      ? isUnderstood
-                        ? "bg-green-50 border-green-300"
-                        : "bg-amber-50 border-amber-300"
-                      : "bg-white border-slate-200 hover:border-blue-300"
-                  }
-                `}
-              >
-                {/* Card Content */}
-                <div className="absolute inset-0 p-4 flex flex-col">
-                  {/* Track badge */}
-                  <div
-                    className={`
-                      self-start px-2 py-1 rounded-lg text-xs font-bold text-white
-                      bg-gradient-to-r ${TRACK_COLORS[track]}
-                    `}
-                  >
-                    {TRACK_TITLES[track]}
-                  </div>
-
-                  {/* Card number */}
-                  <div className="flex-1 flex items-center justify-center">
-                    <span
-                      className={`
-                        text-4xl font-black
-                        ${
-                          isCompleted
-                            ? isUnderstood
-                              ? "text-green-400"
-                              : "text-amber-400"
-                            : "text-slate-300"
-                        }
-                      `}
-                    >
-                      {index + 1}
-                    </span>
-                  </div>
-
-                  {/* Status indicator */}
-                  {isCompleted && (
-                    <div className="absolute bottom-3 left-0 right-0 flex justify-center">
-                      <span
-                        className={`
-                          text-2xl ${isUnderstood ? "animate-bounce" : ""}
-                        `}
-                      >
-                        {isUnderstood ? "✅" : "🔄"}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Decorative icon */}
-                  {!isCompleted && (
-                    <div className="absolute bottom-3 left-0 right-0 flex justify-center">
-                      <span className="text-2xl">✏️</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Just completed animation */}
-                {state.justCompletedCard === card._id && (
-                  <motion.div
-                    initial={{ opacity: 1, scale: 1 }}
-                    animate={{ opacity: 0, scale: 2 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute inset-0 flex items-center justify-center"
-                  >
-                    <span className="text-6xl">✨</span>
-                  </motion.div>
-                )}
-              </motion.div>
+                statusIcon={statusIcon}
+                statusColorClass={statusColorClass}
+              />
             );
           })}
         </div>

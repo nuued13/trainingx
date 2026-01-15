@@ -4,19 +4,45 @@
  * IntermediateCardModal
  *
  * Multi-step modal for intermediate-level prompt writing exercises.
- * Flow: Challenge -> Write Prompt -> View Feedback -> Self-Assess
+ * Flow: Challenge -> Write Prompt -> AI Scoring -> View Feedback
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Lightbulb, ChevronRight, Check, RotateCcw } from "lucide-react";
+import {
+  X,
+  Lightbulb,
+  ChevronRight,
+  ChevronDown,
+  Check,
+  RotateCcw,
+  Loader2,
+  Star,
+} from "lucide-react";
+import { useAction } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import {
   IntermediatePracticeCard,
   IntermediateAssessment,
 } from "../../intermediateTypes";
 
-type ModalStep = "challenge" | "write" | "feedback";
+type ModalStep = "challenge" | "write" | "scoring" | "feedback";
+
+interface AIScoreResult {
+  overallScore: number;
+  scores: {
+    clarity: number;
+    context: number;
+    constraints: number;
+    format: number;
+    testability: number;
+  };
+  feedback: string;
+  strengths: string[];
+  improvements: string[];
+  isGood: boolean;
+}
 
 interface IntermediateCardModalProps {
   card: IntermediatePracticeCard | null;
@@ -36,12 +62,27 @@ export function IntermediateCardModal({
   );
   const [userPrompt, setUserPrompt] = useState("");
   const [showHint, setShowHint] = useState(false);
+  const [aiScore, setAiScore] = useState<AIScoreResult | null>(null);
+  const [scoringError, setScoringError] = useState<string | null>(null);
+
+  // Reset state when card changes
+  useEffect(() => {
+    if (card) {
+      setStep(isViewingCompleted ? "feedback" : "challenge");
+      setUserPrompt("");
+      setShowHint(false);
+      setAiScore(null);
+      setScoringError(null);
+    }
+  }, [card?._id, isViewingCompleted]);
 
   const handleNext = useCallback(() => {
     if (step === "challenge") {
       setStep("write");
     } else if (step === "write") {
-      setStep("feedback");
+      setAiScore(null);
+      setScoringError(null);
+      setStep("scoring");
     }
   }, [step]);
 
@@ -50,8 +91,25 @@ export function IntermediateCardModal({
       setStep("challenge");
     } else if (step === "feedback") {
       setStep("write");
+      setAiScore(null);
     }
   }, [step]);
+
+  const handleScoreComplete = useCallback((result: AIScoreResult) => {
+    setAiScore(result);
+    setStep("feedback");
+  }, []);
+
+  const handleScoringError = useCallback((error: string) => {
+    setScoringError(error);
+    setStep("feedback");
+  }, []);
+
+  const handleBeginScoring = useCallback(() => {
+    setAiScore(null);
+    setScoringError(null);
+    setStep("scoring");
+  }, []);
 
   const handleAssess = useCallback(
     (assessment: IntermediateAssessment) => {
@@ -60,6 +118,9 @@ export function IntermediateCardModal({
       setStep("challenge");
       setUserPrompt("");
       setShowHint(false);
+      setAiScore(null);
+      setScoringError(null);
+      onClose(); // Close the modal after assessment is complete
     },
     [onComplete]
   );
@@ -69,6 +130,8 @@ export function IntermediateCardModal({
     setStep("challenge");
     setUserPrompt("");
     setShowHint(false);
+    setAiScore(null);
+    setScoringError(null);
     onClose();
   }, [onClose]);
 
@@ -105,13 +168,16 @@ export function IntermediateCardModal({
             <div className="flex items-center gap-3">
               {/* Step indicator */}
               <div className="flex gap-1">
-                {["challenge", "write", "feedback"].map((s, i) => (
+                {["challenge", "write", "scoring", "feedback"].map((s, i) => (
                   <div
                     key={s}
                     className={`w-2 h-2 rounded-full transition-colors ${
                       step === s
                         ? "bg-blue-500"
-                        : i < ["challenge", "write", "feedback"].indexOf(step)
+                        : i <
+                          ["challenge", "write", "scoring", "feedback"].indexOf(
+                            step
+                          )
                         ? "bg-green-500"
                         : "bg-slate-200"
                     }`}
@@ -121,7 +187,8 @@ export function IntermediateCardModal({
               <span className="text-sm font-bold text-slate-500 uppercase tracking-wide">
                 {step === "challenge" && "Challenge"}
                 {step === "write" && "Write Your Prompt"}
-                {step === "feedback" && "Review & Learn"}
+                {step === "scoring" && "AI Scoring..."}
+                {step === "feedback" && "Your Score"}
               </span>
             </div>
             <Button
@@ -162,12 +229,27 @@ export function IntermediateCardModal({
               />
             )}
 
+            {step === "scoring" && (
+              <ScoringView
+                userPrompt={userPrompt}
+                goldPrompt={params.goldPrompt}
+                scenario={params.scenario}
+                userInstruction={params.userInstruction}
+                rubric={params.rubric}
+                commonMistakes={params.commonMistakes}
+                onScoreComplete={handleScoreComplete}
+                onError={handleScoringError}
+              />
+            )}
+
             {step === "feedback" && (
               <FeedbackView
                 userPrompt={userPrompt}
                 goldPrompt={params.goldPrompt}
                 commonMistakes={params.commonMistakes}
                 rubric={params.rubric}
+                aiScore={aiScore}
+                scoringError={scoringError}
                 isViewingCompleted={isViewingCompleted}
                 onAssess={handleAssess}
                 onBack={handleBack}
@@ -365,9 +447,102 @@ function WriteView({
           disabled={userPrompt.trim().length < 10}
           className="flex-[2] bg-green-500 hover:bg-green-600 text-white font-bold py-6 rounded-2xl shadow-[0_4px_0_0_rgb(22,163,74)] active:shadow-none active:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-lg">Submit & Compare</span>
+          <span className="text-lg">Submit for AI Review</span>
           <ChevronRight className="w-5 h-5 ml-2 stroke-[3px]" />
         </Button>
+      </div>
+    </div>
+  );
+}
+
+interface ScoringViewProps {
+  userPrompt: string;
+  goldPrompt: string;
+  scenario: string;
+  userInstruction: string;
+  rubric: {
+    clarity: string;
+    context: string;
+    constraints: string;
+    format: string;
+    testability: string;
+  } | null;
+  commonMistakes: string[];
+  onScoreComplete: (result: AIScoreResult) => void;
+  onError: (error: string) => void;
+}
+
+function ScoringView({
+  userPrompt,
+  goldPrompt,
+  scenario,
+  userInstruction,
+  rubric,
+  commonMistakes,
+  onScoreComplete,
+  onError,
+}: ScoringViewProps) {
+  const scorePromptAction = useAction(api.promptScoring.scorePrompt);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const runScoring = async () => {
+      try {
+        console.log("Starting AI scoring via Convex...");
+        const result = await scorePromptAction({
+          userPrompt,
+          goldPrompt,
+          scenario,
+          userInstruction,
+          rubric: rubric || undefined,
+          commonMistakes,
+        });
+
+        if (isMounted) {
+          console.log("AI Scoring complete:", result);
+          onScoreComplete(result);
+        }
+      } catch (error) {
+        console.error("Scoring error:", error);
+        if (isMounted) {
+          onError("Unable to score prompt. Showing comparison instead.");
+        }
+      }
+    };
+
+    runScoring();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    userPrompt,
+    goldPrompt,
+    scenario,
+    userInstruction,
+    rubric,
+    commonMistakes,
+    onScoreComplete,
+    onError,
+    scorePromptAction,
+  ]);
+
+  return (
+    <div className="flex flex-col items-center justify-center py-12 space-y-6">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      >
+        <Loader2 className="w-16 h-16 text-blue-500" />
+      </motion.div>
+      <div className="text-center">
+        <h3 className="text-xl font-bold text-slate-700 mb-2">
+          AI is reviewing your prompt...
+        </h3>
+        <p className="text-slate-500">
+          GPT-5-nano is analyzing your prompt against the rubric
+        </p>
       </div>
     </div>
   );
@@ -384,6 +559,8 @@ interface FeedbackViewProps {
     format: string;
     testability: string;
   } | null;
+  aiScore: AIScoreResult | null;
+  scoringError: string | null;
   isViewingCompleted: boolean;
   onAssess: (assessment: IntermediateAssessment) => void;
   onBack: () => void;
@@ -394,13 +571,128 @@ function FeedbackView({
   goldPrompt,
   commonMistakes,
   rubric,
+  aiScore,
+  scoringError,
   isViewingCompleted,
   onAssess,
   onBack,
 }: FeedbackViewProps) {
+  const [showMistakes, setShowMistakes] = useState(false);
+
+  // Get score color
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-500";
+    if (score >= 60) return "text-amber-500";
+    return "text-red-500";
+  };
+
+  const getScoreBg = (score: number) => {
+    if (score >= 80) return "bg-green-50 border-green-200";
+    if (score >= 60) return "bg-amber-50 border-amber-200";
+    return "bg-red-50 border-red-200";
+  };
+
   return (
     <div className="space-y-6">
-      {/* Side by side comparison */}
+      {/* AI Score Display */}
+      {aiScore && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div
+            className={`inline-flex flex-col items-center p-6 rounded-3xl border-2 ${getScoreBg(
+              aiScore.overallScore
+            )}`}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Star
+                className={`w-6 h-6 ${getScoreColor(
+                  aiScore.overallScore
+                )} fill-current`}
+              />
+              <span
+                className={`text-5xl font-black ${getScoreColor(
+                  aiScore.overallScore
+                )}`}
+              >
+                {aiScore.overallScore}
+              </span>
+              <span className="text-2xl text-slate-400 font-bold">/100</span>
+            </div>
+            <p className="text-slate-600 font-medium">{aiScore.feedback}</p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Score Breakdown */}
+      {aiScore && (
+        <div>
+          <h3 className="text-slate-400 text-xs font-black mb-2 uppercase tracking-wide">
+            Score Breakdown
+          </h3>
+          <div className="grid grid-cols-5 gap-2">
+            {Object.entries(aiScore.scores).map(([key, value]) => (
+              <div
+                key={key}
+                className="bg-slate-50 border-2 border-slate-200 rounded-xl p-3 text-center"
+              >
+                <div
+                  className={`text-lg font-black ${getScoreColor(value * 5)}`}
+                >
+                  {value}
+                </div>
+                <div className="text-xs text-slate-500 capitalize">{key}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI Feedback */}
+      {aiScore && aiScore.strengths.length > 0 && (
+        <div>
+          <h3 className="text-green-600 text-xs font-black mb-2 uppercase tracking-wide">
+            ✅ Strengths
+          </h3>
+          <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-4">
+            <ul className="space-y-1">
+              {aiScore.strengths.map((s, i) => (
+                <li key={i} className="text-green-700 text-sm">
+                  • {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {aiScore && aiScore.improvements.length > 0 && (
+        <div>
+          <h3 className="text-amber-600 text-xs font-black mb-2 uppercase tracking-wide">
+            📈 Areas to Improve
+          </h3>
+          <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4">
+            <ul className="space-y-1">
+              {aiScore.improvements.map((s, i) => (
+                <li key={i} className="text-amber-700 text-sm">
+                  • {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {/* Error message */}
+      {scoringError && (
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4">
+          <p className="text-amber-700 text-sm">{scoringError}</p>
+        </div>
+      )}
+
+      {/* Your Prompt */}
       {userPrompt && !isViewingCompleted && (
         <div>
           <h3 className="text-slate-400 text-xs font-black mb-2 uppercase tracking-wide">
@@ -412,60 +704,54 @@ function FeedbackView({
         </div>
       )}
 
-      {/* Gold prompt */}
+      {/* Common mistakes accordion */}
       <div>
-        <h3 className="text-green-600 text-xs font-black mb-2 uppercase tracking-wide">
-          ✨ Example Great Prompt
-        </h3>
-        <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-4">
-          <p className="text-green-700 font-mono text-sm">"{goldPrompt}"</p>
-        </div>
-      </div>
-
-      {/* Rubric (if exists) */}
-      {rubric && (
-        <div>
-          <h3 className="text-slate-400 text-xs font-black mb-2 uppercase tracking-wide">
-            Scoring Rubric
-          </h3>
-          <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-4 space-y-2">
-            {Object.entries(rubric).map(([key, value]) => (
-              <div key={key} className="flex justify-between text-sm">
-                <span className="text-purple-700 font-medium capitalize">
-                  {key.replace("_", " ")}
-                </span>
-                <span className="text-purple-600 font-mono">{value}</span>
-              </div>
-            ))}
+        <Button
+          variant="ghost"
+          onClick={() => setShowMistakes(!showMistakes)}
+          className="w-full flex items-center justify-between p-4 bg-red-50 border-2 border-red-200 rounded-2xl text-red-600 hover:bg-red-100 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black uppercase tracking-wide">
+              ⚠️ Common Mistakes to Avoid
+            </span>
           </div>
-        </div>
-      )}
+          <ChevronDown
+            className={`w-5 h-5 transition-transform duration-200 ${
+              showMistakes ? "rotate-180" : ""
+            }`}
+          />
+        </Button>
 
-      {/* Common mistakes */}
-      <div>
-        <h3 className="text-red-500 text-xs font-black mb-2 uppercase tracking-wide">
-          ⚠️ Common Mistakes to Avoid
-        </h3>
-        <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4">
-          <ul className="space-y-2">
-            {commonMistakes.map((mistake, i) => (
-              <li
-                key={i}
-                className="text-red-600 text-sm flex items-start gap-2"
-              >
-                <span className="text-red-400">•</span>
-                {mistake}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <AnimatePresence>
+          {showMistakes && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-2 bg-red-50/50 border-2 border-red-100 rounded-2xl p-4">
+                <ul className="space-y-2">
+                  {commonMistakes.map((mistake, i) => (
+                    <li
+                      key={i}
+                      className="text-red-700 text-sm flex items-start gap-2"
+                    >
+                      <span className="text-red-400">•</span>
+                      {mistake}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Self Assessment */}
+      {/* Actions */}
       <div className="pt-4">
-        <h3 className="text-slate-600 text-sm font-bold mb-3 text-center">
-          How well did you understand this?
-        </h3>
         <div className="flex gap-3">
           {!isViewingCompleted && (
             <Button

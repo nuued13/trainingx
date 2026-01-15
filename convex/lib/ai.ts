@@ -84,7 +84,9 @@ function getApiKey(provider: AIProvider): string {
 
   if (!key) {
     throw new Error(
-      `Missing API key for ${provider}. Set ${provider === "openai" ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY"} in environment.`
+      `Missing API key for ${provider}. Set ${
+        provider === "openai" ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY"
+      } in environment.`
     );
   }
 
@@ -120,6 +122,16 @@ async function callOpenAI(
     totalTokens: number;
   };
 }> {
+  // Reasoning models (gpt-5, o1, etc.) have special requirements:
+  // 1. They use max_completion_tokens instead of max_tokens
+  // 2. They only support temperature=1 (default)
+  const isReasoningModel = model.startsWith("gpt-5") || model.startsWith("o1");
+
+  // Newer models (4.1+, 5, etc.) prefer max_completion_tokens
+  const useNewTokenParam =
+    isReasoningModel || model.includes("4.1") || model.startsWith("gpt-5");
+  const tokenParam = useNewTokenParam ? "max_completion_tokens" : "max_tokens";
+
   const response = await fetch(API_ENDPOINTS.openai, {
     method: "POST",
     headers: {
@@ -129,8 +141,9 @@ async function callOpenAI(
     body: JSON.stringify({
       model,
       messages,
-      temperature: options.temperature ?? 0.7,
-      max_tokens: options.maxTokens,
+      // Only skip temperature for reasoning models that don't support it
+      ...(isReasoningModel ? {} : { temperature: options.temperature ?? 0.7 }),
+      [tokenParam]: options.maxTokens,
       ...(options.jsonMode && { response_format: { type: "json_object" } }),
     }),
   });
@@ -142,12 +155,16 @@ async function callOpenAI(
 
   const data = await response.json();
 
+  // gpt-5 models may have content in a different location or use refusal field
+  const message = data.choices?.[0]?.message;
+  const content = message?.content ?? message?.refusal ?? "";
+
   return {
-    content: data.choices[0].message.content,
+    content,
     usage: {
-      promptTokens: data.usage.prompt_tokens,
-      completionTokens: data.usage.completion_tokens,
-      totalTokens: data.usage.total_tokens,
+      promptTokens: data.usage?.prompt_tokens ?? 0,
+      completionTokens: data.usage?.completion_tokens ?? 0,
+      totalTokens: data.usage?.total_tokens ?? 0,
     },
   };
 }
@@ -271,7 +288,11 @@ export async function callAI<T = string>(
         // Try to extract JSON from the response
         const jsonMatch = result.content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          parsedData = JSON.parse(jsonMatch[0]) as T;
+          try {
+            parsedData = JSON.parse(jsonMatch[0]) as T;
+          } catch {
+            throw new Error("Failed to parse JSON from AI response");
+          }
         } else {
           throw new Error("Failed to parse JSON from AI response");
         }

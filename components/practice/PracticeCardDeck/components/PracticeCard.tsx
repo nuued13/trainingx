@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
 import { PracticeCard as PracticeCardType } from "../types";
 
 interface PracticeCardProps {
@@ -10,6 +11,14 @@ interface PracticeCardProps {
   showAnimation: boolean;
   lastScoreChange: number | null;
   onClick: () => void;
+  // Customization for intermediate/standard use
+  colorClass?: string;
+  borderColorClass?: string;
+  bgColorClass?: string;
+  centerIcon?: React.ReactNode;
+  statusIcon?: React.ReactNode;
+  statusColorClass?: string;
+  badge?: React.ReactNode;
 }
 
 export function PracticeCard({
@@ -20,6 +29,13 @@ export function PracticeCard({
   showAnimation,
   lastScoreChange,
   onClick,
+  colorClass = "bg-blue-500",
+  borderColorClass = "border-blue-600",
+  bgColorClass = "bg-blue-400",
+  centerIcon,
+  statusIcon = <Check className="w-5 h-5 stroke-[3px]" />,
+  statusColorClass = "bg-green-500",
+  badge,
 }: PracticeCardProps) {
   return (
     <motion.div
@@ -50,9 +66,22 @@ export function PracticeCard({
         whileTap={!isAnswered ? { scale: 0.95 } : {}}
       >
         <div
-          className={`w-full h-full bg-blue-500 rounded-2xl p-1 shadow-sm border-2 border-b-[6px] border-blue-600 transition-all hover:border-blue-500 hover:translate-y-[2px] active:border-b-2 active:translate-y-[6px] ${isAnswered && "opacity-60"}`}
+          className={cn(
+            "w-full h-full rounded-2xl p-1 shadow-sm border-2 border-b-[6px] transition-all hover:translate-y-[2px] active:border-b-2 active:translate-y-[6px]",
+            colorClass,
+            borderColorClass,
+            isAnswered && "opacity-60"
+          )}
         >
-          <div className="w-full h-full rounded-xl bg-blue-400 flex flex-col items-center justify-center p-4 relative overflow-hidden text-white">
+          <div
+            className={cn(
+              "w-full h-full rounded-xl flex flex-col items-center justify-center p-4 relative overflow-hidden text-white",
+              bgColorClass
+            )}
+          >
+            {/* Badge */}
+            {badge && <div className="absolute top-3 left-3 z-20">{badge}</div>}
+
             {/* Pattern background */}
             <div
               className="absolute inset-0 opacity-10"
@@ -64,25 +93,20 @@ export function PracticeCard({
             />
 
             {/* Card Content or Placeholder */}
-            {/* {card.params?.scenario ? (
-              <div className="relative z-10 text-center space-y-2">
-                <div className="text-4xl">📝</div>
-                <div className="text-sm font-medium line-clamp-3 leading-snug opacity-90">
-                  {card.params.scenario}
-                </div>
-              </div>
-            ) : ( */}
             <div className="text-center relative z-10">
-              <div className="grid grid-cols-3 gap-2 opacity-80">
-                {[...Array(9)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-3 h-3 bg-white rounded-full shadow-sm"
-                  />
-                ))}
-              </div>
+              {centerIcon ? (
+                <div className="text-4xl">{centerIcon}</div>
+              ) : (
+                <div className="grid grid-cols-3 gap-2 opacity-80">
+                  {[...Array(9)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-3 h-3 bg-white rounded-full shadow-sm"
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-            {/* )} */}
           </div>
         </div>
 
@@ -101,12 +125,20 @@ export function PracticeCard({
               <div className="relative">
                 <div
                   className={cn(
-                    "absolute inset-0 bg-green-400 rounded-full blur-md opacity-60",
+                    "absolute inset-0 rounded-full blur-md opacity-60",
+                    statusColorClass === "bg-green-500"
+                      ? "bg-green-400"
+                      : "bg-amber-400",
                     showAnimation && "animate-pulse"
                   )}
                 />
-                <div className="relative bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-lg border-2 border-green-100">
-                  ✓
+                <div
+                  className={cn(
+                    "relative text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-lg border-2 border-white/20",
+                    statusColorClass
+                  )}
+                >
+                  {statusIcon}
                 </div>
               </div>
             </motion.div>

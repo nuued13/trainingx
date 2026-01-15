@@ -59,6 +59,9 @@ export function BeginnerPracticeCardDeck({
   const user = useQuery(api.users.get, { id: userId }) as any;
   const age = user?.age ?? 25; // Default to adult if no age
 
+  console.log("BeginnerPracticeCardDeck: User:", user);
+  console.log("BeginnerPracticeCardDeck: Age:", age);
+
   // Load questions from static files
   const practiceItems = useMemo(() => {
     const questions = getQuestionsForTrack(track, age, { shuffle: false });

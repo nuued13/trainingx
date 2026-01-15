@@ -17,24 +17,28 @@ export default function AuthPage() {
   const [step, setStep] = useState<"signIn" | { email: string } | "forgot">(
     "signIn"
   );
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [, setLocation] = useLocation();
   const { signIn } = useAuthActions();
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isLoading && isAuthenticated && user) {
       console.log("Auth page: User is authenticated, redirecting...");
-      const redirectTo =
-        sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
-      sessionStorage.removeItem("redirectAfterLogin");
+      const needsProfileCompletion = user.needsProfileCompletion === true;
+      const redirectTo = needsProfileCompletion
+        ? "/complete-profile"
+        : sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
+      if (!needsProfileCompletion) {
+        sessionStorage.removeItem("redirectAfterLogin");
+      }
       // Small delay to ensure auth state is fully propagated
       setTimeout(() => {
         console.log("Auth page: Redirecting to", redirectTo);
         setLocation(redirectTo);
       }, 100);
     }
-  }, [isAuthenticated, isLoading, setLocation]);
+  }, [isAuthenticated, isLoading, setLocation, user]);
 
   if (isLoading) {
     return (

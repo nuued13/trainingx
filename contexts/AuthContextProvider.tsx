@@ -1,13 +1,17 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useConvexAuth, useQuery } from 'convex/react';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { api } from 'convex/_generated/api';
+import { useLocation } from 'wouter';
 
 interface User {
   _id: string;
   email?: string;
   name?: string;
   image?: string;
+  age?: number;
+  gender?: string;
+  needsProfileCompletion?: boolean;
   isAnonymous?: boolean;
 }
 
@@ -29,6 +33,26 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { signIn, signOut } = useAuthActions();
   const user = useQuery(api.users.viewer);
+  const [location, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (isLoading || !isAuthenticated) return;
+    if (!user?.needsProfileCompletion) return;
+    if (location === '/complete-profile') return;
+
+    const shouldStoreRedirect =
+      location !== '/auth' && location !== '/complete-profile';
+    if (shouldStoreRedirect && !sessionStorage.getItem('redirectAfterLogin')) {
+      sessionStorage.setItem('redirectAfterLogin', location);
+    }
+    setLocation('/complete-profile');
+  }, [
+    isAuthenticated,
+    isLoading,
+    location,
+    setLocation,
+    user?.needsProfileCompletion,
+  ]);
 
   const value: AuthContext = {
     user: user || null,

@@ -36,7 +36,7 @@ import { useRef } from "react";
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
-  const updateName = useMutation(api.users.updateName);
+  const updateProfile = useMutation(api.users.updateProfile);
   const deleteAccountMutation = useMutation(api.users.deleteAccount);
   const router = useRouter();
   const generateUploadUrl = useMutation(api.users.generateUploadUrl);
@@ -45,6 +45,9 @@ export default function ProfilePage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(user?.name || "");
+  const [age, setAge] = useState(
+    typeof user?.age === "number" ? String(user.age) : ""
+  );
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -55,12 +58,31 @@ export default function ProfilePage() {
     }
   }, [user?.name]);
 
-  const handleUpdateName = async () => {
-    if (!name.trim()) return;
+  useEffect(() => {
+    if (typeof user?.age === "number") {
+      setAge(String(user.age));
+    }
+  }, [user?.age]);
+
+  const handleUpdateProfile = async () => {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      toast.error("Please enter your name.");
+      return;
+    }
+    const trimmedAge = age.trim();
+    const parsedAge = trimmedAge ? Number.parseInt(trimmedAge, 10) : null;
+    if (trimmedAge && (!Number.isFinite(parsedAge) || parsedAge <= 0)) {
+      toast.error("Please enter a valid age.");
+      return;
+    }
     setIsUpdating(true);
     try {
-      await updateName({ name });
-      toast.success("Your name has been updated successfully.");
+      await updateProfile({
+        name: trimmedName,
+        ...(parsedAge ? { age: parsedAge } : {}),
+      });
+      toast.success("Your profile has been updated successfully.");
     } catch (error) {
       toast.error("Failed to update profile.");
     } finally {
@@ -222,8 +244,20 @@ export default function ProfilePage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="age">Age</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  min={1}
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  placeholder="Your age"
+                />
+              </div>
+
               <div className="flex justify-end">
-                <Button onClick={handleUpdateName} disabled={isUpdating}>
+                <Button onClick={handleUpdateProfile} disabled={isUpdating}>
                   {isUpdating && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
