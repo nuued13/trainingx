@@ -8,12 +8,17 @@ import { ArrowLeft } from "lucide-react";
 import { Id } from "convex/_generated/dataModel";
 import { TrackPath } from "./TrackPathSection";
 import { useState } from "react";
+import { DifficultyLevel } from "@/lib/practice";
 
 interface TrackSelectionProps {
   userId: Id<"users">;
   domainId: Id<"practiceDomains">;
   onBack: () => void;
-  onSelectTrack: (trackId: Id<"practiceTracks">, slug: string) => void;
+  onSelectTrack: (
+    trackId: Id<"practiceTracks">,
+    slug: string,
+    difficulty: DifficultyLevel
+  ) => void;
   onSelectLevel?: (levelId: Id<"practiceLevels">) => void;
   onSelectAssessment?: () => void;
 }
@@ -25,6 +30,9 @@ export function TrackSelection({
   onSelectTrack,
   onSelectAssessment,
 }: TrackSelectionProps) {
+  const [selectedDifficulty, setSelectedDifficulty] =
+    useState<DifficultyLevel>("beginner");
+
   const tracks = useQuery(api.practiceTracks.listByDomainWithProgress, {
     domainId,
     userId,
@@ -73,6 +81,22 @@ export function TrackSelection({
       }
     : undefined;
 
+  const difficultyOptions: {
+    level: DifficultyLevel;
+    label: string;
+    available: boolean;
+    emoji: string;
+  }[] = [
+    { level: "beginner", label: "Beginner", available: true, emoji: "🌱" },
+    {
+      level: "intermediate",
+      label: "Intermediate",
+      available: true,
+      emoji: "🌿",
+    },
+    { level: "advanced", label: "Advanced", available: false, emoji: "🌳" },
+  ];
+
   return (
     <div className="min-h-full bg-slate-50 pb-12">
       {/* Header */}
@@ -99,24 +123,22 @@ export function TrackSelection({
 
           {/* Difficulty Level Tabs */}
           <div className="flex justify-center gap-2 mb-4">
-            {[
-              { level: "beginner", label: "Beginner", available: true },
-              {
-                level: "intermediate",
-                label: "Intermediate",
-                available: false,
-              },
-              { level: "advanced", label: "Advanced", available: false },
-            ].map((item) => (
+            {difficultyOptions.map((item) => (
               <button
                 key={item.level}
                 disabled={!item.available}
+                onClick={() =>
+                  item.available && setSelectedDifficulty(item.level)
+                }
                 className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
-                  item.available
+                  selectedDifficulty === item.level && item.available
                     ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30"
+                    : item.available
+                    ? "bg-white text-slate-600 border-2 border-slate-200 hover:border-blue-300"
                     : "bg-slate-100 text-slate-400 cursor-not-allowed"
                 }`}
               >
+                <span className="mr-1">{item.emoji}</span>
                 {item.label}
                 {!item.available && (
                   <span className="ml-1 text-xs opacity-70">🔒</span>
@@ -124,6 +146,16 @@ export function TrackSelection({
               </button>
             ))}
           </div>
+
+          {/* Difficulty description */}
+          <p className="text-sm text-slate-400 mb-4">
+            {selectedDifficulty === "beginner" &&
+              "Judge prompts as Good, Almost, or Bad"}
+            {selectedDifficulty === "intermediate" &&
+              "Write and improve prompts with feedback"}
+            {selectedDifficulty === "advanced" &&
+              "Expert-level prompt crafting"}
+          </p>
         </div>
       </motion.div>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -131,7 +163,9 @@ export function TrackSelection({
         <TrackPath
           tracks={displayTracks}
           assessment={assessmentNode}
-          onSelectTrack={onSelectTrack}
+          onSelectTrack={(trackId, slug) =>
+            onSelectTrack(trackId, slug, selectedDifficulty)
+          }
           onSelectAssessment={onSelectAssessment}
         />
       </div>

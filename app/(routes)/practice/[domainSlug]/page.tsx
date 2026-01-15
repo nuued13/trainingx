@@ -65,8 +65,10 @@ export default function DomainTracksPage() {
         userId={user._id as any}
         domainId={domain._id}
         onBack={() => router.push("/practice")}
-        onSelectTrack={(trackId, trackSlug) =>
-          router.push(`/practice/${domainSlug}/${trackSlug}`)
+        onSelectTrack={(trackId, trackSlug, difficulty) =>
+          router.push(
+            `/practice/${domainSlug}/${trackSlug}?difficulty=${difficulty}`
+          )
         }
         onSelectAssessment={() =>
           router.push(`/practice/${domainSlug}/assessment`)

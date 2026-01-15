@@ -308,8 +308,10 @@ export function normalizeQuestion(
   }
 
   // For simple questions, infer track from ID pattern (B-CL, B-CX, B-CT, B-OF)
-  const trackFromId =
-    inferTrackFromId(question.id) ?? inferredTrack ?? "clarity";
+  // Beginner questions only use base Track types, so cast is safe
+  const trackFromId = (inferTrackFromId(question.id) ??
+    inferredTrack ??
+    "clarity") as Track;
 
   // Simple questions don't have explicit correct_answer, infer from missing_points
   const correctAnswer: PromptRating =

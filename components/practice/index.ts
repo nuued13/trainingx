@@ -2,7 +2,11 @@
 export { DomainSelection } from "./DomainSelection";
 export { TrackSelection } from "./TrackSelection";
 export { LevelSelection } from "./LevelSelection";
-export { PracticeCardDeck, BeginnerPracticeCardDeck } from "./PracticeCardDeck";
+export {
+  PracticeCardDeck,
+  BeginnerPracticeCardDeck,
+  IntermediatePracticeCardDeck,
+} from "./PracticeCardDeck";
 export { ProjectCard } from "./ProjectCard";
 
 // Utilities

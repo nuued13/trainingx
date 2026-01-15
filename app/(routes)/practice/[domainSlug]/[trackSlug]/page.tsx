@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
-import { BeginnerPracticeCardDeck, LoadingState } from "@/components/practice";
+import {
+  BeginnerPracticeCardDeck,
+  IntermediatePracticeCardDeck,
+  LoadingState,
+} from "@/components/practice";
 import { useAuth } from "@/contexts/AuthContextProvider";
-import { Track } from "@/lib/practice";
+import { Track, ExtendedTrack, DifficultyLevel } from "@/lib/practice";
 import { Id } from "convex/_generated/dataModel";
 
 // Map URL slugs to Track types
@@ -21,11 +25,23 @@ const SLUG_TO_TRACK: Record<string, Track> = {
   "formatting-mastery": "output_format",
 };
 
+// Extended tracks for intermediate (includes iteration and evaluation)
+const SLUG_TO_EXTENDED_TRACK: Record<string, ExtendedTrack> = {
+  ...SLUG_TO_TRACK,
+  iteration: "iteration",
+  evaluation: "evaluation",
+};
+
 export default function PracticeGamePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams<{ domainSlug: string; trackSlug: string }>();
+  const searchParams = useSearchParams();
   const { domainSlug, trackSlug } = params || {};
+
+  // Get difficulty from query param (default to beginner)
+  const difficulty =
+    (searchParams.get("difficulty") as DifficultyLevel) || "beginner";
 
   // Map trackSlug to Track type
   const track = useMemo(() => {
@@ -33,15 +49,21 @@ export default function PracticeGamePage() {
     return SLUG_TO_TRACK[trackSlug] ?? null;
   }, [trackSlug]);
 
+  // Map trackSlug to ExtendedTrack for intermediate
+  const extendedTrack = useMemo(() => {
+    if (!trackSlug) return null;
+    return SLUG_TO_EXTENDED_TRACK[trackSlug] ?? null;
+  }, [trackSlug]);
+
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       sessionStorage.setItem(
         "redirectAfterLogin",
-        `/practice/${domainSlug}/${trackSlug}`
+        `/practice/${domainSlug}/${trackSlug}?difficulty=${difficulty}`
       );
       router.push("/auth");
     }
-  }, [isAuthenticated, authLoading, router, domainSlug, trackSlug]);
+  }, [isAuthenticated, authLoading, router, domainSlug, trackSlug, difficulty]);
 
   if (authLoading) {
     return (
@@ -63,7 +85,10 @@ export default function PracticeGamePage() {
     );
   }
 
-  if (!track) {
+  // Check track validity based on difficulty
+  const trackNotFound = difficulty === "beginner" ? !track : !extendedTrack;
+
+  if (trackNotFound) {
     return (
       <SidebarLayout>
         <div className="flex items-center justify-center min-h-screen">
@@ -75,11 +100,19 @@ export default function PracticeGamePage() {
 
   return (
     <SidebarLayout>
-      <BeginnerPracticeCardDeck
-        userId={user._id as Id<"users">}
-        track={track}
-        onBack={() => router.push(`/practice/${domainSlug}`)}
-      />
+      {difficulty === "intermediate" ? (
+        <IntermediatePracticeCardDeck
+          userId={user._id as Id<"users">}
+          track={extendedTrack!}
+          onBack={() => router.push(`/practice/${domainSlug}`)}
+        />
+      ) : (
+        <BeginnerPracticeCardDeck
+          userId={user._id as Id<"users">}
+          track={track!}
+          onBack={() => router.push(`/practice/${domainSlug}`)}
+        />
+      )}
     </SidebarLayout>
   );
 }

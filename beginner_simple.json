@@ -3,224 +3,224 @@
     "id": "B-CL-001",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want to ask your boss for more money.",
-    "why_short": "It doesn't say how much money or why you deserve it.",
-    "missing_points": ["Amount wanted", "Reason for raise", "Polite tone"],
-    "improved_prompt": "Write a polite email asking for a 10% raise because I did a good job on the big project."
+    "scenario": "You want to ask your teacher for extra credit.",
+    "why_short": "It doesn't say which class or why you need it!",
+    "missing_points": ["Which class", "Why you need it", "Being polite"],
+    "improved_prompt": "Write a polite email to my science teacher asking for extra credit to boost my grade after the last test."
   },
   {
     "id": "B-CL-002",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You are writing an ad for new headphones.",
-    "why_short": "It doesn't say who will buy them or what features to talk about.",
-    "missing_points": ["Who it is for", "Best features", "Exciting tone"],
-    "improved_prompt": "Write an exciting ad for college students about the X-200 headphones and their long battery life."
+    "scenario": "You're making an ad for cool new headphones.",
+    "why_short": "It doesn't say who would buy them or what makes them awesome!",
+    "missing_points": ["Who it's for", "Cool features", "Exciting words"],
+    "improved_prompt": "Write an exciting ad for teens about the X-200 headphones and their super long battery life."
   },
   {
     "id": "B-CL-003",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want to summarize a news article.",
-    "why_short": "It doesn't say how long the summary should be.",
-    "missing_points": ["Word count", "Format"],
-    "improved_prompt": "Summarize this article for students in one paragraph of 200 words."
+    "scenario": "You need to summarize a news article.",
+    "why_short": "It doesn't say how long the summary should be!",
+    "missing_points": ["How many words", "What style"],
+    "improved_prompt": "Summarize this article for students in one paragraph of about 200 words."
   },
   {
     "id": "B-CL-004",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You need a chocolate cake recipe.",
-    "why_short": "It doesn't say how big the cake should be or how hard it is to make.",
-    "missing_points": ["Number of servings", "Easy or hard"],
+    "scenario": "You want a chocolate cake recipe.",
+    "why_short": "It doesn't say how big the cake should be or if it's easy to make!",
+    "missing_points": ["How many people", "Easy or hard"],
     "improved_prompt": "Give me an easy gluten-free chocolate cake recipe for 8 people."
   },
   {
     "id": "B-CL-005",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You are writing a welcome email for a newsletter.",
-    "why_short": "It doesn't tell the new readers what to do next.",
-    "missing_points": ["What to do next", "Friendly tone"],
-    "improved_prompt": "Write a friendly welcome email that asks subscribers to reply with their favorite plant."
+    "scenario": "You're writing a welcome message for your club's newsletter.",
+    "why_short": "It doesn't tell new members what to do next!",
+    "missing_points": ["What to do next", "Friendly vibe"],
+    "improved_prompt": "Write a friendly welcome message asking new members to reply with their favorite hobby."
   },
   {
     "id": "B-CL-006",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You need to tell your team about a new work rule.",
-    "why_short": "It doesn't try to make the team feel good about the change.",
-    "missing_points": ["Nice tone", "Good reasons"],
-    "improved_prompt": "Write a nice note about the new work policy that focuses on the benefits of seeing each other."
+    "scenario": "You need to tell your club about a new meeting time.",
+    "why_short": "It doesn't make the change sound good!",
+    "missing_points": ["Positive tone", "Good reasons"],
+    "improved_prompt": "Write a nice message about the new meeting time that explains why it's better for everyone."
   },
   {
     "id": "B-CL-007",
     "difficulty": "beginner",
     "level": "simple",
     "scenario": "You need a study schedule.",
-    "why_short": "It clearly lists the subjects, times, and days nicely.",
+    "why_short": "This one is actually great! It lists subjects, times, and days clearly.",
     "missing_points": [],
-    "improved_prompt": "Create a 2-week study plan for the SATs covering Math and English, assigning 1 hour per subject each weekday and a practice test on Saturdays."
+    "improved_prompt": "Create a 2-week study plan for my exams covering Math and English, with 1 hour per subject each weekday and a practice test on Saturdays."
   },
   {
     "id": "B-CL-008",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want to fix a slow script.",
-    "why_short": "It asks for exactly what is needed and nothing else.",
+    "scenario": "You want to fix a slow Python script.",
+    "why_short": "This one is spot on! It asks for exactly what's needed.",
     "missing_points": [],
-    "improved_prompt": "Review the attached Python script for efficiency errors only, ignoring style guide violations, and provide the top 3 optimizations."
+    "improved_prompt": "Review the attached Python script for speed issues only, and give me the top 3 ways to make it faster."
   },
   {
     "id": "B-CX-001",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want an AI to check your math.",
-    "why_short": "The AI can't check the answer without seeing the problem first.",
+    "scenario": "You want an AI to check your math homework.",
+    "why_short": "The AI can't check without seeing the problem first!",
     "missing_points": ["The math problem", "Your answer"],
-    "improved_prompt": "Here is the problem: '2x + 5 = 15'. My answer is 5. Is that right?"
+    "improved_prompt": "Here's the problem: '2x + 5 = 15'. I got x = 5. Is that right?"
   },
   {
     "id": "B-CX-002",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want feedback on an email draft.",
-    "why_short": "The AI doesn't know what the email says or who it is for.",
-    "missing_points": ["The draft text", "The goal", "Who it is for"],
-    "improved_prompt": "I am writing to my team about a deadline. Does this draft sound polite? [Insert Draft]"
+    "scenario": "You want feedback on a message you wrote.",
+    "why_short": "The AI doesn't know what the message says or who it's for!",
+    "missing_points": ["The message", "Who it's for", "What you want"],
+    "improved_prompt": "I'm writing to my group project partners about a deadline. Does this sound nice? [Paste your message]"
   },
   {
     "id": "B-CX-003",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want code to give grades.",
-    "why_short": "'Standard rules' are different everywhere.",
-    "missing_points": ["Grading scale (A=90, etc.)"],
-    "improved_prompt": "Write a Python function to grade scores: A is 90-100, B is 80-89, C is 70-79."
+    "scenario": "You want code that gives letter grades.",
+    "why_short": "'Normal grading' means different things to different people!",
+    "missing_points": ["The grading scale (A=90, etc.)"],
+    "improved_prompt": "Write a Python function to grade scores: A is 90-100, B is 80-89, C is 70-79, and so on."
   },
   {
     "id": "B-CX-004",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want to change a recipe size.",
-    "why_short": "It doesn't say how many people you want to feed.",
-    "missing_points": ["Number of people", "The recipe"],
-    "improved_prompt": "Change this pancake recipe to feed 10 people instead of 4: [Insert Recipe]"
+    "scenario": "You want to change a recipe to feed more people.",
+    "why_short": "It doesn't say how many people you're cooking for!",
+    "missing_points": ["How many people", "The recipe"],
+    "improved_prompt": "Change this pancake recipe to feed 10 people instead of 4: [Paste recipe here]"
   },
   {
     "id": "B-CX-005",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want an intro for a travel blog.",
-    "why_short": "It doesn't say where you went or what was special.",
+    "scenario": "You want an intro for a travel blog post.",
+    "why_short": "It doesn't say where you went or what was cool!",
     "missing_points": ["Where you went", "Main topic"],
-    "improved_prompt": "Write a blog intro about my solo trip to Japan and its amazing food."
+    "improved_prompt": "Write a blog intro about my trip to Japan and all the amazing food I tried."
   },
   {
     "id": "B-CX-006",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You are planning a weekend trip.",
-    "why_short": "It doesn't say what you like to do or how much money to spend.",
-    "missing_points": ["Budget", "What you like"],
-    "improved_prompt": "Plan a 3-day NYC trip for a couple who loves art and Italian food, with a medium budget."
+    "scenario": "You're planning a weekend trip.",
+    "why_short": "It doesn't say what you like to do or how much to spend!",
+    "missing_points": ["Budget", "What you enjoy"],
+    "improved_prompt": "Plan a 3-day NYC trip for friends who love art and trying new food, with a medium budget."
   },
   {
     "id": "B-CX-007",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You need to organize data.",
-    "why_short": "It gives the data and tells exactly how to organize it.",
+    "scenario": "You need to organize messy data.",
+    "why_short": "This is great! It gives the data and says exactly how to organize it.",
     "missing_points": [],
-    "improved_prompt": "Parse this raw CSV string 'Name,Role;Sarah,Editor;Tom,Writer' into a JSON list of objects with 'name' and 'role' keys."
+    "improved_prompt": "Turn this messy CSV 'Name,Role;Sarah,Editor;Tom,Writer' into a clean JSON list with 'name' and 'role' for each person."
   },
   {
     "id": "B-CX-008",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You are explaining a game to kids.",
-    "why_short": "It says who the kids are and where they are playing.",
+    "scenario": "You're explaining a game to younger kids.",
+    "why_short": "This is good! It says who the kids are and where they're playing.",
     "missing_points": [],
-    "improved_prompt": "Explain the rules of 'Capture the Flag' to a group of 10-year-olds using simple language, assuming they play outdoors."
+    "improved_prompt": "Explain the rules of 'Capture the Flag' to 10-year-olds using simple words, for playing outdoors."
   },
   {
     "id": "B-CT-001",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want a short summary of a long book.",
-    "why_short": "You can't fit a big book summary into just 10 words.",
-    "missing_points": ["Picking what matters", "Real word limit"],
-    "improved_prompt": "Summarize the main idea of 'War and Peace' in one sentence under 20 words."
+    "scenario": "You want a short summary of a really long book.",
+    "why_short": "You can't fit a giant book into just 10 words!",
+    "missing_points": ["Pick what's important", "Realistic word limit"],
+    "improved_prompt": "Summarize the main idea of 'Harry Potter' in one sentence under 20 words."
   },
   {
     "id": "B-CT-002",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want to play a game.",
-    "why_short": "The game has no rules or setting yet.",
-    "missing_points": ["Setting", "Your role", "Rules"],
-    "improved_prompt": "Let's play a game set in a haunted house. I am a detective. You describe the room."
+    "scenario": "You want to play a story game with AI.",
+    "why_short": "The game has no setting or rules yet!",
+    "missing_points": ["Setting", "Your character", "Rules"],
+    "improved_prompt": "Let's play a game set in a haunted house. I'm a detective. You describe what I see in each room."
   },
   {
     "id": "B-CT-003",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You need to answer an angry customer.",
-    "why_short": "It doesn't say to be nice or sorry.",
-    "missing_points": ["Nice tone", "Goal to fix it"],
-    "improved_prompt": "Write a polite email to a customer about their late order and offer a discount."
+    "scenario": "You need to respond to someone who's upset about something.",
+    "why_short": "It doesn't say to be understanding or helpful!",
+    "missing_points": ["Kind tone", "How to help"],
+    "improved_prompt": "Write a polite reply to someone upset about their late package and offer to help fix it."
   },
   {
     "id": "B-CT-004",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You need a coffee slogan.",
-    "why_short": "It asks for too many things in just 3 words.",
-    "missing_points": ["Choice of words", "More words allowed"],
-    "improved_prompt": "Write a rhyming coffee slogan about morning energy that is under 6 words long."
+    "scenario": "You need a catchy slogan for coffee.",
+    "why_short": "It asks for too many ideas in just 3 words!",
+    "missing_points": ["More words allowed", "Pick one idea"],
+    "improved_prompt": "Write a rhyming coffee slogan about morning energy that's under 6 words."
   },
   {
     "id": "B-CT-005",
     "difficulty": "beginner",
     "level": "simple",
     "scenario": "You want a workout plan.",
-    "why_short": "It doesn't say if you have gym gear or are fit.",
+    "why_short": "It doesn't say if you have equipment or your fitness level!",
     "missing_points": ["Equipment", "Fitness level"],
-    "improved_prompt": "Give me a 30-minute workout plan for beginners with no equipment."
+    "improved_prompt": "Give me a 30-minute workout for beginners with no equipment needed."
   },
   {
     "id": "B-CT-006",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You need a movie for family night.",
-    "why_short": "It doesn't say the age rating or what kind of movie.",
+    "scenario": "You need a movie for family movie night.",
+    "why_short": "It doesn't say the age rating or what kind of movie!",
     "missing_points": ["Age rating (PG)", "Movie type"],
-    "improved_prompt": "Recommend 3 animated adventure movies rated PG for 7-year-olds."
+    "improved_prompt": "Recommend 3 fun animated adventure movies rated PG for kids around 7-12 years old."
   },
   {
     "id": "B-CT-007",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You need a safe password.",
-    "why_short": "It gives all the rules for length and characters.",
+    "scenario": "You need a super strong password.",
+    "why_short": "This is perfect! It gives all the rules for length and characters.",
     "missing_points": [],
-    "improved_prompt": "Generate a random password that is 16 characters long, includes keys symbols, numbers, and uppercase letters, but no repeating characters."
+    "improved_prompt": "Make a random password that's 16 characters long with symbols, numbers, and uppercase letters, but no repeating characters."
   },
   {
     "id": "B-CT-008",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You are saying no to a wedding.",
-    "why_short": "It explicitly says to be polite and gives the reason.",
+    "scenario": "You can't make it to a friend's party.",
+    "why_short": "This is good! It says to be polite and gives the reason.",
     "missing_points": [],
-    "improved_prompt": "Write a polite note declining a wedding invitation because I will be out of the country on that date."
+    "improved_prompt": "Write a polite message saying I can't come to the party because I'll be on vacation that weekend."
   },
   {
     "id": "B-OF-001",
     "difficulty": "beginner",
     "level": "simple",
     "scenario": "You need a grocery list.",
-    "why_short": "It doesn't say if it should be a list or a paragraph.",
+    "why_short": "It doesn't say if it should be a list or a paragraph!",
     "missing_points": ["Format type", "Categories"],
     "improved_prompt": "Give me a bulleted list of 10 healthy snacks, grouped by food type."
   },
@@ -228,35 +228,35 @@
     "id": "B-OF-002",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want to sort user feedback.",
-    "why_short": "It doesn't say what columns or headers to use.",
+    "scenario": "You want to organize feedback from friends.",
+    "why_short": "It doesn't say what columns or headers to use!",
     "missing_points": ["Headings", "Table format"],
-    "improved_prompt": "Organize this feedback into a table with columns: 'Name', 'Issue', 'Mood', and 'Fix'."
+    "improved_prompt": "Put this feedback into a table with columns: 'Name', 'Issue', 'Feeling', and 'Suggestion'."
   },
   {
     "id": "B-OF-003",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want to get data for an app.",
-    "why_short": "It asks for JSON but doesn't list the keys.",
+    "scenario": "You want to get data for an app you're building.",
+    "why_short": "It asks for JSON but doesn't list what info to include!",
     "missing_points": ["JSON keys", "Structure"],
-    "improved_prompt": "Extract names and numbers into a JSON list with 'name' and 'phone' keys."
+    "improved_prompt": "Turn names and phone numbers into a JSON list with 'name' and 'phone' for each person."
   },
   {
     "id": "B-OF-004",
     "difficulty": "beginner",
     "level": "simple",
     "scenario": "You want to compare two phones.",
-    "why_short": "A table is better than text for comparing things.",
+    "why_short": "A table is way better than a wall of text for comparing things!",
     "missing_points": ["Table format", "What to compare"],
-    "improved_prompt": "Make a comparison table for the iPhone 15 and Samsung S24 showing Price, Battery, and Screen."
+    "improved_prompt": "Make a comparison table for iPhone 15 and Samsung S24 showing Price, Battery, and Screen size."
   },
   {
     "id": "B-OF-005",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You are writing a poem.",
-    "why_short": "A spreadsheet file (CSV) is a bad shape for a poem.",
+    "scenario": "You're writing a poem.",
+    "why_short": "A spreadsheet format (CSV) is a weird choice for a poem!",
     "missing_points": ["Better format", "Structure"],
     "improved_prompt": "Write a poem about the ocean with three stanzas of 4 lines each."
   },
@@ -264,27 +264,27 @@
     "id": "B-OF-006",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You need notes from a meeting.",
-    "why_short": "It needs headers to be easy to read.",
+    "scenario": "You need notes from a group meeting.",
+    "why_short": "It needs headers to be easy to read!",
     "missing_points": ["Headings", "Format"],
-    "improved_prompt": "Summarize this meeting into notes with headers: 'Who was there', 'What we said', and 'What to do next'."
+    "improved_prompt": "Summarize this meeting into notes with headers: 'Who was there', 'What we talked about', and 'Next steps'."
   },
   {
     "id": "B-OF-007",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You are changing units in a recipe.",
-    "why_short": "It asks for a specific table with exact columns.",
+    "scenario": "You're converting units in a recipe.",
+    "why_short": "This is great! It asks for a specific table with exact columns.",
     "missing_points": [],
-    "improved_prompt": "Convert this recipe's measurements to metric and output as a Markdown table with columns: 'Ingredient', 'Metric Amount', 'Original Amount'."
+    "improved_prompt": "Convert this recipe to metric and make a table with columns: 'Ingredient', 'Metric Amount', 'Original Amount'."
   },
   {
     "id": "B-OF-008",
     "difficulty": "beginner",
     "level": "simple",
-    "scenario": "You want comments for code.",
-    "why_short": "It says exactly which style guide to follow.",
+    "scenario": "You want comments explaining your code.",
+    "why_short": "This is perfect! It says exactly which style guide to follow.",
     "missing_points": [],
-    "improved_prompt": "Add Python docstrings to each function in the attached code, following the Google Docstring Style Guide."
+    "improved_prompt": "Add Python docstrings to each function in my code, following the Google Docstring Style Guide."
   }
 ]

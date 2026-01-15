@@ -3,82 +3,82 @@
     "id": "I-CL-001",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You want to start exercising.",
-    "user_instruction": "Rewrite the prompt to say exactly what your goal is, your level, and what equipment you have.",
-    "gold_prompt": "Create a 4-week beginner workout plan for weight loss using only dumbbells. I can exercise 3 days a week for 30 minutes. Include a checklist to track my progress.",
+    "scenario": "You want to start working out.",
+    "user_instruction": "Rewrite the prompt to say your goal, your level, and what equipment you have.",
+    "gold_prompt": "Create a 4-week beginner workout plan for getting fit using only dumbbells. I can exercise 3 days a week for 30 minutes. Include a checklist to track my progress.",
     "common_mistakes": [
-      "Not saying if you want to lose weight or build muscle",
-      "Forgetting to say what equipment you have",
-      "Not saying how many weeks the plan should be"
+      "Not saying your fitness goal",
+      "Forgetting what equipment you have",
+      "Not saying how long the plan should be"
     ],
-    "hint": "Be specific about your goal and your tools."
+    "hint": "Be specific about your goal and what you have to work with."
   },
   {
     "id": "I-CL-002",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need a story for a contest.",
-    "user_instruction": "Improve the prompt by adding details about the story's tone, length, and a surprise ending.",
-    "gold_prompt": "Write a funny 500-word sci-fi story about a robot who wants to be a chef. The story must end with a surprise twist where the robot invents a new flavor. Keep it fun for kids.",
+    "scenario": "You need a creative story for class.",
+    "user_instruction": "Improve the prompt by adding details about the story's style, length, and ending.",
+    "gold_prompt": "Write a funny 500-word sci-fi story about a robot who wants to be a chef. End with a surprise twist where the robot invents a new flavor. Keep it fun!",
     "common_mistakes": [
-      "Asking for a story without a style or tone",
+      "Asking for a story without a style or mood",
       "Forgetting to say how long it should be",
       "Not asking for a specific ending"
     ],
-    "hint": "Define what a 'winning' story looks like."
+    "hint": "Describe what a 'winning' story looks like."
   },
   {
     "id": "I-CL-003",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are planning a trip with friends.",
-    "user_instruction": "Clarify the request by adding the destination, budget, and number of people.",
-    "gold_prompt": "Plan a 2-day hiking trip for 4 adults near Denver. The budget is $200 per person. List the trails and where we should sleep.",
+    "scenario": "You're planning a trip with friends.",
+    "user_instruction": "Make it clearer by adding where you're going, your budget, and how many people.",
+    "gold_prompt": "Plan a 2-day hiking trip for 4 friends near Denver. Budget is $200 per person. List the trails and where we should stay.",
     "common_mistakes": [
       "Not saying where to go",
       "Ignoring the money limit",
-      "Forgetting to say how many people are going"
+      "Forgetting how many people are going"
     ],
-    "hint": "Give details so the model doesn't have to guess."
+    "hint": "Give details so the AI doesn't have to guess."
   },
   {
     "id": "I-CL-004",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You have leftover food and want to cook.",
-    "user_instruction": "Rewrite the prompt to list your ingredients and what kind of meal you want.",
-    "gold_prompt": "Suggest 3 easy dinner recipes I can make using chicken, broccoli, and rice. I have 30 minutes. List the prep time for each.",
+    "scenario": "You have leftover food and want dinner ideas.",
+    "user_instruction": "Rewrite to list your ingredients and what kind of meal you want.",
+    "gold_prompt": "Suggest 3 easy dinner recipes using chicken, broccoli, and rice. I have 30 minutes. Tell me how long each takes.",
     "common_mistakes": [
-      "Not listing the food you have",
-      "Not saying what kind of meal (dinner)",
+      "Not listing what food you have",
+      "Not saying what meal (breakfast, dinner, etc.)",
       "Not saying how much time you have"
     ],
-    "hint": "Tell the model exactly what you have."
+    "hint": "Tell the AI exactly what you're working with."
   },
   {
     "id": "I-CL-005",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You want to organize your closet.",
-    "user_instruction": "Add details on how you want the items sorted.",
-    "gold_prompt": "Create a guide to organizing a small closet. Separate clothes by season and color. Include a checklist of supplies like bins or hangers.",
+    "scenario": "You want to organize your messy closet.",
+    "user_instruction": "Add details on how you want things sorted.",
+    "gold_prompt": "Create a guide to organizing a small closet. Sort clothes by season and color. Include a supply checklist like bins and hangers.",
     "common_mistakes": [
-      "Asking for help without saying what the goal is",
-      "Not saying how to organize it (by color, etc.)",
+      "Asking for help without saying the goal",
+      "Not saying how to organize (by color, etc.)",
       "Forgetting to ask for steps"
     ],
-    "hint": "Describe how the closet should look when done."
+    "hint": "Describe how the closet should look when you're done."
   },
   {
     "id": "I-CL-006",
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "You want to learn guitar.",
-    "user_instruction": "Clarify the request by saying your level, music style, and practice time.",
+    "user_instruction": "Be clear about your skill level, music style, and practice time.",
     "gold_prompt": "Create a 1-month practice schedule for a beginner learning acoustic guitar. Focus on basic chords for pop songs. I can practice 20 minutes a day.",
     "common_mistakes": [
       "Not saying what kind of guitar",
-      "Forgetting to say you are a beginner",
+      "Forgetting to mention you're a beginner",
       "Not saying how long the plan should be"
     ],
     "hint": "Be specific about time and skill level."
@@ -87,13 +87,13 @@
     "id": "I-CL-007",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need a refund.",
-    "user_instruction": "Rewrite the prompt to include what you bought, why you are returning it, and what you want.",
-    "gold_prompt": "Write a polite email to support asking for a full refund for a broken blender (Order #12345). Explain that the motor broke. Ask for a shipping label.",
+    "scenario": "You need to return something broken.",
+    "user_instruction": "Include what you bought, what's wrong with it, and what you want.",
+    "gold_prompt": "Write a polite email asking for a refund for broken headphones (Order #12345). Explain that one side stopped working. Ask for return instructions.",
     "common_mistakes": [
       "Forgetting the order number",
-      "Not saying why you want a refund",
-      "Not saying if you should be polite or firm"
+      "Not saying what's wrong",
+      "Not saying if you should be polite or direct"
     ],
     "hint": "Give all the facts needed to help you."
   },
@@ -101,13 +101,13 @@
     "id": "I-CL-008",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need a gift for a coffee lover.",
-    "user_instruction": "Improve the prompt by adding your budget and what they like.",
-    "gold_prompt": "Suggest 5 unique gift ideas for a coffee lover under $50. Do not suggest mugs or beans. Say why each is a good choice.",
+    "scenario": "You need a gift idea for someone.",
+    "user_instruction": "Add your budget and what they're into.",
+    "gold_prompt": "Suggest 5 unique gift ideas for someone who loves gaming, under $50. Don't suggest gift cards. Say why each one is cool.",
     "common_mistakes": [
       "Asking for ideas without a price limit",
-      "Not saying what NOT to buy (no mugs)",
-      "Forgetting to mention coffee"
+      "Not saying what NOT to buy",
+      "Forgetting to mention their interests"
     ],
     "hint": "Set limits to get better ideas."
   },
@@ -116,26 +116,26 @@
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "You need to write a thank-you note.",
-    "user_instruction": "Add who the note is for and what gift you got.",
-    "gold_prompt": "Write a warm thank-you note to Aunt Sally for the scarf she knitted for my birthday. Mention that I love the blue color.",
+    "user_instruction": "Add who the note is for and what you're thanking them for.",
+    "gold_prompt": "Write a warm thank-you note to my grandma for the sweater she made for my birthday. Mention that I love the blue color.",
     "common_mistakes": [
-      "Writing a note without details",
-      "Forgetting to say who it is for",
+      "Writing without any details",
+      "Forgetting who it's for",
       "Not naming the gift"
     ],
-    "hint": "The model needs to know who and what."
+    "hint": "The AI needs to know who and what."
   },
   {
     "id": "I-CX-002",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You want to explain a game.",
-    "user_instruction": "Add the name of the game and who you are explaining it to.",
-    "gold_prompt": "Explain the rules of 'Capture the Flag' to a group of 10-year-olds who have never played. Focus on how to win and safety.",
+    "scenario": "You want to explain a game to someone.",
+    "user_instruction": "Add the name of the game and who you're explaining it to.",
+    "gold_prompt": "Explain the rules of 'Capture the Flag' to kids who have never played. Focus on how to win and staying safe.",
     "common_mistakes": [
-      "Assuming the model knows the game",
-      "Explaining it too hard for kids",
-      "Not defining the basic rules"
+      "Assuming the AI knows the game",
+      "Explaining it too complicated",
+      "Not covering the basic rules"
     ],
     "hint": "Say the game name and the audience."
   },
@@ -143,15 +143,15 @@
     "id": "I-CX-003",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "Your plant is sick.",
-    "user_instruction": "Ask the model to ask YOU questions to find the problem.",
-    "gold_prompt": "My indoor fern is turning yellow. Ask me 3 questions about water and light to help find the problem.",
+    "scenario": "Your plant looks sick.",
+    "user_instruction": "Ask the AI to ask YOU questions to figure out the problem.",
+    "gold_prompt": "My indoor plant is turning yellow. Ask me 3 questions about water and sunlight to help find the problem.",
     "common_mistakes": [
-      "Asking for a fix without giving symptoms",
-      "Not asking the model to ask questions",
-      "Not saying what kind of plant it is"
+      "Asking for a fix without describing the problem",
+      "Not asking the AI to ask questions",
+      "Not saying what kind of plant"
     ],
-    "hint": "Ask the model to interview you."
+    "hint": "Let the AI interview you."
   },
   {
     "id": "I-CX-004",
@@ -171,13 +171,13 @@
     "id": "I-CX-005",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You want design feedback.",
-    "user_instruction": "Replace vague words with clear design terms.",
-    "gold_prompt": "Check this poster design. Focus on making the headline stand out more from the background so it is easier to read.",
+    "scenario": "You want feedback on a design.",
+    "user_instruction": "Use clear words instead of vague ones.",
+    "gold_prompt": "Check this poster design. Focus on making the title stand out more from the background so it's easier to read.",
     "common_mistakes": [
-      "Using slang like 'pop' without explaining it",
+      "Using slang like 'make it pop' without explaining",
       "Not saying what part to change",
-      "Not explaining why to change it"
+      "Not explaining why"
     ],
     "hint": "Use clear words instead of slang."
   },
@@ -186,26 +186,26 @@
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "You want a pet recommendation.",
-    "user_instruction": "Tell the model to ask you about your home and life before suggesting a dog.",
-    "gold_prompt": "I want a dog that fits my life. Ask me 5 questions about my home and free time to help me choose.",
+    "user_instruction": "Tell the AI to ask you about your life before suggesting anything.",
+    "gold_prompt": "I want a pet that fits my life. Ask me 5 questions about my home and schedule to help me choose.",
     "common_mistakes": [
-      "Asking for a dog without giving info",
-      "Giving all the info at once instead of asking for questions",
+      "Asking for a pet without giving info",
+      "Dumping all info at once",
       "Asking for too many questions"
     ],
-    "hint": "Make the model ask you for details first."
+    "hint": "Make the AI ask you for details first."
   },
   {
     "id": "I-CX-007",
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "You need a social media caption.",
-    "user_instruction": "Add details about the photo and where you will post it.",
-    "gold_prompt": "Write a fun Instagram caption for a photo of a dog playing in the snow. Include winter emojis.",
+    "user_instruction": "Add details about the photo and where you'll post it.",
+    "gold_prompt": "Write a fun Instagram caption for a photo of my dog playing in the snow. Add some winter emojis!",
     "common_mistakes": [
-      "Forgetting to say what is in the photo",
-      "Not saying which app it is for",
-      "Not setting a tone (funny, sad)"
+      "Forgetting to say what's in the photo",
+      "Not saying which app",
+      "Not setting a mood (funny, cute)"
     ],
     "hint": "Describe the photo."
   },
@@ -214,12 +214,12 @@
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "You want a sports rule explained.",
-    "user_instruction": "Add which rule and which sport.",
-    "gold_prompt": "Explain the 'offside' rule in soccer to a beginner. Use a simple example.",
+    "user_instruction": "Say which rule and which sport.",
+    "gold_prompt": "Explain the 'offside' rule in soccer to someone who's never watched. Use a simple example.",
     "common_mistakes": [
-      "Assuming the model knows the sport",
+      "Assuming the AI knows the sport",
       "Asking about a rule without naming it",
-      "Not saying how simple the explanation should be"
+      "Not saying how simple it should be"
     ],
     "hint": "Name the rule and the sport."
   },
@@ -227,41 +227,41 @@
     "id": "I-CT-001",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need a special meal plan.",
-    "user_instruction": "Add constraints for a vegetarian and peanut-free diet.",
-    "gold_prompt": "Create a 7-day dinner menu that is vegetarian and peanut-free. Make sure ingredients are easy to find.",
+    "scenario": "You need a meal plan with food restrictions.",
+    "user_instruction": "Add rules for vegetarian and nut-free.",
+    "gold_prompt": "Create a 7-day dinner menu that's vegetarian and nut-free. Use ingredients that are easy to find.",
     "common_mistakes": [
-      "Forgetting one of the diets",
+      "Forgetting one of the diet rules",
       "Not saying how many days",
-      "Asking for hard recipes"
+      "Asking for complicated recipes"
     ],
-    "hint": "Safety and diet are important rules."
+    "hint": "Diet rules are super important."
   },
   {
     "id": "I-CT-002",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need a wedding playlist.",
+    "scenario": "You need a party playlist.",
     "user_instruction": "Set rules: upbeat music only, no slow songs, no bad words.",
-    "gold_prompt": "Make a 3-hour wedding playlist. Songs must be happy and fast. Do not include slow songs or songs with bad words.",
+    "gold_prompt": "Make a 3-hour party playlist. Songs must be happy and upbeat. No slow songs or songs with bad language.",
     "common_mistakes": [
-      "Asking regarding a playlist without a style",
-      "Forgetting to ban bad words",
-      "Not defining the length"
+      "Asking for a playlist without a style",
+      "Forgetting to say 'no bad words'",
+      "Not saying how long"
     ],
-    "hint": "Tell the model what to avoid."
+    "hint": "Tell the AI what to avoid."
   },
   {
     "id": "I-CT-003",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need to schedule a meeting.",
-    "user_instruction": "Solve the problem: Busy Tuesday/Thursday, Office closed Friday. Find a time.",
-    "gold_prompt": "Find 3 times for a 1-hour meeting next week. It cannot be Tuesday, Thursday, or Friday. Monday and Wednesday are open.",
+    "scenario": "You need to schedule a group meeting.",
+    "user_instruction": "Rule out the days that don't work.",
+    "gold_prompt": "Find 3 times for a 1-hour group meeting next week. It can't be Tuesday or Thursday. Monday and Wednesday work.",
     "common_mistakes": [
       "Forgetting busy days",
       "Not saying how long the meeting is",
-      "Picking a day the office is closed"
+      "Picking a day that doesn't work"
     ],
     "hint": "Rule out the bad times clearly."
   },
@@ -269,79 +269,79 @@
     "id": "I-CT-004",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are buying a laptop.",
-    "user_instruction": "Add limits: price under $1000 and must be Windows.",
-    "gold_prompt": "Suggest 3 laptops for a student. The price must be under $1000. Do not list Macs; I only want Windows.",
+    "scenario": "You're looking for a new laptop.",
+    "user_instruction": "Add limits: price under $1000 and Windows only.",
+    "gold_prompt": "Suggest 3 laptops for a student under $1000. No Macs—I only want Windows.",
     "common_mistakes": [
-      "Asking for any price",
+      "Not setting a price limit",
       "Forgetting the Windows rule",
-      "Not saying it is for a student"
+      "Not saying it's for a student"
     ],
-    "hint": "Price and type are strict rules."
+    "hint": "Price and type are important rules."
   },
   {
     "id": "I-CT-005",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need to write a complaint.",
-    "user_instruction": "Set the tone to be serious but polite. No mean words.",
-    "gold_prompt": "Write a complaint letter to my landlord about a leaking roof. Be serious but polite. Do not use mean or angry words.",
+    "scenario": "You need to write about a problem politely.",
+    "user_instruction": "Be serious but polite. No rude words.",
+    "gold_prompt": "Write a message about a broken item I received. Be serious but polite. Don't use angry words.",
     "common_mistakes": [
       "Being too vague",
       "Being rude",
-      "Not stating the problem"
+      "Not explaining the problem"
     ],
-    "hint": "You can be firm without being rude."
+    "hint": "You can be firm without being mean."
   },
   {
     "id": "I-CT-006",
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "You need a logo idea.",
-    "user_instruction": "Add rules: only 2 colors and describe it in text.",
-    "gold_prompt": "Describe a simple logo for a bakery. Use only 2 colors: brown and white. Keep it simple.",
+    "user_instruction": "Add rules: only 2 colors and describe it in words.",
+    "gold_prompt": "Describe a simple logo for a bake sale. Use only 2 colors: pink and white. Keep it simple.",
     "common_mistakes": [
       "Asking for too many colors",
-      "Not saying what business it is for",
-      "Expecting a picture instead of text"
+      "Not saying what it's for",
+      "Expecting a picture instead of words"
     ],
-    "hint": "Limit the colors to save money."
+    "hint": "Limit the colors to keep it simple."
   },
   {
     "id": "I-CT-007",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are planning family fun.",
-    "user_instruction": "Solve the conflict: Kids want fun, parents want quiet. Find a middle ground.",
-    "gold_prompt": "Suggest a family spot in San Diego that has fun for kids but also culture for adults. We want a place that isn't too loud.",
+    "scenario": "You're planning a family outing.",
+    "user_instruction": "Find something that works for both kids and adults.",
+    "gold_prompt": "Suggest a fun place in San Diego that has activities for kids but also stuff adults will enjoy. Not too loud!",
     "common_mistakes": [
-      "Ignoring the kids or the parents",
-      "Not picking a specific place",
+      "Only thinking of kids or only adults",
+      "Not picking a specific location",
       "Being too vague"
     ],
-    "hint": "Find a choice that works for everyone."
+    "hint": "Find something everyone will like."
   },
   {
     "id": "I-CT-008",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are asking for a raise.",
-    "user_instruction": "Set rules: stick to facts and numbers, no feelings.",
-    "gold_prompt": "Write an email asking for a pay review. Focus only on my 20% sales growth. Do not talk about my personal bills.",
+    "scenario": "You think your test grade is wrong.",
+    "user_instruction": "Stick to facts and examples, no feelings.",
+    "gold_prompt": "Write an email asking my teacher to review my test grade. Point to the specific questions I think were marked wrong. Don't say it's unfair.",
     "common_mistakes": [
       "Using feelings instead of facts",
-      "Comparing yourself to others",
-      "Not mentioning your success"
+      "Comparing yourself to classmates",
+      "Not pointing to specific questions"
     ],
-    "hint": "Stick to the data."
+    "hint": "Stick to the facts."
   },
   {
     "id": "I-OF-001",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need a shopping list.",
-    "user_instruction": "Ask for a checklist grouped by food type.",
-    "gold_prompt": "Make a shopping list for a taco party. Group items by section like Produce, Meat, and Dairy so it is easy to shop.",
+    "scenario": "You need a shopping list for a party.",
+    "user_instruction": "Ask for a checklist grouped by store section.",
+    "gold_prompt": "Make a shopping list for a taco party. Group items by section like Produce, Meat, and Dairy so it's easy to shop.",
     "common_mistakes": [
       "Asking for a plain list",
       "Not asking for groups",
@@ -353,13 +353,13 @@
     "id": "I-OF-002",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You want to journal daily.",
-    "user_instruction": "Ask for a specific format: Gratitude, Goal, Reflection.",
-    "gold_prompt": "Write a template for my journal. Follow this order: 1. Gratitude (3 things), 2. Today's Goal, 3. Reflection.",
+    "scenario": "You want to start journaling.",
+    "user_instruction": "Ask for a specific template: Gratitude, Goal, Reflection.",
+    "gold_prompt": "Make a journal template. Follow this order: 1. Gratitude (3 things), 2. Today's Goal, 3. Reflection.",
     "common_mistakes": [
       "Asking for a generic entry",
       "Not asking for the specific order",
-      "Not saying how many things to list"
+      "Not saying how many items to list"
     ],
     "hint": "Define the outline."
   },
@@ -367,13 +367,13 @@
     "id": "I-OF-003",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are choosing a car.",
+    "scenario": "You're comparing cars to buy.",
     "user_instruction": "Ask for a table to compare price and features.",
-    "gold_prompt": "Compare the Toyota Camry and Honda Accord. Make a table comparing Price, Gas Mileage, and Power.",
+    "gold_prompt": "Compare the Toyota Camry and Honda Accord. Make a table with Price, Gas Mileage, and Power.",
     "common_mistakes": [
       "Asking for text instead of a table",
       "Not saying what to compare",
-      "Letting the model choose the format"
+      "Letting the AI pick the format"
     ],
     "hint": "Tables are best for comparing."
   },
@@ -381,22 +381,22 @@
     "id": "I-OF-004",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need business cards.",
+    "scenario": "You need a contact card design.",
     "user_instruction": "Give a specific layout template.",
-    "gold_prompt": "Write text for my business card. Use this format:\n[Name] | [Title]\n----------------\n[Phone] | [Email]\n[Website]",
+    "gold_prompt": "Write text for my contact card. Use this format:\\n[Name] | [Title]\\n----------------\\n[Phone] | [Email]\\n[Website]",
     "common_mistakes": [
       "Asking for text without a layout",
-      "Not showing the visual lines",
+      "Not showing the visual format",
       "Not using a clear template"
     ],
-    "hint": "Show the model exactly how it should look."
+    "hint": "Show the AI exactly how it should look."
   },
   {
     "id": "I-OF-005",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are planning meals.",
-    "user_instruction": "Ask for specific headers for Breakfast, Lunch, and Dinner.",
+    "scenario": "You're planning meals for the week.",
+    "user_instruction": "Ask for headers for Breakfast, Lunch, and Dinner.",
     "gold_prompt": "Create a 3-day meal plan. Use headers for 'Breakfast', 'Lunch', and 'Dinner' for each day. Include calories.",
     "common_mistakes": [
       "Accepting a big block of text",
@@ -409,9 +409,9 @@
     "id": "I-OF-006",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need to leave instructions for a pet sitter.",
+    "scenario": "You need instructions for a pet sitter.",
     "user_instruction": "Ask for a numbered list in time order.",
-    "gold_prompt": "Write instructions for my cat sitter. Make a numbered list in order: Morning, Afternoon, Evening.",
+    "gold_prompt": "Write instructions for my cat sitter. Make a numbered list: Morning, Afternoon, Evening.",
     "common_mistakes": [
       "Writing a long paragraph",
       "Not using a list",
@@ -423,23 +423,23 @@
     "id": "I-OF-007",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are listing your books.",
+    "scenario": "You're making a list of your books.",
     "user_instruction": "Ask for a CSV format with Title and Author.",
-    "gold_prompt": "Make a CSV list example for 3 books. Use these headers: Title, Author, Year, Genre.",
+    "gold_prompt": "Make a CSV list of 3 books. Use these headers: Title, Author, Year, Genre.",
     "common_mistakes": [
-      "Asking for a list without commas",
+      "Asking for a list without the right format",
       "Not naming the headers",
       "Not asking for CSV"
     ],
-    "hint": "CSV is a computer format."
+    "hint": "CSV is a computer-friendly format."
   },
   {
     "id": "I-OF-008",
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "You lost your phone.",
-    "user_instruction": "Ask for a flyer with sections for Description, Location, and Contact.",
-    "gold_prompt": "Write a 'Lost Phone' flyer. Include 4 sections: 'Description', 'Where Lost', 'Contact Info', and 'Reward'.",
+    "user_instruction": "Ask for a flyer with clear sections.",
+    "gold_prompt": "Write a 'Lost Phone' flyer. Include 4 sections: 'What It Looks Like', 'Where I Lost It', 'Contact Info', and 'Reward'.",
     "common_mistakes": [
       "Writing one long sentence",
       "Forgetting contact info",
@@ -452,10 +452,10 @@
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "The recipe math is wrong.",
-    "user_instruction": "The model missed one ingredient. Rewrite the prompt to check ALL items.",
+    "user_instruction": "The AI missed one ingredient. Rewrite to check ALL items.",
     "gold_prompt": "Double this recipe. Calculate 2x for every single item: 1 egg, 2 cups flour.",
     "common_mistakes": [
-      "Repeating the prompt without changing it",
+      "Repeating the prompt without fixing it",
       "Doing the math yourself",
       "Not checking all ingredients"
     ],
@@ -466,11 +466,11 @@
     "difficulty": "intermediate",
     "level": "simple",
     "scenario": "The math answer looks wrong.",
-    "user_instruction": "The answer is wrong. Ask the model to show its work step-by-step.",
-    "gold_prompt": "Solve 2x + 4 = 10. Show your work step-by-step to explain the math.",
+    "user_instruction": "Ask the AI to show its work step-by-step.",
+    "gold_prompt": "Solve 2x + 4 = 10. Show your work step-by-step so I can follow.",
     "common_mistakes": [
       "Just asking 'Are you sure?'",
-      "Giving the right answer yourself",
+      "Giving the answer yourself",
       "Not asking for steps"
     ],
     "hint": "Asking for steps helps catch errors."
@@ -479,69 +479,69 @@
     "id": "I-IT-003",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are checking birth years.",
+    "scenario": "You're checking birth years.",
     "user_instruction": "What if the year is in the future? Add a rule for that.",
-    "gold_prompt": "Calculate age from a birth year. If the year is in the future (like 2050), say 'Invalid Year'.",
+    "gold_prompt": "Calculate age from a birth year. If the year is in the future (like 2050), say 'That year hasn't happened yet!'",
     "common_mistakes": [
       "Not saying what to do with bad dates",
-      "Assuming the model knows to flag it",
+      "Assuming the AI will catch it",
       "Not giving the error message"
     ],
-    "hint": "Tell it what to do with bad inputs."
+    "hint": "Tell it what to do with weird inputs."
   },
   {
     "id": "I-IT-004",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "The haiku is too long.",
-    "user_instruction": "The syllable count is wrong. Fix the prompt to check the count.",
-    "gold_prompt": "Write a haiku about rain. Make sure it is exactly 5, 7, 5 syllables. Write the count next to each line.",
+    "scenario": "The haiku has too many syllables.",
+    "user_instruction": "Fix the prompt to make the AI count syllables.",
+    "gold_prompt": "Write a haiku about rain. It must be exactly 5, 7, 5 syllables. Write the count next to each line.",
     "common_mistakes": [
       "Asking for a haiku again without checking",
-      "Not asking the model to count",
+      "Not asking the AI to count",
       "Changing the topic"
     ],
-    "hint": "Make the model prove the count."
+    "hint": "Make the AI prove the count."
   },
   {
     "id": "I-IT-005",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are splitting a bill.",
-    "user_instruction": "There is a leftover penny. Tell the model who pays it.",
-    "gold_prompt": "Split $100 among 3 people. Give the extra penny to the first person so it totals $100.00.",
+    "scenario": "You're splitting a bill with friends.",
+    "user_instruction": "There's a leftover penny. Say who pays it.",
+    "gold_prompt": "Split $100 among 3 friends. Give the extra penny to the first person so it adds up to exactly $100.00.",
     "common_mistakes": [
       "Ignoring the extra penny",
-      "Asking for bad decimals",
+      "Asking for weird decimals",
       "Not saying who pays the extra"
     ],
-    "hint": "Tell it how to handle the remainder."
+    "hint": "Tell it how to handle leftovers."
   },
   {
     "id": "I-IT-006",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "The description is too simple.",
-    "user_instruction": "The answer is boring. Ask for details like material and color.",
-    "gold_prompt": "Write a product description for a running shoe. Mention the mesh material, neon color, and that it is for runners.",
+    "scenario": "The description is too boring.",
+    "user_instruction": "Ask for specific details like color and material.",
+    "gold_prompt": "Write a product description for running shoes. Mention the mesh material, bright colors, and that they're great for runners.",
     "common_mistakes": [
       "Asking for 'more' without saying what",
       "Not fixing the boring parts",
       "Not giving facts to use"
     ],
-    "hint": "Give the model facts to work with."
+    "hint": "Give the AI specific details to work with."
   },
   {
     "id": "I-IT-007",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "The flight time is wrong.",
-    "user_instruction": "The model forgot the time zone. Tell it to check the time difference.",
-    "gold_prompt": "Calculate the landing time in London for a flight from New York. Flight is 7 hours. Remember the +5 hour time difference.",
+    "scenario": "The flight arrival time is wrong.",
+    "user_instruction": "The AI forgot the time zone. Tell it the time difference.",
+    "gold_prompt": "Calculate landing time in London for a flight from New York. Flight is 7 hours. Remember London is 5 hours ahead.",
     "common_mistakes": [
-      "Assuming the model knows the time zone",
+      "Assuming the AI knows time zones",
       "Not stating the time difference",
-      "Asking for length instead of time"
+      "Asking for flight length instead of time"
     ],
     "hint": "Time zones change the clock."
   },
@@ -551,7 +551,7 @@
     "level": "simple",
     "scenario": "You need a username.",
     "user_instruction": "'Sam' is taken. Ask for 3 other options.",
-    "gold_prompt": "Create a username from 'Sam'. Since 'Sam' is taken, give me 3 variations using numbers (e.g., Sam_99).",
+    "gold_prompt": "Create a username from 'Sam'. Since 'Sam' is taken, give me 3 variations with numbers (like Sam_99).",
     "common_mistakes": [
       "Asking for just one name",
       "Not planning for it to be taken",
@@ -563,13 +563,13 @@
     "id": "I-IT-009",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "The list sort is wrong.",
-    "user_instruction": "It sorted by capital letters. Fix it to ignore case.",
-    "gold_prompt": "Sort this list alphabetically: Apple, banana, Cherry. Ignore capitilization (treat 'b' and 'B' the same).",
+    "scenario": "The list sort is messed up.",
+    "user_instruction": "It sorted by capital letters. Fix it to ignore uppercase.",
+    "gold_prompt": "Sort this list alphabetically: Apple, banana, Cherry. Ignore capitals (treat 'b' and 'B' the same).",
     "common_mistakes": [
-      "Thinking it was a random mistake",
+      "Thinking it was random",
       "Not seeing the capital letter issue",
-      "Retrying without fixing constraints"
+      "Retrying without fixing"
     ],
     "hint": "Computers treat 'A' and 'a' differently."
   },
@@ -577,69 +577,69 @@
     "id": "I-IT-010",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You asked for advice.",
-    "user_instruction": "The model guessed. Add the weather context.",
-    "gold_prompt": "It is 45 degrees and windy. Should I wear a coat? Explain why.",
+    "scenario": "You asked for outfit advice.",
+    "user_instruction": "The AI guessed. Add the weather details.",
+    "gold_prompt": "It's 45 degrees and windy. Should I wear a jacket? Tell me why.",
     "common_mistakes": [
-      "Asking for opinion without facts",
+      "Asking without giving facts",
       "Trusting a guess",
       "Not giving the temperature"
     ],
-    "hint": "The model can't feel cold; tell it the temp."
+    "hint": "The AI can't feel cold—tell it the temp!"
   },
   {
     "id": "I-EV-001",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need a history bio.",
-    "user_instruction": "Ask the model to double-check the dates.",
-    "gold_prompt": "Write a bio of Abraham Lincoln. Verify and list his birth date, death date, and years of presidency to be sure they are right.",
+    "scenario": "You need a history report.",
+    "user_instruction": "Ask the AI to double-check the dates.",
+    "gold_prompt": "Write about Abraham Lincoln. List and verify his birth date, death date, and when he was president.",
     "common_mistakes": [
-      "Asking for bio without checking facts",
-      "Not saying which facts to check",
-      "Not asking for a list of facts"
+      "Asking without checking facts",
+      "Not saying which facts to verify",
+      "Not asking for a list of dates"
     ],
-    "hint": "History has lots of dates; check them."
+    "hint": "History has lots of dates—check them."
   },
   {
     "id": "I-EV-002",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You want a weather guess.",
-    "user_instruction": "Ask for history and risks, not a magic guess.",
-    "gold_prompt": "Check historical weather for Seattle in June. Instead of a guess, give me the chance of rain based on history.",
+    "scenario": "You want a weather prediction.",
+    "user_instruction": "Ask for past data and chances, not a magic guess.",
+    "gold_prompt": "Check past weather for Seattle in June. Give me the chance of rain based on history, not a guess.",
     "common_mistakes": [
       "Asking for a specific day too far away",
       "Not asking for history",
-      "Thinking the model can predict the future"
+      "Thinking the AI can predict the future"
     ],
-    "hint": "Long-term weather is about chances, not facts."
+    "hint": "Weather is about chances, not certainty."
   },
   {
     "id": "I-EV-003",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are writing a cover letter.",
-    "user_instruction": "Ask the model to grade its own work.",
-    "gold_prompt": "Write a cover letter. Then, grade it 1-5 for being professional and clear. Suggest one fix.",
+    "scenario": "You're writing an application essay.",
+    "user_instruction": "Ask the AI to grade its own work.",
+    "gold_prompt": "Write an essay about why I want to volunteer. Then grade it 1-5 for being clear and interesting. Suggest one improvement.",
     "common_mistakes": [
       "Not checking the work",
       "Not saying how to grade it",
-      "Not asking for a fix"
+      "Not asking for fixes"
     ],
-    "hint": "Make the model be your editor."
+    "hint": "Make the AI be your editor."
   },
   {
     "id": "I-EV-004",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are asking about health.",
-    "user_instruction": "Ask for proof and side effects.",
-    "gold_prompt": "Is coffee good for you? summarize the science and mention one negative side effect.",
+    "scenario": "You're asking about health stuff.",
+    "user_instruction": "Ask for science and mention downsides too.",
+    "gold_prompt": "Is coffee good for you? Summarize the science and mention one downside.",
     "common_mistakes": [
       "Asking for a simple yes/no",
-      "Accepting one side",
-      "Not asking for the bad side"
+      "Only hearing one side",
+      "Not asking about negatives"
     ],
     "hint": "Science usually has two sides."
   },
@@ -647,23 +647,23 @@
     "id": "I-EV-005",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need a budget estimate.",
-    "user_instruction": "Ask for a range (Low-High) and what is included.",
-    "gold_prompt": "Estimate the cost of a wedding in Chicago. Give a Low, Medium, High range and list what assumption you made for guest count.",
+    "scenario": "You need a cost estimate for a party.",
+    "user_instruction": "Ask for a range (Low-High) and what's included.",
+    "gold_prompt": "Estimate the cost of a birthday party. Give Low, Medium, High prices and say how many guests you assumed.",
     "common_mistakes": [
       "Asking for one number",
-      "Not asking what is included",
+      "Not asking what's included",
       "Forgetting the location"
     ],
-    "hint": "Estimates are guesses unless you have rules."
+    "hint": "Estimates are guesses without clear rules."
   },
   {
     "id": "I-EV-006",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are getting code.",
-    "user_instruction": "Ask the model to check if the code works for screen readers.",
-    "gold_prompt": "Write HTML for a 'Submit' button. Verify that it works for screen readers (has a label).",
+    "scenario": "You're getting code help.",
+    "user_instruction": "Ask the AI to check if the code works for everyone.",
+    "gold_prompt": "Write HTML for a 'Submit' button. Make sure it works for screen readers (has a label).",
     "common_mistakes": [
       "Not checking the code",
       "Ignoring accessibility",
@@ -675,56 +675,56 @@
     "id": "I-EV-007",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You need visa advice.",
-    "user_instruction": "Ask specifically for a warning to check official sites.",
-    "gold_prompt": "Do US citizens need a visa for Japan? Add a warning that rules change and I should check the Embassy website.",
+    "scenario": "You need travel visa info.",
+    "user_instruction": "Ask for a warning to check official websites.",
+    "gold_prompt": "Do US citizens need a visa for Japan? Add a warning that rules change and I should check the official Embassy website.",
     "common_mistakes": [
-      "Trusting the model for legal advice",
+      "Trusting the AI for legal stuff",
       "Not saying your citizenship",
       "Not checking official sources"
     ],
-    "hint": "Always check official rules."
+    "hint": "Always double-check official rules."
   },
   {
     "id": "I-EV-008",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You ask 'Why is the sky blue?'.",
-    "user_instruction": "Make sure the answer is simple for a kid.",
-    "gold_prompt": "Explain why the sky is blue to a 5-year-old. Check that you don't use big words.",
+    "scenario": "You're explaining something to a little kid.",
+    "user_instruction": "Make sure the answer is really simple.",
+    "gold_prompt": "Explain why the sky is blue to a 5-year-old. Don't use big words.",
     "common_mistakes": [
-      "Not saying it is for a kid",
-      "Using big words",
-      "Assuming the model knows the age"
+      "Not saying the age",
+      "Using complicated words",
+      "Assuming the AI knows the audience"
     ],
-    "hint": "Check the answer fits the audience."
+    "hint": "Make sure the answer fits the audience."
   },
   {
     "id": "I-EV-009",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are writing a sales email.",
-    "user_instruction": "Check if the email talks about the client's needs.",
-    "gold_prompt": "Write a sales email for our software. Check: Does it talk more about the client's problems than our features? If not, fix it.",
+    "scenario": "You're writing a message to convince someone.",
+    "user_instruction": "Check if it focuses on what they care about.",
+    "gold_prompt": "Write a message about my project. Check: Does it talk more about what's in it for them than about me? If not, fix it.",
     "common_mistakes": [
-      "Writing a generic sales pitch",
-      "Talking only about yourself",
+      "Writing a generic pitch",
+      "Only talking about yourself",
       "Not asking to fix it"
     ],
-    "hint": "Focus on the customer, not the product."
+    "hint": "Focus on the other person, not yourself."
   },
   {
     "id": "I-EV-010",
     "difficulty": "intermediate",
     "level": "simple",
-    "scenario": "You are quoting a poem.",
-    "user_instruction": "Ask the model to be exact.",
-    "gold_prompt": "Quote the first part of 'The Raven'. Check that every word and comma is exactly right.",
+    "scenario": "You're quoting a poem or song.",
+    "user_instruction": "Ask the AI to be word-for-word exact.",
+    "gold_prompt": "Quote the first part of 'The Raven'. Make sure every word and comma is exactly right.",
     "common_mistakes": [
       "Asking for a quote loosely",
-      "Not naming the poem",
+      "Not naming the poem/song",
       "Ignoring punctuation"
     ],
-    "hint": "Poetry needs to be exact."
+    "hint": "Quotes need to be exact."
   }
 ]
