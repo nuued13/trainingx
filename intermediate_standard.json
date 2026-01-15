@@ -1,0 +1,1259 @@
+[
+  {
+    "id": "I-CL-001",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "clarity",
+    "lesson_type": "rewrite_clear_goal",
+    "scenario": "You want to start exercising but don't know where to begin.",
+    "broken_prompt": "Give me a workout plan.",
+    "user_instruction": "Rewrite the prompt to clearly define your fitness goals, experience level, and available equipment.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Create a 4-week beginner workout plan for weight loss using only dumbbells. I can exercise 3 days a week for 30 minutes. Include a verification step to track progress by listing weekly milestones.",
+    "common_mistakes": [
+      "Failing to specify the goal (e.g., weight loss vs. muscle gain)",
+      "Omitting constraints like available equipment or time",
+      "Not defining the duration of the plan"
+    ],
+    "hint": "Be specific about what you want to achieve and what tools you have."
+  },
+  {
+    "id": "I-CL-002",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "clarity",
+    "lesson_type": "add_success_criteria",
+    "scenario": "You need a short story for a contest.",
+    "broken_prompt": "Write a story about a robot.",
+    "user_instruction": "Improve the prompt by adding specific success criteria for the story's tone, length, and plot twist.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write a humorous 500-word sci-fi story about a robot who wants to be a chef. The story must end with a surprising twist where the robot invents a new flavor. Ensure the tone is lighthearted and suitable for children.",
+    "common_mistakes": [
+      "Asking for a story without defining the genre or tone",
+      "Forgetting to specify the word count or length",
+      "Leaving the ending open instead of requesting a specific element"
+    ],
+    "hint": "Define what a 'winning' story looks like in terms of style and structure."
+  },
+  {
+    "id": "I-CL-003",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "clarity",
+    "lesson_type": "clarify_scope",
+    "scenario": "You are planning a weekend getaway with friends.",
+    "broken_prompt": "Plan a trip for us.",
+    "user_instruction": "Clarify the scope of the request by specifying the destination type, budget, and number of people.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Plan a 2-day hiking trip for 4 adults within a 2-hour drive of Denver. The budget is $200 per person. Output the plan as a detailed itinerary including trail names and lodging options.",
+    "common_mistakes": [
+      "Not mentioning the location or starting point",
+      "Ignoring the budget constraints",
+      "Failing to specify the group size or interests"
+    ],
+    "hint": "Narrow down the request so the model doesn't have to guess your preferences."
+  },
+  {
+    "id": "I-CL-004",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "clarity",
+    "lesson_type": "rewrite_clear_goal",
+    "scenario": "You have some leftover ingredients strings and want to cook dinner.",
+    "broken_prompt": "What can I cook?",
+    "user_instruction": "Rewrite the prompt to list your available ingredients and specify the type of meal you want.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Suggest 3 easy dinner recipes I can make using chicken breast, broccoli, and rice. I have 30 minutes to cook. Format the output as a list with preparation times for each.",
+    "common_mistakes": [
+      "Not listing the specific ingredients available",
+      "Failing to mention dietary restrictions or meal type",
+      "Being vague about the time available for cooking"
+    ],
+    "hint": "Tell the model exactly what you have to work with."
+  },
+  {
+    "id": "I-CL-005",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "clarity",
+    "lesson_type": "add_success_criteria",
+    "scenario": "You want to reorganize your messy closet.",
+    "broken_prompt": "Help me clean my closet.",
+    "user_instruction": "Add success criteria to define how you want the items sorted and organized.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Create a step-by-step guide to organizing a small bedroom closet. The goal is to separate clothes by season and color. Include a checklist of necessary supplies like bins or hangers.",
+    "common_mistakes": [
+      "Asking for help without defining the desired outcome",
+      "Not specifying the method of organization (e.g., color, season)",
+      "Forgetting to ask for a logical sequence of steps"
+    ],
+    "hint": "Describe exactly how the closet should look when you are done."
+  },
+  {
+    "id": "I-CL-006",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "clarity",
+    "lesson_type": "clarify_scope",
+    "scenario": "You want to start learning to play the guitar.",
+    "broken_prompt": "Teach me guitar.",
+    "user_instruction": "Clarify the scope by specifying your current skill level, preferred genre, and practice time.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Create a 1-month practice schedule for a complete beginner learning acoustic guitar. Focus on learning basic chords and strumming patterns for pop songs. I can practice 20 minutes a day.",
+    "common_mistakes": [
+      "Not stating whether it's acoustic or electric guitar",
+      "Failing to mention the starting skill level",
+      "Not defining a specific timeframe for the plan"
+    ],
+    "hint": "Limit the scope to a specific timeframe and skill set."
+  },
+  {
+    "id": "I-CL-007",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "clarity",
+    "lesson_type": "rewrite_clear_goal",
+    "scenario": "You need to ask customer support for a refund.",
+    "broken_prompt": "Write an email for a refund.",
+    "user_instruction": "Rewrite the prompt to include the product details, reason for return, and desired outcome.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Draft a polite but firm email to customer support requesting a full refund for a defective blender (Order #12345). Explain that the motor burned out after one use. Ask for a prepaid shipping label.",
+    "common_mistakes": [
+      "Omitting the order number or product details",
+      "Failing to state the clear reason for the refund",
+      "Not specifying the tone of the email"
+    ],
+    "hint": "Provide all the facts the support agent would need to help you."
+  },
+  {
+    "id": "I-CL-008",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "clarity",
+    "lesson_type": "add_success_criteria",
+    "scenario": "You are looking for a gift for a friend who loves coffee.",
+    "broken_prompt": "Give me gift ideas.",
+    "user_instruction": "Improve the prompt by adding specific criteria about the recipient's interests and your budget.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Suggest 5 unique gift ideas for a coffee enthusiast under $50. The ideas should not include mugs or beans. Include a brief reason why each item is a good choice for a coffee lover.",
+    "common_mistakes": [
+      "Asking for generic ideas without a budget",
+      "Not specifying what to exclude (e.g., no mugs)",
+      "Failing to target the specific interest (coffee)"
+    ],
+    "hint": "Set boundaries on price and types of items to get better recommendations."
+  },
+  {
+    "id": "I-CX-001",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "context",
+    "lesson_type": "add_required_inputs",
+    "scenario": "You want to write a thank-you note but haven't provided details.",
+    "broken_prompt": "Write a thank you note.",
+    "user_instruction": "Add the required inputs: who the note is for and what specific gift you received.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write a warm thank-you note to my Aunt Sally for the hand-knitted scarf she sent me for my birthday. Mention that I love the blue color.",
+    "common_mistakes": [
+      "Writing a generic template without specific details",
+      "Forgetting to mention the relationship to the recipient",
+      "Omitting the specific item received"
+    ],
+    "hint": "The model needs to know who to thank and what for."
+  },
+  {
+    "id": "I-CX-002",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "context",
+    "lesson_type": "add_definitions",
+    "scenario": "You want an explanation of a game but haven't named it.",
+    "broken_prompt": "Explain the rules of the game.",
+    "user_instruction": "Add the definition of which game you are referring to and the audience for the explanation.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Explain the basic rules of 'Capture the Flag' to a group of 10-year-olds who have never played before. Focus on how to win and safety rules.",
+    "common_mistakes": [
+      "Assuming the model knows which game you mean",
+      "Providing a technical explanation unsuitable for the audience",
+      "Failing to define the scope (e.g., basic rules vs. professional league rules)"
+    ],
+    "hint": "Specify the game and who is learning it."
+  },
+  {
+    "id": "I-CX-003",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "context",
+    "lesson_type": "add_clarifying_questions",
+    "scenario": "Your houseplant is unwell and you need advice.",
+    "broken_prompt": "My plant is dying.",
+    "user_instruction": "Improve the prompt to ask the model for clarifying questions to diagnose the issue.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "My indoor fern is turning yellow and dropping leaves. Ask me 3 diagnostic questions about my watering habits, light exposure, and pot drainage to help identify the problem.",
+    "common_mistakes": [
+      "Asking for a solution without providing symptoms",
+      "Not asking the model to probe for missing information",
+      "Failing to identify the type of plant"
+    ],
+    "hint": "Flip the script: ask the model to interview you."
+  },
+  {
+    "id": "I-CX-004",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "context",
+    "lesson_type": "add_required_inputs",
+    "scenario": "You need a study plan but haven't given the parameters.",
+    "broken_prompt": "Make me a study schedule.",
+    "user_instruction": "Add the required inputs: the subject, the material to cover, and the time available.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Create a 3-day study schedule for my Biology final. I need to cover chapters 5 through 9. I have 4 hours available each day.",
+    "common_mistakes": [
+      "Not specifying the subject or topic",
+      "Failing to list the amount of material (e.g., chapters)",
+      "Omitting the time constraints"
+    ],
+    "hint": "Input = Subject + Volume + Time."
+  },
+  {
+    "id": "I-CX-005",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "context",
+    "lesson_type": "add_definitions",
+    "scenario": "You want feedback on a design but use vague terms.",
+    "broken_prompt": "Make it pop.",
+    "user_instruction": "Replace the vague term with specific design definitions you want improved (e.g., contrast, hierarchy).",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Critique this poster design. Focus on increasing the visual contrast between the headline and the background to improve readability from a distance.",
+    "common_mistakes": [
+      "Using subjective slang like 'pop' or 'edgy' without definition",
+      "Failing to specify the design element to change",
+      "Not explaining the goal of the change (e.g., readability)"
+    ],
+    "hint": "Translate 'pop' into technical design language."
+  },
+  {
+    "id": "I-CX-006",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "context",
+    "lesson_type": "add_clarifying_questions",
+    "scenario": "You are looking for a pet but haven't specified your lifestyle.",
+    "broken_prompt": "What dog should I get?",
+    "user_instruction": "Instruct the model to ask you questions about your living situation and activity level before making a recommendation.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "I am looking for a dog breed that fits my lifestyle. Ask me 5 questions about my home size, work schedule, and activity level to create a recommendation.",
+    "common_mistakes": [
+      "Asking for a recommendation without context",
+      "Giving the context immediately instead of asking for questions (prompt engineering technique)",
+      "Asking for too many or too few questions"
+    ],
+    "hint": "Make the model gather the context from you first."
+  },
+  {
+    "id": "I-CX-007",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "context",
+    "lesson_type": "add_required_inputs",
+    "scenario": "You need a caption for a social media post.",
+    "broken_prompt": "Write a caption for this photo.",
+    "user_instruction": "Add the required inputs: describe the photo content and the platform it is for.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write an engaging Instagram caption for a photo of a golden retriever playing in the snow. Include emojis and hashtags related to winter and dogs.",
+    "common_mistakes": [
+      "Forgetting to describe the image content",
+      "Not specifying the platform (which affects length and style)",
+      "Failing to set the tone (e.g., funny, sentimental)"
+    ],
+    "hint": "The model cannot see the photo; you must describe it."
+  },
+  {
+    "id": "I-CX-008",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "context",
+    "lesson_type": "add_definitions",
+    "scenario": "You want an explanation of a sports rule.",
+    "broken_prompt": "Explain the rule.",
+    "user_instruction": "Add definitions for which rule and which sport you are asking about.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Explain the 'offside' rule in soccer to a complete beginner. Use a simple analogy to help clear up the definition.",
+    "common_mistakes": [
+      "Assuming the model knows the sport",
+      "Asking about a 'rule' without naming it",
+      "Not defining the complexity level of the explanation"
+    ],
+    "hint": "Contextualize the rule within a specific sport and audience."
+  },
+  {
+    "id": "I-CT-001",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "constraints",
+    "lesson_type": "add_constraints",
+    "scenario": "You need a meal plan for someone with specific dietary needs.",
+    "broken_prompt": "Plan a menu for the week.",
+    "user_instruction": "Add constraints for a vegetarian diet and a severe peanut allergy.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Create a 7-day dinner menu that is strictly vegetarian and peanut-free. Ensure all ingredients listed are easy to find in a standard grocery store.",
+    "common_mistakes": [
+      "Forgetting to mention one of the restrictions (vegetarian or peanut-free)",
+      "Not specifying the duration (e.g., 7 days)",
+      "Asking for recipes that are too complex"
+    ],
+    "hint": "Safety and diet are critical boundaries for the model."
+  },
+  {
+    "id": "I-CT-002",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "constraints",
+    "lesson_type": "set_tone_and_boundaries",
+    "scenario": "You need a playlist for a wedding reception.",
+    "broken_prompt": "Make a wedding playlist.",
+    "user_instruction": "Set boundaries on the music style: upbeat only, no slow songs, and nothing with explicit lyrics.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Curate a 3-hour wedding reception playlist. The songs must be upbeat and danceable. Do not include any slow ballads or songs with explicit lyrics.",
+    "common_mistakes": [
+      "Asking for a playlist without specifying the vibe",
+      "Forgetting to ban explicit content for a family event",
+      "Not defining the length of the playlist"
+    ],
+    "hint": "Tell the model what to avoid as much as what to include."
+  },
+  {
+    "id": "I-CT-003",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "constraints",
+    "lesson_type": "resolve_conflicts",
+    "scenario": "You need to schedule a team meeting but times are tight.",
+    "broken_prompt": "Schedule a meeting for next week.",
+    "user_instruction": "Resolve the conflict: The team is busy Tuesday and Thursday, and the office is closed Friday. Find a slot.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Suggest 3 options for a 1-hour team meeting next week. Verify that the slots are not on Tuesday, Thursday, or Friday. Monday and Wednesday are the only open days.",
+    "common_mistakes": [
+      "Failing to list the busy days",
+      "Not explicitly stating the length of the meeting",
+      "Asking for a slot on a closed day (Friday)"
+    ],
+    "hint": "You must explicitly rule out the conflicting times."
+  },
+  {
+    "id": "I-CT-004",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "constraints",
+    "lesson_type": "add_constraints",
+    "scenario": "You are looking to buy a new laptop.",
+    "broken_prompt": "Recommend a laptop.",
+    "user_instruction": "Add hard constraints: price under $1000 and must use the Windows operating system.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Suggest 3 laptops for a college student. The price must be strictly under $1000. Do not include Macs or Chromebooks; I only want Windows machines.",
+    "common_mistakes": [
+      "Asking for too wide a price range",
+      "Forgetting to specify the OS preference",
+      "Not stating the primary use case (e.g., student)"
+    ],
+    "hint": "Budget and OS are non-negotiable filters."
+  },
+  {
+    "id": "I-CT-005",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "constraints",
+    "lesson_type": "set_tone_and_boundaries",
+    "scenario": "You need to write a formal complaint letter.",
+    "broken_prompt": "Write a complaint letter.",
+    "user_instruction": "Set the tone to be professional and firm, but explicitly forbid aggressive or insulting language.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Draft a formal complaint letter to my landlord about a leaking roof. The tone should be serious and urgent but remain polite. Do not use any aggressive or accusatory language.",
+    "common_mistakes": [
+      "Being too vague about the tone (e.g., just 'nice')",
+      "Failing to set a boundary against aggression",
+      "Not clearly stating the issue (leaking roof)"
+    ],
+    "hint": "You can be firm without being rude; tell the model how."
+  },
+  {
+    "id": "I-CT-006",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "constraints",
+    "lesson_type": "add_constraints",
+    "scenario": "You need a logo design for a print job.",
+    "broken_prompt": "Design a logo.",
+    "user_instruction": "Add constraints: use only 2 colors to save printing costs and output description in text format.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Describe a minimalist logo concept for a bakery. You must use only 2 colors: brown and white. The design must be simple enough for cheap printing.",
+    "common_mistakes": [
+      "Asking for a complex design that ignores the color limit",
+      "Not specifying the industry (bakery)",
+      "Expecting an actual image file instead of a text description"
+    ],
+    "hint": "Constraints can be creative (industry) or technical (colors)."
+  },
+  {
+    "id": "I-CT-007",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "constraints",
+    "lesson_type": "resolve_conflicts",
+    "scenario": "You are planning a vacation with conflicting interests.",
+    "broken_prompt": "Plan a family activity.",
+    "user_instruction": "Resolve the conflict: Kids want an amusement park, parents want a quiet museum. Find a compromise.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Suggest a family activity in San Diego that balances fun for kids and culture for adults. We want a place that has interactive exhibits but isn't a loud theme park. Balboa Park might be a good compromise.",
+    "common_mistakes": [
+      "Ignoring one group's preference entirely",
+      "Not proposing a specific middle-ground solution",
+      "Being too vague about the location"
+    ],
+    "hint": "Explicitly state the trade-off you are looking for."
+  },
+  {
+    "id": "I-CT-008",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "constraints",
+    "lesson_type": "set_tone_and_boundaries",
+    "scenario": "You are emailing your boss for a raise.",
+    "broken_prompt": "Ask for a raise.",
+    "user_instruction": "Set the boundaries: stick to data and achievements, and avoid emotional appeals.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Draft an email to my manager requesting a salary review. Focus strictly on my 20% sales increase this year. Do not mention personal financial issues or compare me to other colleagues.",
+    "common_mistakes": [
+      "Using emotional arguments instead of data",
+      "Failing to ban comparisons with coworkers",
+      "Not specifying the specific achievement to highlight"
+    ],
+    "hint": "Data over drama. Tell the model what NOT to say."
+  },
+  {
+    "id": "I-OF-001",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "output_format",
+    "lesson_type": "choose_right_format",
+    "scenario": "You are organizing a shopping list for a party.",
+    "broken_prompt": "Write a shopping list.",
+    "user_instruction": "Request the output as a checklist categorized by food group (e.g., Produce, Dairy).",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Create a shopping list for a taco party. Format the output as a checklist categorized by section (Produce, Meat, Dairy, Bakery) so it is easy to use in the store.",
+    "common_mistakes": [
+      "Asking for a simple list without categorization",
+      "Failing to specify the checkbox or checklist format",
+      "Not clarifying the sections/categories"
+    ],
+    "hint": "Think about how the aisles are arranged in a grocery store."
+  },
+  {
+    "id": "I-OF-002",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "output_format",
+    "lesson_type": "enforce_structure",
+    "scenario": "You want to start a daily journaling habit.",
+    "broken_prompt": "Write a journal entry.",
+    "user_instruction": "Enforce a specific structure: Gratitude, Daily Goal, and Reflection.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write a template for my daily journal entry. The output must follow this exact structure:\n1. Gratitude (3 things)\n2. Today's Main Goal\n3. Evening Reflection.",
+    "common_mistakes": [
+      "Asking for a generic journal entry",
+      "Listing the topics without insisting on the structure/order",
+      "Not specifying how many items per section"
+    ],
+    "hint": "Define the skeleton you want the model to fill in."
+  },
+  {
+    "id": "I-OF-003",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "output_format",
+    "lesson_type": "choose_right_format",
+    "scenario": "You are deciding between two cars to buy.",
+    "broken_prompt": "Compare these two cars.",
+    "user_instruction": "Request a comparison table to easily see differences in price and features.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Compare the Toyota Camry and Honda Accord. Output the result as a table comparing Price, MPG, and Horsepower.",
+    "common_mistakes": [
+      "Asking for paragraphs of text instead of a table",
+      "Not analyzing specific features (Price, MPG)",
+      "Leaving the formatting up to the model"
+    ],
+    "hint": "Tables are best for side-by-side comparisons."
+  },
+  {
+    "id": "I-OF-004",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "output_format",
+    "lesson_type": "provide_template_or_schema",
+    "scenario": "You need to print new business cards.",
+    "broken_prompt": "Make business card text.",
+    "user_instruction": "Provide a specific format template using placeholders for the card layout.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Generate text for my business card. Follow this format exactly:\n[Name] | [Title]\n----------------\n[Phone] | [Email]\n[Website]",
+    "common_mistakes": [
+      "Asking for the content without the layout",
+      "Not providing the visual separator instructions",
+      "Failing to use a clear template structure"
+    ],
+    "hint": "Show the model exactly what the card should look like."
+  },
+  {
+    "id": "I-OF-005",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "output_format",
+    "lesson_type": "enforce_structure",
+    "scenario": "You are planning meals for the week.",
+    "broken_prompt": "Give me a meal plan.",
+    "user_instruction": "Enforce a structure where each day includes specific headers for Breakfast, Lunch, and Dinner.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Create a 3-day healthy meal plan. Format each day with headers for 'Breakfast', 'Lunch', and 'Dinner', followed by the calorie count for each meal.",
+    "common_mistakes": [
+      "Accepting a paragraph block of text",
+      "Not asking for explicit headers",
+      "Failing to include the metadata (calories) requested"
+    ],
+    "hint": "Headers make complex information readable."
+  },
+  {
+    "id": "I-OF-006",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "output_format",
+    "lesson_type": "choose_right_format",
+    "scenario": "You are writing instructions for a house sitter.",
+    "broken_prompt": "Instructions for the cat.",
+    "user_instruction": "Request a numbered list formatted chronologically (Morning, Afternoon, Evening).",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write instructions for my house sitter regarding the cat. Format the output as a numbered list organized chronologically: Morning routine, Afternoon checks, and Evening feeding.",
+    "common_mistakes": [
+      "Writing a long narrative letter",
+      "Not using a list format",
+      "Failing to organize by time of day"
+    ],
+    "hint": "Lists are easier to follow than paragraphs."
+  },
+  {
+    "id": "I-OF-007",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "output_format",
+    "lesson_type": "provide_template_or_schema",
+    "scenario": "You are cataloging your personal library.",
+    "broken_prompt": "List my books.",
+    "user_instruction": "Provide a CSV format with specific headers (Title, Author, Genre).",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "I have a stack of books to catalog. Generate a CSV format example for 3 books with these headers: Title, Author, Year, Genre.",
+    "common_mistakes": [
+      "Asking for a list without comma-separation",
+      "Not specifying the headers",
+      "Failing to mention CSV explicitly"
+    ],
+    "hint": "CSV is a specific computer-readable format you can ask for."
+  },
+  {
+    "id": "I-OF-008",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "output_format",
+    "lesson_type": "enforce_structure",
+    "scenario": "You lost your phone and need to post a flyer.",
+    "broken_prompt": "Write a lost item ad.",
+    "user_instruction": "Enforce a structure: Item Description, Location Lost, Contact Info, and Reward.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Draft a 'Lost and Found' flyer for my missing phone. The output must contain four distinct sections: 'Description of Item', 'Where it was Lost', 'Contact Information', and 'Reward Details'.",
+    "common_mistakes": [
+      "Writing a generic sentence",
+      "Missing critical contact or reward info",
+      "Not breaking the text into distinct sections"
+    ],
+    "hint": "Flyers need clear sections to catch attention."
+  },
+  {
+    "id": "I-IT-001",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "fix_based_on_bad_output",
+    "scenario": "You asked for a cookie recipe doubled, but the math is wrong.",
+    "broken_prompt": "Double this recipe: 1 egg, 2 cups flour.",
+    "model_output": "recipe: 1 egg, 4 cups flour",
+    "user_instruction": "The model forgot to double the egg. Rewrite the prompt to ensure ALL ingredients are multiplied.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Double the following recipe ingredients. You must calculate 2x for every single item listed: 1 egg, 2 cups flour.",
+    "common_mistakes": [
+      "Repeating the broken prompt without adding emphasis",
+      "Manually doing the math instead of asking the model to do it correctly",
+      "Not checking if other ingredients were missed"
+    ],
+    "hint": "Emphasize that the operation applies to the entire list."
+  },
+  {
+    "id": "I-IT-002",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "diagnose_failure_cause",
+    "scenario": "You asked for a math solution but the answer seems off.",
+    "broken_prompt": "Solve 2x + 4 = 10.",
+    "model_output": "x = 2",
+    "user_instruction": "The answer is wrong (should be 3). Add a requirement for the model to show step-by-step work to catch the logic error.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Solve the equation 2x + 4 = 10. You must show your work step-by-step, explaining each subtraction and division operation.",
+    "common_mistakes": [
+      "Just asking 'Are you sure?' without asking for the logic",
+      "Providing the correct answer yourself instead of fixing the prompt",
+      "Not explicitly asking for the chain of thought"
+    ],
+    "hint": "Asking for 'steps' forces the model to slow down and check its logic."
+  },
+  {
+    "id": "I-IT-003",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "add_edge_case_handling",
+    "scenario": "You are building a form to calculate age.",
+    "broken_prompt": "Calculate age from birth year.",
+    "user_instruction": "Add handling for an edge case: What if the user inputs a future year?",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Calculate the current age based on a birth year ending in 2050. If the input year is in the future, return an error message: 'Invalid Birth Year'.",
+    "common_mistakes": [
+      "Asking for the calculation without defining the error behavior",
+      "Assuming the model knows what to do with invalid data",
+      "Not specifying the error message text"
+    ],
+    "hint": "Define what should happen when the input doesn't make sense."
+  },
+  {
+    "id": "I-IT-004",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "fix_based_on_bad_output",
+    "scenario": "You requested a haiku, but the syllable count is wrong.",
+    "broken_prompt": "Write a haiku about rain.",
+    "model_output": "Water falls from sky (5)\nIt makes the ground very wet (7)\nI need an umbrella (6)",
+    "user_instruction": "The last line has 6 syllables. Fix the prompt to strictly enforce the 5-7-5 structure.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write a haiku about rain. You must count the syllables and ensure the structure is exactly 5, 7, and 5 syllables. Output the syllable count next to each line.",
+    "common_mistakes": [
+      "Asking for a haiku again without adding the constraint verification",
+      "Not asking the model to verify its own count",
+      "Changing the topic instead of fixing the structure"
+    ],
+    "hint": "Make the model prove it followed the rules by showing the count."
+  },
+  {
+    "id": "I-IT-005",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "add_edge_case_handling",
+    "scenario": "You are splitting a bill.",
+    "broken_prompt": "Split $100 among 3 people.",
+    "model_output": "$33.33 each",
+    "user_instruction": "The total adds up to $99.99. Handle the edge case of the leftover penny.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Split $100 exactly among 3 people. Assign the extra penny to the first person so the total is exactly $100.00.",
+    "common_mistakes": [
+      "Ignoring the rounding error",
+      "Asking for decimals that don't exist (e.g. 33.333)",
+      "Not specifying who pays the difference"
+    ],
+    "hint": "Computers need rules for remainders."
+  },
+  {
+    "id": "I-IT-006",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "fix_based_on_bad_output",
+    "scenario": "You asked for a product description but it's too vague.",
+    "broken_prompt": "Describe this shoe.",
+    "model_output": "It is a shoe for feet.",
+    "user_instruction": "The output is technically true but useless. Iterate to request specific details like material, color, and purpose.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write a compelling product description for a running shoe. Include details about the breathable mesh material, the bright neon color, and its design for marathon runners.",
+    "common_mistakes": [
+      "Asking for 'more detail' without listing what details",
+      "Not correcting the vague nature of the previous output",
+      "Failing to provide the product specs to the model"
+    ],
+    "hint": "If the model says something obvious, give it specific facts to work with."
+  },
+  {
+    "id": "I-IT-007",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "diagnose_failure_cause",
+    "scenario": "You calculate flight arrival time but the hour is wrong.",
+    "broken_prompt": "I leave NY at 8AM, fly 7 hours to London. What time do I land?",
+    "model_output": "3 PM",
+    "user_instruction": "The model missed the time zone change. Add a diagnostic instruction to check local time zones.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Calculate the arrival time in London for a flight arriving from New York. Flight time is 7 hours, departure is 8 AM EST. You must account for the +5 hour time difference.",
+    "common_mistakes": [
+      "Assuming the model knows to switch time zones",
+      "Not providing the specific time difference or asking the model to look it up",
+      "Asking for the duration instead of the clock time"
+    ],
+    "hint": "Travel math requires location logic."
+  },
+  {
+    "id": "I-IT-008",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "add_edge_case_handling",
+    "scenario": "You want to generate a username.",
+    "broken_prompt": "Make a username from 'Sam'.",
+    "model_output": "Sam",
+    "user_instruction": "The name 'Sam' is likely taken. Add handling to suggest 3 alternatives if the base name is common.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Generate a username based on 'Sam'. Since 'Sam' is common, provide 3 unique variations using numbers or underscores (e.g., Sam_99).",
+    "common_mistakes": [
+      "Asking for just one name",
+      "Not anticipating the 'username taken' problem",
+      "Failing to specify how to modify the name"
+    ],
+    "hint": "Plan for the most likely failure mode: unavailability."
+  },
+  {
+    "id": "I-IT-009",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "diagnose_failure_cause",
+    "scenario": "You tried to sort a list but the order is weird.",
+    "broken_prompt": "Sort: Apple, banana, Cherry.",
+    "model_output": "Apple, Cherry, banana",
+    "user_instruction": "The model sorted by ASCII (Capital C before lowercase b). Fix the prompt to sort alphabetically ignoring case.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Sort this list alphabetically: Apple, banana, Cherry. Ignore case sensitivity (treat 'b' and 'B' the same).",
+    "common_mistakes": [
+      "Thinking the model just made a random mistake",
+      "Not recognizing the case-sensitivity issue",
+      "Re-running the same prompt expecting a different result"
+    ],
+    "hint": "Computers treat 'A' and 'a' as different characters unless told otherwise."
+  },
+  {
+    "id": "I-IT-010",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "iteration",
+    "lesson_type": "fix_based_on_bad_output",
+    "scenario": "You asked for advice but got a yes/no answer.",
+    "broken_prompt": "Should I wear a coat?",
+    "model_output": "Yes.",
+    "user_instruction": "The model guessed without knowing the weather. Iterate to include the temperature context.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "It is 45 degrees Fahrenheit and windy outside. Should I wear a coat? Explain why.",
+    "common_mistakes": [
+      "Asking for an opinion without facts",
+      "Accepting the random guess as truth",
+      "Not providing the specific condition (temperature) that matters"
+    ],
+    "hint": "The model cannot feel the cold; you must tell it the temperature."
+  },
+  {
+    "id": "I-EV-001",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_fact_check_steps",
+    "scenario": "You asked for a biography of a historical figure.",
+    "broken_prompt": "Write a bio of Abraham Lincoln.",
+    "user_instruction": "Add a verification step to ensure the dates of his presidency and birth/death are fact-checked.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write a short biography of Abraham Lincoln. You must verify and explicitly list his birth date, death date, and the exact years of his presidency to ensure historical accuracy.",
+    "common_mistakes": [
+      "Asking for the bio without accuracy constraints",
+      "Not specifying which facts need checking (dates)",
+      "Failing to ask for explicit listing of the verified facts"
+    ],
+    "hint": "History is full of dates; ask the model to double-check them."
+  },
+  {
+    "id": "I-EV-002",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_assumptions_and_uncertainty",
+    "scenario": "You want a prediction about the weather for an outdoor event.",
+    "broken_prompt": "Will it rain on my wedding next month?",
+    "user_instruction": "Improve the prompt to ask for an analysis of historical patterns and uncertainty rather than a definitive prediction.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Analyze historical weather trends for Seattle in June. Instead of a guaranteed forecast, provide the historical probability of rain and list 3 factors that typically contribute to uncertainty in long-range weather predictions.",
+    "common_mistakes": [
+      "Asking for a specific daily forecast too far in advance",
+      "Not asking for probabilities or historical data",
+      "Failing to ask the model to state the uncertainty"
+    ],
+    "hint": "Long-range forecasts are probabilities, not facts."
+  },
+  {
+    "id": "I-EV-003",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_rubric_and_self_critique",
+    "scenario": "You are writing a cover letter.",
+    "broken_prompt": "Write a cover letter for me.",
+    "user_instruction": "Add a step for the model to critique its own draft against a rubric of 'professionalism' and 'clarity'.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Draft a cover letter for a marketing job. After writing it, critique the draft on a scale of 1-5 for Professionalism and Clarity, and suggest one improvement.",
+    "common_mistakes": [
+      "Just asking for the letter without review",
+      "Not defining the criteria for the critique",
+      "Failing to ask for suggestions to improve"
+    ],
+    "hint": "Make the model be its own editor."
+  },
+  {
+    "id": "I-EV-004",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_fact_check_steps",
+    "scenario": "You are researching health benefits of a food.",
+    "broken_prompt": "Is coffee good for you?",
+    "user_instruction": "Add a requirement to cite scientific consensus and mention conflicting studies.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Summarize the health effects of coffee. You must cite the general scientific consensus and explicitly mention one potential negative side effect supported by research.",
+    "common_mistakes": [
+      "Asking for a simple opinion",
+      "Accepting a one-sided answer",
+      "Not asking for the counter-evidence (negative side effects)"
+    ],
+    "hint": "Science is rarely 100% one-way; ask for the nuance."
+  },
+  {
+    "id": "I-EV-005",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_assumptions_and_uncertainty",
+    "scenario": "You are planning a budget based on estimated costs.",
+    "broken_prompt": "Estimate the cost of a wedding.",
+    "user_instruction": "Improve the prompt to require a range (low to high) and a list of assumptions made (e.g., guest count).",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Provide a cost estimate for a wedding in Chicago. Give a range (Low, Medium, High) and explicitly list the assumptions made for each regarding guest count and venue type.",
+    "common_mistakes": [
+      "Asking for a single number",
+      "Not asking for the assumptions behind the math",
+      "Failing to specify the location context"
+    ],
+    "hint": "An estimate without assumptions is a guess."
+  },
+  {
+    "id": "I-EV-006",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_rubric_and_self_critique",
+    "scenario": "You are generating code for a website.",
+    "broken_prompt": "Write HTML for a button.",
+    "user_instruction": "Add a verification step to check if the code creates an accessible button (screen reader friendly).",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write HTML and CSS for a 'Submit' button. After generating the code, verify that it includes an 'aria-label' and passes color contrast standards for accessibility.",
+    "common_mistakes": [
+      "Asking for code without quality checks",
+      "ignoring accessibility standards",
+      "Not asking the model to verify compliance"
+    ],
+    "hint": "Good code isn't just valid; it's accessible."
+  },
+  {
+    "id": "I-EV-007",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_fact_check_steps",
+    "scenario": "You are asking for travel visa advice.",
+    "broken_prompt": "Do I need a visa for Japan?",
+    "user_instruction": "Add a disclaimer requirement: Ask the model to state that regulations change and to check the official embassy website.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Do US citizens need a visa for a tourist trip to Japan? Include a disclaimer that visa rules change and suggest checking the official outcome source (e.g., Embassy website).",
+    "common_mistakes": [
+      "Treating the model's answer as legal advice",
+      "Not clarifying your citizenship",
+      "Failing to ask for the official source check"
+    ],
+    "hint": "Always verify legal/travel info with an official source."
+  },
+  {
+    "id": "I-EV-008",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_assumptions_and_uncertainty",
+    "scenario": "You are asking 'Why is the sky blue?'.",
+    "broken_prompt": "Why is the sky blue?",
+    "user_instruction": "The user is a 5-year-old. Add a check to ensure the explanation is simple enough effectively.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Explain why the sky is blue to a 5-year-old. Verify that you did not use complex terms like 'Rayleigh scattering' without simplifying them first.",
+    "common_mistakes": [
+      "Asking for science without setting the audience level",
+      "Not checking for jargon",
+      "Assuming the model knows the audience is a child"
+    ],
+    "hint": "Verify the output matches the audience."
+  },
+  {
+    "id": "I-EV-009",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_rubric_and_self_critique",
+    "scenario": "You want a persuasive email to a client.",
+    "broken_prompt": "Write a sales email.",
+    "user_instruction": "Add a self-critique step: Check if the email focuses on the client's needs rather than just the product features.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Write a sales email for our new CRM software. Afterward, critique the email: Does it talk more about the client's problems than our features? If not, rewrite the opening.",
+    "common_mistakes": [
+      "Writing a generic pitch",
+      "Not checking the focus (client vs. product)",
+      "Failing to ask for a rewrite if the check fails"
+    ],
+    "hint": "The 'You' orientation is key in sales; ensure the model checks for it."
+  },
+  {
+    "id": "I-EV-010",
+    "difficulty": "intermediate",
+    "level": "standard",
+    "track": "evaluation",
+    "lesson_type": "add_fact_check_steps",
+    "scenario": "You are quoting a famous poem.",
+    "broken_prompt": "Give me the first line of 'The Raven'.",
+    "user_instruction": "Add a verification step to ensure the quote is exact and punctuation is preserved.",
+    "rubric": {
+      "clarity": "0-2",
+      "context": "0-2",
+      "constraints": "0-2",
+      "format": "0-2",
+      "testability": "0-2"
+    },
+    "gold_prompt": "Quote the first stanza of Edgar Allan Poe's 'The Raven'. Verify that every word and punctuation mark matches the original text exactly.",
+    "common_mistakes": [
+      "Asking for a quote without demanding accuracy",
+      "Not specifying the author/work clearly",
+      "Ignoring punctuation importance in poetry"
+    ],
+    "hint": "Poetry requires precision; ask for it."
+  }
+]

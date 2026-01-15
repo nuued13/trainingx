@@ -11,12 +11,18 @@ import {
   calculateYouthResults,
   YouthQuizResult,
 } from "@/data/youth-questions";
+import {
+  kidQuestions,
+  calculateKidResults,
+  KidQuizResult,
+} from "@/data/kid-questions";
 import { questions as adultQuestions } from "@/data/questions";
 
 import { PathwayWelcome } from "@/components/pathway/PathwayWelcome";
-import { AgeSelection } from "@/components/pathway/AgeSelection";
+import { AgeSelection, AgeGroup } from "@/components/pathway/AgeSelection";
 import { AdultTypeSelection } from "@/components/pathway/AdultTypeSelection";
 import { PathwayQuiz } from "@/components/pathway/PathwayQuiz";
+import { KidQuiz } from "@/components/pathway/KidQuiz";
 import { PathwayCongratulations } from "@/components/pathway/PathwayCongratulations";
 
 const STORAGE_KEY = "pathway_quiz_state";
@@ -29,12 +35,11 @@ type FlowStep =
   | "congratulations"
   | "results";
 
-type AgeGroup = "youth" | "adult" | null;
 type AdultType = "student" | "professional" | null;
 
 interface QuizState {
   step: FlowStep;
-  ageGroup: AgeGroup;
+  ageGroup: AgeGroup | null;
   adultType: AdultType;
   currentQuestionIndex: number;
   answers: Record<string, string>;
@@ -81,8 +86,21 @@ export default function DiscoverPage() {
     }
   }, [state]);
 
-  const currentQuestions =
-    state.ageGroup === "youth" ? youthQuestions : adultQuestions;
+  // Get the right questions based on age group
+  const getCurrentQuestions = () => {
+    switch (state.ageGroup) {
+      case "kid":
+        return kidQuestions;
+      case "teen":
+        return youthQuestions;
+      case "adult":
+        return adultQuestions;
+      default:
+        return [];
+    }
+  };
+
+  const currentQuestions = getCurrentQuestions();
 
   const updateState = (updates: Partial<QuizState>) => {
     setState((prev) => ({ ...prev, ...updates }));
@@ -108,6 +126,10 @@ export default function DiscoverPage() {
       currentQuestionIndex: 0,
       answers: {},
     });
+  };
+
+  const handleBackToAge = () => {
+    updateState({ step: "age", ageGroup: null });
   };
 
   const handleBack = () => {
@@ -139,11 +161,16 @@ export default function DiscoverPage() {
       // Small delay for animation
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      if (state.ageGroup === "youth") {
+      if (state.ageGroup === "kid") {
+        const results = calculateKidResults(
+          newAnswers as Record<string, "yes" | "no">
+        );
+        await saveKidResults(results);
+      } else if (state.ageGroup === "teen") {
         const results = calculateYouthResults(
           newAnswers as Record<string, "a" | "b">
         );
-        await saveResults(results);
+        await saveTeenResults(results);
       } else {
         await saveAdultResults(newAnswers);
       }
@@ -155,7 +182,7 @@ export default function DiscoverPage() {
 
       // If logged in, go to results; otherwise show sign-up gate
       if (userId) {
-        if (state.ageGroup === "youth") {
+        if (state.ageGroup === "kid" || state.ageGroup === "teen") {
           router.push("/discover/results");
         } else {
           router.push("/matching");
@@ -172,17 +199,15 @@ export default function DiscoverPage() {
     }
   };
 
-  const saveResults = async (results: YouthQuizResult) => {
+  const saveKidResults = async (results: KidQuizResult) => {
+    const payload = {
+      type: "kid" as const,
+      results,
+      completedAt: new Date().toISOString(),
+    };
+
     if (!userId) {
-      // Save to localStorage for after sign-up
-      localStorage.setItem(
-        "pathway_quiz_results",
-        JSON.stringify({
-          type: "youth",
-          results,
-          completedAt: new Date().toISOString(),
-        })
-      );
+      localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
       return;
     }
 
@@ -192,7 +217,36 @@ export default function DiscoverPage() {
         quizType: "pathway",
         answers: {
           ...results.answers,
-          _ageGroup: "youth",
+          _ageGroup: "kid",
+          _scores: JSON.stringify(results.scores),
+          _dominantPath: results.dominantPath,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to save quiz results:", error);
+      localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
+    }
+  };
+
+  const saveTeenResults = async (results: YouthQuizResult) => {
+    const payload = {
+      type: "teen" as const,
+      results,
+      completedAt: new Date().toISOString(),
+    };
+
+    if (!userId) {
+      localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
+      return;
+    }
+
+    try {
+      await saveQuizResult({
+        userId,
+        quizType: "pathway",
+        answers: {
+          ...results.answers,
+          _ageGroup: "teen",
           _scores: JSON.stringify(results.scores),
           _filters: JSON.stringify(results.filters),
           _dominantPath: results.dominantPath,
@@ -200,29 +254,20 @@ export default function DiscoverPage() {
       });
     } catch (error) {
       console.error("Failed to save quiz results:", error);
-      // Fallback to localStorage
-      localStorage.setItem(
-        "pathway_quiz_results",
-        JSON.stringify({
-          type: "youth",
-          results,
-          completedAt: new Date().toISOString(),
-        })
-      );
+      localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
     }
   };
 
   const saveAdultResults = async (answers: Record<string, string>) => {
+    const payload = {
+      type: "adult" as const,
+      adultType: state.adultType,
+      answers,
+      completedAt: new Date().toISOString(),
+    };
+
     if (!userId) {
-      localStorage.setItem(
-        "pathway_quiz_results",
-        JSON.stringify({
-          type: "adult",
-          adultType: state.adultType,
-          answers,
-          completedAt: new Date().toISOString(),
-        })
-      );
+      localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
       return;
     }
 
@@ -237,15 +282,7 @@ export default function DiscoverPage() {
       });
     } catch (error) {
       console.error("Failed to save quiz results:", error);
-      localStorage.setItem(
-        "pathway_quiz_results",
-        JSON.stringify({
-          type: "adult",
-          adultType: state.adultType,
-          answers,
-          completedAt: new Date().toISOString(),
-        })
-      );
+      localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
     }
   };
 
@@ -263,24 +300,13 @@ export default function DiscoverPage() {
 
   return (
     <div className="min-h-screen w-full flex flex-col relative overflow-hidden bg-slate-50">
-      {/* Background with subtle dot pattern */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0074b9]/5 via-transparent to-[#46bc61]/5" />
-        {/* Subtle dot grid pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.4]"
-          style={{
-            backgroundImage: `radial-gradient(circle, #94a3b8 1px, transparent 1px)`,
-            backgroundSize: "24px 24px",
-          }}
-        />
-      </div>
+      {/* Clean white background - matching dashboard */}
 
-      {/* Progress Bar (only during quiz) */}
+      {/* Progress Bar - Duolingo style with thick bottom */}
       {state.step === "quiz" && (
-        <div className="w-full h-2 bg-slate-200 z-20">
+        <div className="w-full h-4 bg-slate-200 z-20 border-b-2 border-slate-300">
           <div
-            className="h-full theme-gradient-r transition-all duration-500"
+            className="h-full bg-green-500 transition-all duration-500 rounded-r-full"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -300,22 +326,40 @@ export default function DiscoverPage() {
             <AdultTypeSelection
               key="adult-type"
               onSelect={handleAdultTypeSelect}
+              onBack={handleBackToAge}
             />
           )}
 
-          {state.step === "quiz" && currentQuestion && (
-            <PathwayQuiz
-              key={`quiz-${currentQuestion.id}`}
-              question={currentQuestion}
-              questionNumber={state.currentQuestionIndex + 1}
-              totalQuestions={currentQuestions.length}
-              isYouth={state.ageGroup === "youth"}
-              onAnswer={(answer) => handleAnswer(currentQuestion.id, answer)}
-              onBack={handleBack}
-              canGoBack={true}
-              isCalculating={isCalculating}
-            />
-          )}
+          {state.step === "quiz" &&
+            currentQuestion &&
+            state.ageGroup === "kid" && (
+              <KidQuiz
+                key={`quiz-${currentQuestion.id}`}
+                question={currentQuestion as any}
+                questionNumber={state.currentQuestionIndex + 1}
+                totalQuestions={currentQuestions.length}
+                onAnswer={(answer) => handleAnswer(currentQuestion.id, answer)}
+                onBack={handleBack}
+                canGoBack={true}
+                isCalculating={isCalculating}
+              />
+            )}
+
+          {state.step === "quiz" &&
+            currentQuestion &&
+            (state.ageGroup === "teen" || state.ageGroup === "adult") && (
+              <PathwayQuiz
+                key={`quiz-${currentQuestion.id}`}
+                question={currentQuestion as any}
+                questionNumber={state.currentQuestionIndex + 1}
+                totalQuestions={currentQuestions.length}
+                isYouth={state.ageGroup === "teen"}
+                onAnswer={(answer) => handleAnswer(currentQuestion.id, answer)}
+                onBack={handleBack}
+                canGoBack={true}
+                isCalculating={isCalculating}
+              />
+            )}
 
           {state.step === "congratulations" && (
             <PathwayCongratulations

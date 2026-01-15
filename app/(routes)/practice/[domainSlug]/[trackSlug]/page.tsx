@@ -1,14 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
-import { PracticeCardDeck } from "@/components/practice/PracticeCardDeck";
-import { LoadingState } from "@/components/practice";
+import { BeginnerPracticeCardDeck, LoadingState } from "@/components/practice";
 import { useAuth } from "@/contexts/AuthContextProvider";
-import { api } from "@/convex/_generated/api";
+import { Track } from "@/lib/practice";
 import { Id } from "convex/_generated/dataModel";
+
+// Map URL slugs to Track types
+const SLUG_TO_TRACK: Record<string, Track> = {
+  clarity: "clarity",
+  context: "context",
+  constraints: "constraints",
+  "output-format": "output_format",
+  // Legacy slugs (from Convex)
+  "prompt-engineering-fundamentals": "clarity",
+  "effective-context-setting": "context",
+  "smart-constraints": "constraints",
+  "formatting-mastery": "output_format",
+};
 
 export default function PracticeGamePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -16,19 +27,11 @@ export default function PracticeGamePage() {
   const params = useParams<{ domainSlug: string; trackSlug: string }>();
   const { domainSlug, trackSlug } = params || {};
 
-  // Get track details to find the first level
-  const track = useQuery(
-    api.practiceTracks.getBySlug,
-    trackSlug ? { slug: trackSlug } : "skip"
-  );
-
-  // Once we have track ID, get the details including levels
-  const trackDetails = useQuery(
-    api.practiceTracks.getTrackDetails,
-    track && user?._id
-      ? { trackId: track._id, userId: user._id as Id<"users"> }
-      : "skip"
-  );
+  // Map trackSlug to Track type
+  const track = useMemo(() => {
+    if (!trackSlug) return null;
+    return SLUG_TO_TRACK[trackSlug] ?? null;
+  }, [trackSlug]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -40,7 +43,7 @@ export default function PracticeGamePage() {
     }
   }, [isAuthenticated, authLoading, router, domainSlug, trackSlug]);
 
-  if (authLoading || track === undefined || trackDetails === undefined) {
+  if (authLoading) {
     return (
       <SidebarLayout>
         <LoadingState />
@@ -60,26 +63,11 @@ export default function PracticeGamePage() {
     );
   }
 
-  if (!track || !trackDetails) {
+  if (!track) {
     return (
       <SidebarLayout>
         <div className="flex items-center justify-center min-h-screen">
-          <p className="text-slate-500">Track not found.</p>
-        </div>
-      </SidebarLayout>
-    );
-  }
-
-  // Find the first level (or appropriate level)
-  // Since user said "everyone has just one level, so directly just take to the first level"
-  // We'll take the first one from the list.
-  const firstLevel = trackDetails.levels?.[0];
-
-  if (!firstLevel) {
-    return (
-      <SidebarLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-slate-500">No levels found in this track.</p>
+          <p className="text-slate-500">Track not found: {trackSlug}</p>
         </div>
       </SidebarLayout>
     );
@@ -87,9 +75,9 @@ export default function PracticeGamePage() {
 
   return (
     <SidebarLayout>
-      <PracticeCardDeck
-        userId={user._id as any}
-        levelId={firstLevel._id}
+      <BeginnerPracticeCardDeck
+        userId={user._id as Id<"users">}
+        track={track}
         onBack={() => router.push(`/practice/${domainSlug}`)}
       />
     </SidebarLayout>

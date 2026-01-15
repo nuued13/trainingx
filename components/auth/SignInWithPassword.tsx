@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { ConvexError } from "convex/values";
 import { INVALID_PASSWORD } from "convex/errors";
+import { normalizeEmail } from "@/lib/auth/normalizeEmail";
 
 export function SignInWithPassword({
   provider,
@@ -39,6 +40,15 @@ export function SignInWithPassword({
         event.preventDefault();
         setSubmitting(true);
         const formData = new FormData(event.currentTarget);
+        const normalizedEmail = normalizeEmail(
+          (formData.get("email") || "").toString()
+        );
+        if (!normalizedEmail) {
+          toast.error("Please enter your email.");
+          setSubmitting(false);
+          return;
+        }
+        formData.set("email", normalizedEmail);
         const nameValue = (formData.get("name") || "").toString().trim();
         const ageValue = (formData.get("age") || "").toString().trim();
         const genderValue = (formData.get("gender") || "").toString().trim();
@@ -70,56 +80,29 @@ export function SignInWithPassword({
         }
         signIn(provider ?? "password", formData)
           .then(() => {
-            handleSent?.(formData.get("email") as string);
-            toast.success("You're signed in!");
+            if (flow === "signUp") {
+              handleSent?.(normalizedEmail);
+              toast.success("Check your email for a verification code.");
+            } else {
+              toast.success("You're signed in!");
+            }
             // Auth page will handle redirect via useEffect
           })
           .catch((error) => {
             console.error(error);
-            let toastTitle: string;
-            let toastDescription: string | undefined;
-
-            const errorMessage = error?.message || error?.toString() || "";
-            const errorName = error?.name || "";
-
+            if (flow === "signIn") {
+              toast.error("Email or password is incorrect.");
+              setSubmitting(false);
+              return;
+            }
             if (
               error instanceof ConvexError &&
               error.data === INVALID_PASSWORD
             ) {
-              toastTitle = "Invalid password";
-              toastDescription = "Check the requirements and try again.";
-            } else if (
-              errorMessage.includes("InvalidAccountId") ||
-              errorName === "InvalidAccountId" ||
-              (error instanceof Error &&
-                error.message.includes("InvalidAccountId"))
-            ) {
-              toastTitle = "Account not found";
-              toastDescription =
-                flow === "signIn"
-                  ? "This account doesn't exist. Did you mean to sign up?"
-                  : "Could not create account. Please try again.";
-            } else if (
-              errorMessage.includes("Invalid") ||
-              errorMessage.includes("not found") ||
-              errorMessage.includes("does not exist")
-            ) {
-              toastTitle =
-                flow === "signIn" ? "Could not sign in" : "Could not sign up";
-              toastDescription =
-                flow === "signIn"
-                  ? "This account doesn't exist. Did you mean to sign up?"
-                  : "Could not create account. Please try again.";
+              toast.error("Password doesn't meet the requirements.");
             } else {
-              toastTitle =
-                flow === "signIn" ? "Could not sign in" : "Could not sign up";
-              toastDescription =
-                flow === "signIn"
-                  ? "Please check your credentials and try again."
-                  : "Could not create account. Please try again.";
+              toast.error("Could not create account. Please try again.");
             }
-
-            toast.error(toastDescription || "Could not sign in");
             setSubmitting(false);
           });
       }}

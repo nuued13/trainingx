@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
+import { normalizeEmail } from "@/lib/auth/normalizeEmail";
 
 export function SignInWithEmailCode({
   handleCodeSent,
@@ -22,11 +23,24 @@ export function SignInWithEmailCode({
         event.preventDefault();
         setSubmitting(true);
         const formData = new FormData(event.currentTarget);
-        console.log("Attempting sign in with provider:", provider ?? "resend-otp");
+        const normalizedEmail = normalizeEmail(
+          (formData.get("email") || "").toString()
+        );
+        if (!normalizedEmail) {
+          toast.error("Please enter your email.");
+          setSubmitting(false);
+          return;
+        }
+        formData.set("email", normalizedEmail);
+        const flow = formData.get("flow")?.toString();
+        console.log(
+          "Attempting sign in with provider:",
+          provider ?? "resend-otp"
+        );
         signIn(provider ?? "resend-otp", formData)
           .then(() => {
             console.log("Sign in successful");
-            handleCodeSent(formData.get("email") as string);
+            handleCodeSent(normalizedEmail);
           })
           .catch((error) => {
             console.log("=== ERROR CAUGHT ===");
@@ -36,31 +50,14 @@ export function SignInWithEmailCode({
             console.log("Error type:", typeof error);
             console.log("Is Error instance:", error instanceof Error);
 
-            const errorMessage = error?.message || error?.toString() || "";
-            const errorName = error?.name || "";
+            const isResetFlow = flow === "reset";
+            const toastDescription = isResetFlow
+              ? "Couldn't send a reset code. If your account uses Google sign-in, continue with Google."
+              : "Couldn't send the code. Check your email and try again.";
 
-            let toastTitle = "Could not send code";
-            let toastDescription: string | undefined;
-
-            if (
-              errorMessage.includes("InvalidAccountId") ||
-              errorName === "InvalidAccountId" ||
-              (error instanceof Error && error.message.includes("InvalidAccountId"))
-            ) {
-              toastTitle = "Account not found";
-              toastDescription = "This account doesn't exist. Please sign up first.";
-            } else if (
-              errorMessage.includes("Invalid") ||
-              errorMessage.includes("not found") ||
-              errorMessage.includes("does not exist")
-            ) {
-              toastTitle = "Could not send code";
-              toastDescription = "Please check your email address and try again.";
-            } else {
-              toastDescription = "Please try again later.";
-            }
-
-            console.log("About to show toast:", { toastTitle, toastDescription });
+            console.log("About to show toast:", {
+              toastDescription,
+            });
 
             toast.error(toastDescription || "Could not send code");
             console.log("Toast called");
@@ -69,9 +66,9 @@ export function SignInWithEmailCode({
       }}
     >
       <label htmlFor="email">Email</label>
-      <Input name="email" id="email" className="mb-4" autoComplete="email" />
+      <Input name="email" id="email" className="mb-8" autoComplete="email" />
       {children}
-        <Button type="submit" disabled={submitting}>
+      <Button type="submit" disabled={submitting}>
         Send code
       </Button>
     </form>

@@ -15,6 +15,12 @@ export interface PracticeCard {
     prompt?: string;
     correctAnswer?: AnswerType;
     explanation?: string;
+    // New fields for enhanced feedback
+    why_short?: string;
+    missingPoints?: string[];
+    improvedPrompt?: string;
+    track?: string;
+    lessonType?: string;
   };
 }
 

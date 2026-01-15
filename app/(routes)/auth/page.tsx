@@ -4,15 +4,23 @@ import { ResetPasswordWithEmailCode } from "@/components/auth/ResetPasswordWithE
 import { SignInMethodDivider } from "@/components/auth/SignInMethodDivider";
 import { SignInWithGoogle } from "@/components/auth/oauth/SignInWithGoogle";
 import { SignInWithPassword } from "@/components/auth/SignInWithPassword";
+import { CodeInput } from "@/components/auth/CodeInput";
+import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContextProvider";
 import { useLocation } from "wouter";
+import { useAuthActions } from "@convex-dev/auth/react";
+import toast from "react-hot-toast";
 
 export default function AuthPage() {
-  const [step, setStep] = useState<"signIn" | "forgot">("signIn");
+  const [step, setStep] = useState<"signIn" | { email: string } | "forgot">(
+    "signIn"
+  );
   const { isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
+  const { signIn } = useAuthActions();
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -38,7 +46,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="max-w-[384px] w-full flex flex-col gap-6">
+      <div className="max-w-[420px] w-full flex flex-col gap-6">
         {step === "signIn" ? (
           <>
             <div className="text-center">
@@ -49,15 +57,60 @@ export default function AuthPage() {
             <SignInWithGoogle />
             <SignInMethodDivider />
             <SignInWithPassword
-              provider="password-with-reset"
+              provider="password-code"
+              handleSent={(email) => setStep({ email })}
               handlePasswordReset={() => setStep("forgot")}
             />
           </>
-        ) : (
+        ) : step === "forgot" ? (
           <ResetPasswordWithEmailCode
-            provider="password-with-reset"
+            provider="password-code"
             handleCancel={() => setStep("signIn")}
           />
+        ) : (
+          <>
+            <h1 className="font-semibold text-4xl tracking-tight">
+              Check your email
+            </h1>
+            <p className="text-muted-foreground text-base">
+              Enter the 8-digit code we sent to your email address to verify
+              your account.
+            </p>
+            <form
+              className="flex flex-col"
+              onSubmit={(event) => {
+                event.preventDefault();
+                setSubmitting(true);
+                const formData = new FormData(event.currentTarget);
+                signIn("password-code", formData)
+                  .then(() => {
+                    toast.success("Email verified! You're signed in.");
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                    toast.error("Code could not be verified, try again");
+                    setSubmitting(false);
+                  });
+              }}
+            >
+              <label htmlFor="code" className="text-base font-semibold mb-4">
+                Verification Code
+              </label>
+              <CodeInput />
+              <input name="email" value={step.email} type="hidden" />
+              <input name="flow" value="email-verification" type="hidden" />
+              <Button type="submit" disabled={submitting} className="mt-8">
+                Verify Email
+              </Button>
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => setStep("signIn")}
+              >
+                Cancel
+              </Button>
+            </form>
+          </>
         )}
         <Toaster />
       </div>

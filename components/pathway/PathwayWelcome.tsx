@@ -1,8 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Rocket } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { JuicyButton } from "@/components/ui/juicy-button";
 
 interface PathwayWelcomeProps {
   onStart: () => void;
@@ -10,59 +9,33 @@ interface PathwayWelcomeProps {
 
 export function PathwayWelcome({ onStart }: PathwayWelcomeProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-2xl mx-auto text-center space-y-8"
-    >
-      {/* Badge */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2 }}
-        className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-lg border border-slate-100"
-      >
+    <div className="w-full max-w-2xl mx-auto text-center space-y-8">
+      {/* Badge - Duolingo style */}
+      <div className="inline-flex items-center gap-2 rounded-full border-2 border-b-4 border-amber-200 bg-amber-50 px-4 py-2">
         <Sparkles className="h-4 w-4 text-amber-500" />
-        <span className="text-sm font-medium text-slate-600">
+        <span className="text-sm font-extrabold uppercase tracking-widest text-amber-600">
           Free Assessment • 3 Minutes
         </span>
-      </motion.div>
+      </div>
 
-      {/* Hero Icon */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-        className="mx-auto w-24 h-24 rounded-3xl theme-gradient flex items-center justify-center shadow-xl shadow-[var(--gradient-from)]/20"
-      >
-        <Rocket className="h-12 w-12 text-white" />
-      </motion.div>
+      {/* Hero Icon - Duolingo card style */}
+      <div className="mx-auto w-24 h-24 rounded-3xl border-2 border-b-[6px] border-blue-200 bg-blue-100 flex items-center justify-center">
+        <Rocket className="h-12 w-12 text-blue-500" />
+      </div>
 
       {/* Headline */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="space-y-4"
-      >
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">
+      <div className="space-y-4">
+        <h1 className="text-4xl md:text-5xl font-black text-slate-800 leading-13">
           Welcome to Your{" "}
-          <span className="bg-gradient-to-r from-[var(--gradient-from)] to-[var(--gradient-to)] bg-clip-text text-transparent">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#0074b9] to-[#46bc61]">
             21st Century
           </span>{" "}
           Success Pathway
         </h1>
-      </motion.div>
+      </div>
 
       {/* Body Text */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="space-y-4 text-lg text-slate-600 max-w-xl mx-auto"
-      >
+      <div className="space-y-4 text-lg text-slate-600 max-w-xl mx-auto">
         <p>
           Taking this AI Prompting & Skills Assessment is your first step into
           the future. It will help you discover exactly where you fit in the new
@@ -74,33 +47,27 @@ export function PathwayWelcome({ onStart }: PathwayWelcomeProps) {
           just for you. You will see which cool AI careers, trades, and side
           hustles match your natural talents.
         </p>
-      </motion.div>
+      </div>
 
-      {/* Reassurance */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="text-sm text-slate-500 font-medium"
-      >
-        There are no right or wrong answers—just be real.
-      </motion.p>
+      {/* Reassurance - Duolingo style pill */}
+      <div className="inline-block rounded-full border-2 border-slate-200 bg-slate-50 px-4 py-2">
+        <p className="text-sm font-bold text-slate-500">
+          ✨ There are no right or wrong answers—just be real!
+        </p>
+      </div>
 
-      {/* CTA Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-      >
-        <Button
+      {/* CTA Button - JuicyButton */}
+      <div>
+        <JuicyButton
+          variant="primary"
           size="lg"
           onClick={onStart}
-          className="h-14 px-8 text-lg font-semibold theme-gradient-r hover:opacity-90 text-white shadow-xl shadow-[var(--gradient-from)]/20 group"
+          className="gap-2"
         >
           Start Assessment
-          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-        </Button>
-      </motion.div>
-    </motion.div>
+          <ArrowRight className="h-5 w-5" />
+        </JuicyButton>
+      </div>
+    </div>
   );
 }

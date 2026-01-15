@@ -11,9 +11,8 @@ import { ResendOTP } from "./otp/ResendOTP.js";
 import { TwilioOTP } from "./otp/TwilioOTP.js";
 import { TwilioVerify } from "./otp/TwilioVerify.js";
 import { ResendOTPPasswordReset } from "./passwordReset/ResendOTPPasswordReset.js";
-import { NodemailerOTP } from "./otp/NodemailerOTP.js";
-import { NodemailerOTPPasswordReset } from "./passwordReset/NodemailerOTPPasswordReset.js";
 import { DataModel } from "./_generated/dataModel.js";
+import { normalizeEmail } from "./normalizeEmail.js";
 
 const profileWithOptionalName = (params: Record<string, unknown>) => {
   const name = (params.name as string | undefined)?.trim();
@@ -30,7 +29,7 @@ const profileWithOptionalName = (params: Record<string, unknown>) => {
       ? ageValue
       : undefined;
   return {
-    email: params.email as string,
+    email: normalizeEmail(params.email as string),
     ...(name ? { name } : {}),
     ...(gender ? { gender } : {}),
     ...(age !== undefined ? { age } : {}),
@@ -40,7 +39,30 @@ const profileWithOptionalName = (params: Record<string, unknown>) => {
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
     // GitHub,
-    Google,
+    Google({
+      allowDangerousEmailAccountLinking: false,
+      authorization: {
+        params: {
+          scope: "openid email profile",
+        },
+      },
+      profile(profile) {
+        const email =
+          typeof profile.email === "string"
+            ? normalizeEmail(profile.email)
+            : undefined;
+        const legacyVerified =
+          (profile as { verified_email?: boolean }).verified_email === true;
+        const emailVerified =
+          profile.email_verified === true || legacyVerified === true;
+        return {
+          email,
+          emailVerified,
+          name: profile.name,
+          image: profile.picture,
+        };
+      },
+    }),
     Apple({
       clientSecret: process.env.AUTH_APPLE_SECRET!,
       client: {
@@ -50,6 +72,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     }),
     Resend({
       from: process.env.AUTH_EMAIL ?? "My App <onboarding@resend.dev>",
+      normalizeIdentifier: normalizeEmail,
     }),
     ResendOTP,
     TwilioVerify,
@@ -66,7 +89,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         const name = (params.name as string | undefined)?.trim();
         const favoriteColor = params.favoriteColor as string | undefined;
         return {
-          email: params.email as string,
+          email: normalizeEmail(params.email as string),
           ...(name ? { name } : {}),
           ...(favoriteColor ? { favoriteColor } : {}),
         };
@@ -98,13 +121,6 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     Password<DataModel>({
       id: "password-link",
       verify: Resend,
-      profile: profileWithOptionalName,
-    }),
-    // Email verification via Nodemailer (primary provider)
-    Password<DataModel>({
-      id: "password-nodemailer",
-      reset: NodemailerOTPPasswordReset,
-      verify: NodemailerOTP,
       profile: profileWithOptionalName,
     }),
     Anonymous,

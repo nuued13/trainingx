@@ -1,13 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowRight, PartyPopper, Sparkles, Trophy } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { JuicyButton } from "@/components/ui/juicy-button";
 import confetti from "canvas-confetti";
 import { useEffect } from "react";
 
 interface PathwayCongratulationsProps {
-  ageGroup: "youth" | "adult" | null;
+  ageGroup: "kid" | "teen" | "adult" | null;
   onSignUp: () => void;
 }
 
@@ -26,14 +25,14 @@ export function PathwayCongratulations({
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: ["#0074b9", "#46bc61", "#00a8e8"],
+        colors: ["#22c55e", "#3b82f6", "#a855f7", "#f59e0b"],
       });
       confetti({
         particleCount: 3,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: ["#0074b9", "#46bc61", "#00a8e8"],
+        colors: ["#22c55e", "#3b82f6", "#a855f7", "#f59e0b"],
       });
 
       if (Date.now() < end) {
@@ -44,52 +43,31 @@ export function PathwayCongratulations({
     frame();
   }, []);
 
-  const isYouth = ageGroup === "youth";
+  const isYouth = ageGroup === "kid" || ageGroup === "teen";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.5, type: "spring" }}
-      className="w-full max-w-2xl mx-auto text-center space-y-8"
-    >
-      {/* Celebration Icon */}
-      <motion.div
-        initial={{ scale: 0, rotate: -180 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-        className="mx-auto w-24 h-24 rounded-3xl theme-gradient flex items-center justify-center shadow-xl shadow-[var(--gradient-from)]/30"
-      >
-        <Trophy className="h-12 w-12 text-white" />
-      </motion.div>
+    <div className="w-full max-w-2xl mx-auto text-center space-y-8">
+      {/* Celebration Icon - Duolingo card style */}
+      <div className="mx-auto w-24 h-24 rounded-3xl border-2 border-b-[6px] border-amber-300 bg-amber-100 flex items-center justify-center animate-bounce">
+        <Trophy className="h-12 w-12 text-amber-600" />
+      </div>
 
       {/* Headline */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="space-y-3"
-      >
+      <div className="space-y-3">
         <div className="flex items-center justify-center gap-2">
-          <PartyPopper className="h-6 w-6 text-[var(--gradient-to)]" />
-          <span className="text-lg font-semibold text-[var(--gradient-to)]">
+          <PartyPopper className="h-6 w-6 text-green-500" />
+          <span className="text-lg font-extrabold uppercase tracking-widest text-green-500">
             Amazing work!
           </span>
-          <PartyPopper className="h-6 w-6 text-[var(--gradient-to)] scale-x-[-1]" />
+          <PartyPopper className="h-6 w-6 text-green-500 scale-x-[-1]" />
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
-          Congratulations! You&apos;ve Unlocked Your Profile.
+        <h1 className="text-3xl md:text-4xl font-black text-slate-800">
+          You&apos;ve Unlocked Your Profile! 🎉
         </h1>
-      </motion.div>
+      </div>
 
       {/* Body Text */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="space-y-4 text-lg text-slate-600 max-w-xl mx-auto"
-      >
+      <div className="space-y-4 text-lg text-slate-600 max-w-xl mx-auto">
         <p>
           Your results are in! Based on your answers, we have identified your
           unique{" "}
@@ -102,18 +80,13 @@ export function PathwayCongratulations({
           Your Personal Results show your strengths, your hidden talents, and
           the specific AI tools you are naturally good at.
         </p>
-      </motion.div>
+      </div>
 
-      {/* The Hook */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="rounded-2xl bg-gradient-to-r from-[var(--gradient-from)]/5 to-[var(--gradient-to)]/5 border border-[var(--gradient-from)]/10 p-6 max-w-lg mx-auto"
-      >
+      {/* The Hook - Duolingo style card */}
+      <div className="rounded-2xl border-2 border-b-4 border-green-200 bg-green-50 p-6 max-w-lg mx-auto">
         <div className="flex items-start gap-3">
-          <Sparkles className="h-5 w-5 text-[var(--gradient-from)] mt-0.5 shrink-0" />
-          <p className="text-sm text-slate-600 text-left">
+          <Sparkles className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
+          <p className="text-sm font-semibold text-slate-600 text-left">
             This profile is just the beginning. The platform is designed to help
             you turn these strengths into real{" "}
             <strong className="text-slate-800">money and skills</strong>.
@@ -121,42 +94,29 @@ export function PathwayCongratulations({
             every tool on the market.
           </p>
         </div>
-      </motion.div>
+      </div>
 
       {/* Question */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="text-base font-medium text-slate-700"
-      >
+      <p className="text-base font-bold text-slate-500">
         Ready to see your matches for AI Careers, Trades, and Side Hustles?
-      </motion.p>
+      </p>
 
-      {/* CTA Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-      >
-        <Button
+      {/* CTA Button - JuicyButton */}
+      <div>
+        <JuicyButton
+          variant="success"
           size="lg"
           onClick={onSignUp}
-          className="h-14 px-8 text-lg font-semibold theme-gradient-r hover:opacity-90 text-white shadow-xl shadow-[var(--gradient-from)]/20 group"
+          className="gap-2"
         >
           Sign Up to View My Pathway
-          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-        </Button>
-      </motion.div>
+          <ArrowRight className="h-5 w-5" />
+        </JuicyButton>
+      </div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="text-sm text-slate-500"
-      >
+      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
         Free to join • No credit card required
-      </motion.p>
-    </motion.div>
+      </p>
+    </div>
   );
 }

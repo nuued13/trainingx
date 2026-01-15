@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
 // Admin email allowlist - simple access control
@@ -978,5 +978,117 @@ export const listUsersWithStatus = query({
     combined = combined.slice(offset, offset + limit);
 
     return { users: combined, total, statusCounts };
+  },
+});
+
+// ============================================
+// DANGEROUS: DELETE USERS
+// ============================================
+
+const USER_RELATED_TABLES = [
+  "profiles",
+  "userProgress",
+  "assessmentAttempts",
+  "careerMatches",
+  "aiMatchingResults",
+  "opportunityRoadmaps",
+  "feedback",
+  "chatSessions",
+  "enrollments",
+  "files",
+  "userStats",
+  "postVotes",
+  "userBookmarks",
+  "quizResults",
+  "customDomainRequests",
+  "userTrackProgress",
+  "userLevelProgress",
+  "userDomainUnlocks",
+  "messages",
+] as const;
+
+export const deleteUsersByEmail = mutation({
+  args: {
+    emails: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const results = [];
+
+    for (const email of args.emails) {
+      // 1. Find ALL users with this email (handle duplicates)
+      const users = await ctx.db
+        .query("users")
+        .withIndex("email", (q) => q.eq("email", email))
+        .collect();
+
+      if (users.length === 0) {
+        results.push({ email, status: "not_found" });
+        continue;
+      }
+
+      for (const user of users) {
+        const userId = user._id;
+
+        // 2. Delete related data in known tables
+        for (const table of USER_RELATED_TABLES) {
+          try {
+            // Use filter instead of withIndex to avoid "index not found" errors
+            // This is safer because index names vary (by_user, by_userId, etc.)
+            const records = await ctx.db
+              .query(table as any)
+              .filter((q: any) => q.eq(q.field("userId"), userId))
+              .collect();
+
+            for (const record of records) {
+              await ctx.db.delete(record._id);
+            }
+          } catch (error) {
+            console.error(
+              `Failed to cleanup table ${table} for user ${userId}:`,
+              error
+            );
+          }
+        }
+
+        // 3. Delete posts/comments/assistants (tables with different field names)
+        const posts = await ctx.db
+          .query("posts")
+          .withIndex("by_author", (q) => q.eq("authorId", userId))
+          .collect();
+        for (const post of posts) await ctx.db.delete(post._id);
+
+        const comments = await ctx.db
+          .query("comments")
+          .withIndex("by_author", (q) => q.eq("authorId", userId))
+          .collect();
+        for (const comment of comments) await ctx.db.delete(comment._id);
+
+        const assistants = await ctx.db
+          .query("customAssistants")
+          .withIndex("by_creator", (q) => q.eq("creatorId", userId))
+          .collect();
+        for (const assistant of assistants) await ctx.db.delete(assistant._id);
+
+        // 4. Delete Auth Accounts (internal tables - use filter since index names differ)
+        const authAccounts = await ctx.db
+          .query("authAccounts")
+          .filter((q) => q.eq(q.field("userId"), userId))
+          .collect();
+        for (const acc of authAccounts) await ctx.db.delete(acc._id);
+
+        const authSessions = await ctx.db
+          .query("authSessions")
+          .filter((q) => q.eq(q.field("userId"), userId))
+          .collect();
+        for (const session of authSessions) await ctx.db.delete(session._id);
+
+        // 5. Finally, delete the user itself
+        await ctx.db.delete(userId);
+
+        results.push({ email, status: "deleted", userId });
+      }
+    }
+
+    return results;
   },
 });

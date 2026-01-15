@@ -10,6 +10,7 @@ interface TrackNode {
   _id: Id<"practiceTracks">;
   slug: string;
   title: string;
+  description?: string;
   icon: string;
   progress?: {
     percentComplete: number;
@@ -34,12 +35,12 @@ interface TrackPathProps {
   onSelectAssessment?: () => void;
 }
 
-export function TrackPath({
+export const TrackPath = ({
   tracks,
   assessment,
   onSelectTrack,
   onSelectAssessment,
-}: TrackPathProps) {
+}: TrackPathProps) => {
   return (
     <div className="relative flex flex-col items-center py-8 gap-4">
       {/* Connecting line */}
@@ -92,7 +93,7 @@ export function TrackPath({
       )}
     </div>
   );
-}
+};
 
 // Individual track node
 function TrackNodeComponent({
@@ -116,31 +117,31 @@ function TrackNodeComponent({
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "relative flex items-center gap-4 p-4 rounded-2xl border-2 border-b-4 transition-all min-w-[280px] sm:min-w-[320px]",
+        "relative flex items-center gap-4 p-4 rounded-2xl border-2 border-b-4 transition-all min-w-[280px] sm:min-w-[320px] max-w-md w-full",
         "focus:outline-none focus:ring-2 focus:ring-offset-2",
         isCompleted
           ? "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:border-green-300 focus:ring-green-500"
           : hasProgress
-            ? "bg-blue-50 border-blue-200 hover:border-blue-300 focus:ring-blue-500"
-            : "bg-white border-slate-200 hover:border-slate-300 focus:ring-slate-500"
+          ? "bg-blue-50 border-blue-200 hover:border-blue-300 focus:ring-blue-500"
+          : "bg-white border-slate-200 hover:border-slate-300 focus:ring-slate-500"
       )}
     >
       {/* Icon circle */}
       <div
         className={cn(
-          "flex items-center justify-center w-14 h-14 rounded-xl text-3xl transition-colors",
+          "flex items-center justify-center w-14 h-14 rounded-xl text-3xl transition-colors shrink-0",
           isCompleted
             ? "bg-green-100 border-2 border-green-200"
             : hasProgress
-              ? "bg-blue-100 border-2 border-blue-200"
-              : "bg-slate-100 border-2 border-slate-200"
+            ? "bg-blue-100 border-2 border-blue-200"
+            : "bg-slate-100 border-2 border-slate-200"
         )}
       >
         {track.icon}
       </div>
 
       {/* Content */}
-      <div className="flex-1 text-left">
+      <div className="flex-1 text-left min-w-0">
         <h3
           className={cn(
             "font-bold text-lg leading-tight",
@@ -149,6 +150,18 @@ function TrackNodeComponent({
         >
           {track.title}
         </h3>
+
+        {/* Description */}
+        {track.description && (
+          <p
+            className={cn(
+              "text-sm font-medium mt-0.5 line-clamp-2",
+              isCompleted ? "text-green-700/80" : "text-slate-500"
+            )}
+          >
+            {track.description}
+          </p>
+        )}
 
         {/* Progress or Stars */}
         {isCompleted ? (
@@ -188,8 +201,8 @@ function TrackNodeComponent({
           isCompleted
             ? "bg-green-200 text-green-700"
             : hasProgress
-              ? "bg-blue-500 text-white"
-              : "bg-slate-200 text-slate-600 hover:bg-slate-300"
+            ? "bg-blue-500 text-white"
+            : "bg-slate-200 text-slate-600 hover:bg-slate-300"
         )}
       >
         {isCompleted ? (

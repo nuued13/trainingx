@@ -63,8 +63,8 @@ export function CardBack({
                 isViewingAttempted
                   ? "bg-purple-50 border-purple-200 border-b-purple-500"
                   : selectedAnswer === card.params?.correctAnswer
-                    ? "bg-green-50 border-green-200 border-b-green-500"
-                    : "bg-red-50 border-red-200 border-b-red-500"
+                  ? "bg-green-50 border-green-200 border-b-green-500"
+                  : "bg-red-50 border-red-200 border-b-red-500"
               )}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -76,8 +76,8 @@ export function CardBack({
                   isViewingAttempted
                     ? "text-purple-700"
                     : selectedAnswer === card.params?.correctAnswer
-                      ? "text-green-700"
-                      : "text-red-700"
+                    ? "text-green-700"
+                    : "text-red-700"
                 )}
               >
                 {isViewingAttempted ? (
@@ -101,8 +101,8 @@ export function CardBack({
                       lastScoreChange > 0
                         ? "text-green-600"
                         : lastScoreChange < 0
-                          ? "text-red-600"
-                          : "text-yellow-600"
+                        ? "text-red-600"
+                        : "text-yellow-600"
                     }
                   >
                     {lastScoreChange > 0 ? "+" : ""}
@@ -171,9 +171,48 @@ export function CardBack({
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <p className="text-slate-600 text-base leading-relaxed font-medium">
-                {card.params?.explanation || "Great job practicing!"}
+              <p className="text-slate-600 text-base leading-relaxed font-medium mb-4">
+                {card.params?.explanation ||
+                  card.params?.why_short ||
+                  "Great job practicing!"}
               </p>
+
+              {/* Missing Points - shown for bad/almost answers */}
+              {card.params?.missingPoints &&
+                card.params.missingPoints.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-slate-200">
+                    <h4 className="text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">
+                      What's Missing
+                    </h4>
+                    <ul className="space-y-1">
+                      {card.params.missingPoints.map(
+                        (point: string, idx: number) => (
+                          <li
+                            key={idx}
+                            className="flex items-start gap-2 text-slate-600 text-sm"
+                          >
+                            <span className="text-red-400 font-bold">•</span>
+                            <span>{point}</span>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                )}
+
+              {/* Improved Prompt Example */}
+              {card.params?.improvedPrompt && (
+                <div className="mt-4 pt-4 border-t border-slate-200">
+                  <h4 className="text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">
+                    Better Version
+                  </h4>
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                    <p className="text-green-800 text-sm font-mono leading-relaxed">
+                      "{card.params.improvedPrompt}"
+                    </p>
+                  </div>
+                </div>
+              )}
             </motion.div>
           </>
         )}

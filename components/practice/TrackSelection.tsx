@@ -6,7 +6,7 @@ import { api } from "convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Id } from "convex/_generated/dataModel";
-import { TrackPath } from "./TrackPath";
+import { TrackPath } from "./TrackPathSection";
 import { useState } from "react";
 
 interface TrackSelectionProps {
@@ -93,9 +93,37 @@ export function TrackSelection({
           <h1 className="text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">
             Your Learning Path
           </h1>
-          <p className="text-lg font-medium text-slate-500">
+          <p className="text-lg font-medium text-slate-500 mb-6">
             Complete all tracks to unlock the Domain Assessment
           </p>
+
+          {/* Difficulty Level Tabs */}
+          <div className="flex justify-center gap-2 mb-4">
+            {[
+              { level: "beginner", label: "Beginner", available: true },
+              {
+                level: "intermediate",
+                label: "Intermediate",
+                available: false,
+              },
+              { level: "advanced", label: "Advanced", available: false },
+            ].map((item) => (
+              <button
+                key={item.level}
+                disabled={!item.available}
+                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
+                  item.available
+                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30"
+                    : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                }`}
+              >
+                {item.label}
+                {!item.available && (
+                  <span className="ml-1 text-xs opacity-70">🔒</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </motion.div>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

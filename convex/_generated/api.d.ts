@@ -41,9 +41,10 @@ import type * as itemTemplates from "../itemTemplates.js";
 import type * as leaderboard from "../leaderboard.js";
 import type * as lib_ai from "../lib/ai.js";
 import type * as messages from "../messages.js";
+import type * as migrateToNewTracks from "../migrateToNewTracks.js";
+import type * as migrations from "../migrations.js";
 import type * as migrations_backfillDuelMembers from "../migrations/backfillDuelMembers.js";
 import type * as migrations_cleanOldDuels from "../migrations/cleanOldDuels.js";
-import type * as migrations from "../migrations.js";
 import type * as moderation from "../moderation.js";
 import type * as otp_ResendOTP from "../otp/ResendOTP.js";
 import type * as otp_TwilioOTP from "../otp/TwilioOTP.js";
@@ -80,6 +81,7 @@ import type * as seedTrack6Items from "../seedTrack6Items.js";
 import type * as seedTrack7Items from "../seedTrack7Items.js";
 import type * as seedTrack8Items from "../seedTrack8Items.js";
 import type * as sharing from "../sharing.js";
+import type * as skillTags from "../skillTags.js";
 import type * as spacedRepetition from "../spacedRepetition.js";
 import type * as userProgress from "../userProgress.js";
 import type * as userStatsUtils from "../userStatsUtils.js";
@@ -92,14 +94,6 @@ import type {
   FunctionReference,
 } from "convex/server";
 
-/**
- * A utility for referencing Convex functions in your app's API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = api.myModule.myFunction;
- * ```
- */
 declare const fullApi: ApiFromModules<{
   adaptiveEngine: typeof adaptiveEngine;
   admin: typeof admin;
@@ -134,9 +128,10 @@ declare const fullApi: ApiFromModules<{
   leaderboard: typeof leaderboard;
   "lib/ai": typeof lib_ai;
   messages: typeof messages;
+  migrateToNewTracks: typeof migrateToNewTracks;
+  migrations: typeof migrations;
   "migrations/backfillDuelMembers": typeof migrations_backfillDuelMembers;
   "migrations/cleanOldDuels": typeof migrations_cleanOldDuels;
-  migrations: typeof migrations;
   moderation: typeof moderation;
   "otp/ResendOTP": typeof otp_ResendOTP;
   "otp/TwilioOTP": typeof otp_TwilioOTP;
@@ -173,20 +168,37 @@ declare const fullApi: ApiFromModules<{
   seedTrack7Items: typeof seedTrack7Items;
   seedTrack8Items: typeof seedTrack8Items;
   sharing: typeof sharing;
+  skillTags: typeof skillTags;
   spacedRepetition: typeof spacedRepetition;
   userProgress: typeof userProgress;
   userStatsUtils: typeof userStatsUtils;
   users: typeof users;
   vibeProjects: typeof vibeProjects;
 }>;
-declare const fullApiWithMounts: typeof fullApi;
 
+/**
+ * A utility for referencing Convex functions in your app's public API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
 export declare const api: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "public">
 >;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
 export declare const internal: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "internal">
 >;
 

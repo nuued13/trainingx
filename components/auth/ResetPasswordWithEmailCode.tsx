@@ -5,6 +5,7 @@ import { CodeInput } from "@/components/auth/CodeInput";
 import { SignInWithEmailCode } from "@/components/auth/SignInWithEmailCode";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
+import { normalizeEmail } from "@/lib/auth/normalizeEmail";
 
 export function ResetPasswordWithEmailCode({
   handleCancel,
@@ -18,25 +19,28 @@ export function ResetPasswordWithEmailCode({
   const [submitting, setSubmitting] = useState(false);
   return step === "forgot" ? (
     <>
-      <h2 className="font-semibold text-2xl tracking-tight">
+      <h2 className="font-semibold text-3xl tracking-tight">
         Send password reset code
       </h2>
       <SignInWithEmailCode
         handleCodeSent={(email) => setStep({ email })}
         provider={provider}
       >
-        <input name="flow" type="hidden" value="reset" />
+        <input name="flow" type="hidden" value="reset" className="" />
       </SignInWithEmailCode>
-      <Button type="button" variant="link" onClick={handleCancel}>
+      <Button
+        type="button"
+        variant="link"
+        onClick={handleCancel}
+        className="-mt-4"
+      >
         Cancel
       </Button>
     </>
   ) : (
     <>
-      <h2 className="font-semibold text-2xl tracking-tight">
-        Check your email
-      </h2>
-      <p className="text-muted-foreground text-sm">
+      <h2 className="font-semibold text-3xl tracking-10">Check your email</h2>
+      <p className="text-muted-foreground">
         Enter the 8-digit code we sent to your email address and choose a new
         password.
       </p>
@@ -46,41 +50,30 @@ export function ResetPasswordWithEmailCode({
           event.preventDefault();
           setSubmitting(true);
           const formData = new FormData(event.currentTarget);
+          formData.set(
+            "email",
+            normalizeEmail((formData.get("email") || "").toString())
+          );
           signIn(provider, formData).catch((error) => {
             console.error(error);
             const errorMessage = error?.message || error?.toString() || "";
-            const errorName = error?.name || "";
-            
-            let toastTitle = "Code could not be verified";
-            let toastDescription: string | undefined;
-            
+            let toastDescription = "Reset failed. Please try again.";
             if (
-              errorMessage.includes("InvalidAccountId") ||
-              errorName === "InvalidAccountId" ||
-              (error instanceof Error && error.message.includes("InvalidAccountId"))
-            ) {
-              toastTitle = "Verification failed";
-              toastDescription = "This account doesn't exist. Please sign up first.";
-            } else if (
               errorMessage.includes("Invalid") ||
               errorMessage.includes("incorrect") ||
               errorMessage.includes("wrong")
             ) {
-              toastTitle = "Invalid code";
-              toastDescription = "The code you entered is incorrect. Please try again.";
+              toastDescription = "Invalid code. Please try again.";
             } else if (
               errorMessage.includes("password") ||
               errorMessage.includes("too short") ||
               errorMessage.includes("requirements")
             ) {
-              toastTitle = "Password error";
-              toastDescription = "The new password doesn't meet the requirements. Please try again.";
-            } else {
-              toastTitle = "Reset failed";
-              toastDescription = "Code could not be verified or new password is too short. Please try again.";
+              toastDescription =
+                "Password doesn't meet the requirements. Please try again.";
             }
-            
-            toast.error(toastDescription || "Reset failed");
+
+            toast.error(toastDescription);
             setSubmitting(false);
           });
         }}
@@ -92,7 +85,7 @@ export function ResetPasswordWithEmailCode({
           type="password"
           name="newPassword"
           id="newPassword"
-          className="mb-4 "
+          className="mb-8"
           autoComplete="new-password"
         />
         <input type="hidden" name="flow" value="reset-verification" />
