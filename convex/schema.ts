@@ -898,6 +898,22 @@ export default defineSchema({
     .index("by_skill", ["skillId"])
     .index("by_user_skill", ["userId", "skillId"]),
 
+  // Practice Zone Progress (for static-file based questions - Beginner/Intermediate/Pro tracks)
+  practiceZoneProgress: defineTable({
+    userId: v.id("users"),
+    difficulty: v.string(), // "beginner" | "intermediate" | "pro"
+    track: v.string(), // "clarity" | "context" | "constraints" | "output_format" | "iteration" | "evaluation"
+    completedQuestionIds: v.array(v.string()), // ["B-CL-001", "B-CL-002", ...]
+    scores: v.any(), // { "B-CL-001": 100, "B-CL-002": 75, ... }
+    totalScore: v.number(),
+    correctAnswers: v.number(),
+    bestStreak: v.number(),
+    attempts: v.number(),
+    lastPlayedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_difficulty_track", ["userId", "difficulty", "track"]),
+
   // Practice Review Deck (spaced repetition)
   practiceReviewDeck: defineTable({
     userId: v.id("users"),
@@ -1174,6 +1190,8 @@ export default defineSchema({
     maxPlayers: v.number(),
     // Topic selection
     trackId: v.optional(v.id("practiceTracks")),
+    trackSlug: v.optional(v.string()),
+    questions: v.optional(v.array(v.any())), // Store full question content local-first
     // Ready system
     readyPlayers: v.array(v.id("users")),
     // Legacy fields for backward compatibility

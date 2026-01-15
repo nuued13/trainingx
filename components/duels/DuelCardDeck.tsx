@@ -153,29 +153,48 @@ export function DuelCardDeck({ roomId }: DuelCardDeckProps) {
     if (!selectedCard || selectedAnswer !== null) return;
 
     const startTime = Date.now() - timer * 1000;
+
+    // Determine card type (Legacy vs New)
+    const task = selectedCard.tasks?.[0]; // New structure has tasks
+    const legacyParams = selectedCard.params; // Legacy structure
+
     const isRateType =
-      !selectedCard.params?.options || selectedCard.type === "rate";
+      task?.type === "rate" || // New
+      !legacyParams?.options ||
+      selectedCard.type === "rate"; // Legacy
 
     let correct = false;
     let pointsEarned = 0;
 
     if (isRateType && typeof answer === "string") {
-      correct = answer === selectedCard.params?.correctAnswer;
+      // For Rate type (Self-reflection), correctness is subjective or always true for "good"
+      // Legacy used specific correct answer, new system treats "good" as goal
+      correct = answer === "good"; // Simplified logic for Duels
+
+      // Legacy fallback logic
+      if (!task && legacyParams?.correctAnswer) {
+        correct = answer === legacyParams.correctAnswer;
+      }
+
       if (correct) {
         const timeBonus = timer < 5 ? 5 : timer < 10 ? 2 : 0;
         const streakBonus = Math.floor(streak / 3) * 2;
         pointsEarned = 10 + timeBonus + streakBonus;
-      } else if (
-        answer === "almost" ||
-        selectedCard.params?.correctAnswer === "almost"
-      ) {
-        pointsEarned = 0;
+      } else if (answer === "almost") {
+        pointsEarned = 5;
       } else {
-        pointsEarned = -5;
+        pointsEarned = 0;
       }
     } else if (!isRateType && typeof answer === "number") {
-      const options = selectedCard.params?.options || [];
-      correct = options[answer]?.quality === "good";
+      if (task?.options) {
+        // New structure options
+        const selectedOpt = task.options[answer];
+        correct = selectedOpt?.isCorrect || selectedOpt?.quality === "good";
+      } else {
+        // Legacy structure
+        const options = legacyParams?.options || [];
+        correct = options[answer]?.quality === "good";
+      }
       pointsEarned = correct ? 10 : -5;
     }
 

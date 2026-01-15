@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
 import {
@@ -63,6 +63,19 @@ export function IntermediatePracticeCardDeck({
   const user = useQuery(api.users.get, { id: userId }) as any;
   const age = user?.age ?? 25; // Default to adult if no age
 
+  // Load saved progress from Convex
+  const savedProgress = useQuery(api.practiceZoneProgress.getProgress, {
+    userId,
+    difficulty: "intermediate",
+    track,
+  });
+
+  // Mutations for saving progress
+  const saveAnswer = useMutation(api.practiceZoneProgress.saveAnswer);
+  const resetProgressMutation = useMutation(
+    api.practiceZoneProgress.resetProgress
+  );
+
   // Load questions from static files
   const practiceItems = useMemo(() => {
     const questions = getIntermediateQuestionsForTrack(track, age, {
@@ -84,6 +97,9 @@ export function IntermediatePracticeCardDeck({
     showLevelComplete: false,
   });
 
+  // Track if we've initialized from saved progress
+  const hasInitializedFromProgress = useRef(false);
+
   const [isViewingCompleted, setIsViewingCompleted] = useState(false);
   const [shuffledOrder, setShuffledOrder] = useState<number[]>([]);
 
@@ -93,6 +109,27 @@ export function IntermediatePracticeCardDeck({
       setShuffledOrder(practiceItems.map((_, i) => i));
     }
   }, [practiceItems, shuffledOrder.length]);
+
+  // Initialize state from saved progress (only once when data loads)
+  useEffect(() => {
+    if (
+      savedProgress &&
+      !hasInitializedFromProgress.current &&
+      practiceItems.length > 0
+    ) {
+      hasInitializedFromProgress.current = true;
+      const completedIds = savedProgress.completedQuestionIds || [];
+      if (completedIds.length > 0) {
+        setState((s) => ({
+          ...s,
+          completedCards: new Set(completedIds),
+          understoodCards: new Set(completedIds), // Assume understood for restoration
+          score: savedProgress.totalScore || 0,
+          showLevelComplete: completedIds.length >= practiceItems.length,
+        }));
+      }
+    }
+  }, [savedProgress, practiceItems.length]);
 
   // Get cards in shuffled order
   const cardsToDisplay = useMemo(() => {
@@ -148,6 +185,19 @@ export function IntermediatePracticeCardDeck({
 
       const allCompleted = newCompletedCards.size >= practiceItems.length;
       const scoreChange = assessment === "understood" ? 100 : 50;
+      const isCorrect = assessment === "understood";
+      const newStreak = isCorrect ? state.streak + 1 : 0;
+
+      // Save to Convex (fire and forget)
+      saveAnswer({
+        userId,
+        difficulty: "intermediate",
+        track,
+        questionId: card._id,
+        score: scoreChange,
+        isCorrect,
+        currentStreak: newStreak,
+      }).catch(console.error);
 
       setState((s) => ({
         ...s,
@@ -156,13 +206,13 @@ export function IntermediatePracticeCardDeck({
         understoodCards: newUnderstood,
         needsPracticeCards: newNeedsPractice,
         score: s.score + scoreChange,
-        streak: assessment === "understood" ? s.streak + 1 : 0,
+        streak: newStreak,
         justCompletedCard: card._id,
         showLevelComplete: allCompleted,
       }));
       setIsViewingCompleted(false);
     },
-    [state, cardsToDisplay, practiceItems.length]
+    [state, cardsToDisplay, practiceItems.length, saveAnswer, userId, track]
   );
 
   const handleShuffle = useCallback(() => {
@@ -173,6 +223,14 @@ export function IntermediatePracticeCardDeck({
   }, [shuffledOrder]);
 
   const handleReset = useCallback(() => {
+    // Reset in Convex
+    resetProgressMutation({
+      userId,
+      difficulty: "intermediate",
+      track,
+    }).catch(console.error);
+
+    // Reset local state
     setState({
       selectedCardIndex: null,
       isShuffling: false,
@@ -185,7 +243,8 @@ export function IntermediatePracticeCardDeck({
       showLevelComplete: false,
     });
     setShuffledOrder(practiceItems.map((_, i) => i));
-  }, [practiceItems]);
+    hasInitializedFromProgress.current = true; // Prevent re-init from old data
+  }, [practiceItems, resetProgressMutation, userId, track]);
 
   const closeLevelComplete = useCallback(() => {
     setState((s) => ({ ...s, showLevelComplete: false }));

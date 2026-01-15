@@ -13,7 +13,10 @@ export const getProjectCount = query({
 export const getProjects = query({
   args: {
     category: v.optional(v.string()),
-    difficultyLevel: v.optional(v.number()),
+    difficulty: v.optional(v.string()), // "Beginner", "Intermediate", "Advanced"
+    minHours: v.optional(v.number()),
+    maxHours: v.optional(v.number()),
+    keywords: v.optional(v.string()),
     limit: v.optional(v.number()),
     status: v.optional(v.string()), // "completed" | "pending" | "all"
   },
@@ -21,13 +24,34 @@ export const getProjects = query({
     const userId = await getAuthUserId(ctx);
     let tasks = await ctx.db.query("projects").collect();
 
-    // Filter in memory for now as some fields might be optional/missing in old data
+    // Filter by options
     if (args.category && args.category !== "All") {
       tasks = tasks.filter((t) => t.category === args.category);
     }
 
-    if (args.difficultyLevel) {
-      tasks = tasks.filter((t) => t.difficultyLevel === args.difficultyLevel);
+    if (args.difficulty) {
+      tasks = tasks.filter((t) => t.difficulty === args.difficulty);
+    }
+
+    if (args.minHours !== undefined && args.maxHours !== undefined) {
+      tasks = tasks.filter(
+        (t) => t.estimatedHours >= args.minHours! && t.estimatedHours <= args.maxHours!
+      );
+    } else if (args.minHours !== undefined) {
+      tasks = tasks.filter((t) => t.estimatedHours >= args.minHours!);
+    } else if (args.maxHours !== undefined) {
+      tasks = tasks.filter((t) => t.estimatedHours <= args.maxHours!);
+    }
+    
+    // Keyword Search (Naive implementation for now)
+    if (args.keywords && args.keywords.trim() !== "") {
+       const terms = args.keywords.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+       if (terms.length > 0) {
+          tasks = tasks.filter(t => {
+             const content = (t.title + " " + t.description + " " + t.tags.join(" ")).toLowerCase();
+             return terms.some(term => content.includes(term));
+          });
+       }
     }
 
     // Determine completion status

@@ -46,10 +46,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { createDuelRoom } from "@/app/actions/duels";
+
 export function DuelArena() {
   const [selectedTab, setSelectedTab] = useState("active");
   const { user } = useAuth();
 
+  // ... (keep queries)
   const userDuels = useQuery(
     api.duels.getUserDuels,
     user?._id ? { userId: user._id as any } : "skip"
@@ -59,32 +62,40 @@ export function DuelArena() {
     api.duels.getDuelStats,
     user?._id ? { userId: user._id as any } : "skip"
   );
-  const createDuel = useMutation(api.duels.createDuel);
   const acceptDuel = useMutation(api.duels.acceptDuel);
 
   const [creating, setCreating] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [dialogStep, setDialogStep] = useState<"topic" | "settings">("topic");
   const [selectedTopic, setSelectedTopic] = useState<{
-    trackId: Id<"practiceTracks"> | null;
+    trackSlug: string;
     trackName: string;
   } | null>(null);
   const [duelParams, setDuelParams] = useState({
     itemCount: 5,
-    difficulty: "matched",
+    difficulty: "intermediate",
   });
 
   const handleCreateDuel = async () => {
     if (!user?._id) return;
     setCreating(true);
     try {
-      const result = await createDuel({
-        userId: user._id as any,
-        itemCount: duelParams.itemCount,
-        minPlayers: 2,
-        maxPlayers: 10,
-        trackId: selectedTopic?.trackId || undefined,
-      });
+      if (!selectedTopic?.trackSlug) {
+        throw new Error("No track selected");
+      }
+
+      // Call Server Action
+      const result = await createDuelRoom(
+        user._id as string,
+        selectedTopic.trackSlug,
+        duelParams.itemCount,
+        "intermediate"
+      );
+
+      if (!result.success || !result.roomId) {
+        throw new Error(result.error || "Failed to create room");
+      }
+
       setShowCreateDialog(false);
       setDialogStep("topic");
       setSelectedTopic(null);
@@ -97,11 +108,8 @@ export function DuelArena() {
     }
   };
 
-  const handleTopicSelect = (
-    trackId: Id<"practiceTracks"> | null,
-    trackName: string
-  ) => {
-    setSelectedTopic({ trackId, trackName });
+  const handleTopicSelect = (trackSlug: string, trackName: string) => {
+    setSelectedTopic({ trackSlug, trackName });
     setDialogStep("settings");
   };
 
@@ -447,7 +455,9 @@ export function DuelArena() {
                       const isWinner = userRank === 1;
                       return (
                         <div
-                          className={`flex items-center gap-2 font-bold ${isWinner ? "text-green-500" : "text-slate-500"}`}
+                          className={`flex items-center gap-2 font-bold ${
+                            isWinner ? "text-green-500" : "text-slate-500"
+                          }`}
                         >
                           {isWinner ? (
                             <>

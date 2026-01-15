@@ -27,7 +27,7 @@ import {
   IntermediateAssessment,
 } from "../../intermediateTypes";
 
-type ModalStep = "challenge" | "write" | "scoring" | "feedback";
+type ModalStep = "write" | "scoring" | "feedback" | "review";
 
 interface AIScoreResult {
   overallScore: number;
@@ -58,7 +58,7 @@ export function IntermediateCardModal({
   isViewingCompleted = false,
 }: IntermediateCardModalProps) {
   const [step, setStep] = useState<ModalStep>(
-    isViewingCompleted ? "feedback" : "challenge"
+    isViewingCompleted ? "review" : "write"
   );
   const [userPrompt, setUserPrompt] = useState("");
   const [showHint, setShowHint] = useState(false);
@@ -68,7 +68,7 @@ export function IntermediateCardModal({
   // Reset state when card changes
   useEffect(() => {
     if (card) {
-      setStep(isViewingCompleted ? "feedback" : "challenge");
+      setStep(isViewingCompleted ? "review" : "write");
       setUserPrompt("");
       setShowHint(false);
       setAiScore(null);
@@ -77,9 +77,7 @@ export function IntermediateCardModal({
   }, [card?._id, isViewingCompleted]);
 
   const handleNext = useCallback(() => {
-    if (step === "challenge") {
-      setStep("write");
-    } else if (step === "write") {
+    if (step === "write") {
       setAiScore(null);
       setScoringError(null);
       setStep("scoring");
@@ -87,9 +85,7 @@ export function IntermediateCardModal({
   }, [step]);
 
   const handleBack = useCallback(() => {
-    if (step === "write") {
-      setStep("challenge");
-    } else if (step === "feedback") {
+    if (step === "feedback") {
       setStep("write");
       setAiScore(null);
     }
@@ -115,19 +111,19 @@ export function IntermediateCardModal({
     (assessment: IntermediateAssessment) => {
       onComplete(assessment);
       // Reset state for next card
-      setStep("challenge");
+      setStep("write");
       setUserPrompt("");
       setShowHint(false);
       setAiScore(null);
       setScoringError(null);
       onClose(); // Close the modal after assessment is complete
     },
-    [onComplete]
+    [onComplete, onClose]
   );
 
   const handleClose = useCallback(() => {
     // Reset state
-    setStep("challenge");
+    setStep("write");
     setUserPrompt("");
     setShowHint(false);
     setAiScore(null);
@@ -168,16 +164,13 @@ export function IntermediateCardModal({
             <div className="flex items-center gap-3">
               {/* Step indicator */}
               <div className="flex gap-1">
-                {["challenge", "write", "scoring", "feedback"].map((s, i) => (
+                {["write", "scoring", "feedback"].map((s, i) => (
                   <div
                     key={s}
                     className={`w-2 h-2 rounded-full transition-colors ${
                       step === s
                         ? "bg-blue-500"
-                        : i <
-                          ["challenge", "write", "scoring", "feedback"].indexOf(
-                            step
-                          )
+                        : i < ["write", "scoring", "feedback"].indexOf(step)
                         ? "bg-green-500"
                         : "bg-slate-200"
                     }`}
@@ -185,10 +178,10 @@ export function IntermediateCardModal({
                 ))}
               </div>
               <span className="text-sm font-bold text-slate-500 uppercase tracking-wide">
-                {step === "challenge" && "Challenge"}
                 {step === "write" && "Write Your Prompt"}
                 {step === "scoring" && "AI Scoring..."}
                 {step === "feedback" && "Your Score"}
+                {step === "review" && "Review"}
               </span>
             </div>
             <Button
@@ -203,8 +196,8 @@ export function IntermediateCardModal({
 
           {/* Content */}
           <div className="p-6">
-            {step === "challenge" && (
-              <ChallengeView
+            {step === "write" && (
+              <ChallengeWriteView
                 scenario={params.scenario}
                 brokenPrompt={params.brokenPrompt}
                 modelOutput={params.modelOutput}
@@ -212,20 +205,9 @@ export function IntermediateCardModal({
                 hint={params.hint}
                 showHint={showHint}
                 onToggleHint={() => setShowHint(!showHint)}
-                onNext={handleNext}
-              />
-            )}
-
-            {step === "write" && (
-              <WriteView
-                userInstruction={params.userInstruction}
-                hint={params.hint}
-                showHint={showHint}
-                onToggleHint={() => setShowHint(!showHint)}
                 userPrompt={userPrompt}
                 onPromptChange={setUserPrompt}
                 onNext={handleNext}
-                onBack={handleBack}
               />
             )}
 
@@ -255,6 +237,18 @@ export function IntermediateCardModal({
                 onBack={handleBack}
               />
             )}
+
+            {step === "review" && (
+              <ReviewView
+                scenario={params.scenario}
+                brokenPrompt={params.brokenPrompt}
+                userInstruction={params.userInstruction}
+                goldPrompt={params.goldPrompt}
+                commonMistakes={params.commonMistakes}
+                onClose={handleClose}
+                onPracticeAgain={() => setStep("write")}
+              />
+            )}
           </div>
         </motion.div>
       </motion.div>
@@ -266,7 +260,7 @@ export function IntermediateCardModal({
 // SUB-COMPONENTS
 // ============================================================================
 
-interface ChallengeViewProps {
+interface ChallengeWriteViewProps {
   scenario: string;
   brokenPrompt: string | null;
   modelOutput: string | null;
@@ -274,10 +268,12 @@ interface ChallengeViewProps {
   hint: string;
   showHint: boolean;
   onToggleHint: () => void;
+  userPrompt: string;
+  onPromptChange: (value: string) => void;
   onNext: () => void;
 }
 
-function ChallengeView({
+function ChallengeWriteView({
   scenario,
   brokenPrompt,
   modelOutput,
@@ -285,10 +281,12 @@ function ChallengeView({
   hint,
   showHint,
   onToggleHint,
+  userPrompt,
+  onPromptChange,
   onNext,
-}: ChallengeViewProps) {
+}: ChallengeWriteViewProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Scenario */}
       <div>
         <h3 className="text-slate-400 text-xs font-black mb-2 uppercase tracking-wide">
@@ -333,69 +331,6 @@ function ChallengeView({
         </div>
       </div>
 
-      {/* Hint */}
-      <div>
-        <Button
-          variant="ghost"
-          onClick={onToggleHint}
-          className="text-amber-600 hover:bg-amber-50 hover:text-amber-700 rounded-xl font-bold"
-        >
-          <Lightbulb className="w-4 h-4 mr-2" />
-          {showHint ? "Hide Hint" : "Show Hint"}
-        </Button>
-        {showHint && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="mt-2 bg-amber-50 border-2 border-amber-200 rounded-xl p-3"
-          >
-            <p className="text-amber-700 text-sm font-medium">💡 {hint}</p>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Action */}
-      <div className="pt-4">
-        <Button
-          onClick={onNext}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-6 rounded-2xl shadow-[0_4px_0_0_rgb(37,99,235)] active:shadow-none active:translate-y-[4px] transition-all"
-        >
-          <span className="text-lg">Start Writing</span>
-          <ChevronRight className="w-5 h-5 ml-2 stroke-[3px]" />
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-interface WriteViewProps {
-  userInstruction: string;
-  hint: string;
-  showHint: boolean;
-  onToggleHint: () => void;
-  userPrompt: string;
-  onPromptChange: (value: string) => void;
-  onNext: () => void;
-  onBack: () => void;
-}
-
-function WriteView({
-  userInstruction,
-  hint,
-  showHint,
-  onToggleHint,
-  userPrompt,
-  onPromptChange,
-  onNext,
-  onBack,
-}: WriteViewProps) {
-  return (
-    <div className="space-y-6">
-      {/* Task reminder */}
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
-        <p className="text-blue-700 text-sm font-medium">{userInstruction}</p>
-      </div>
-
       {/* Prompt input */}
       <div>
         <h3 className="text-slate-400 text-xs font-black mb-2 uppercase tracking-wide">
@@ -405,47 +340,19 @@ function WriteView({
           value={userPrompt}
           onChange={(e) => onPromptChange(e.target.value)}
           placeholder="Write your improved prompt here..."
-          className="w-full h-48 p-4 text-slate-700 bg-slate-50 border-2 border-slate-200 rounded-2xl resize-none focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 font-mono text-sm"
+          className="w-full h-36 p-4 text-slate-700 bg-slate-50 border-2 border-slate-200 rounded-2xl resize-none focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 font-mono text-sm"
         />
         <p className="text-xs text-slate-400 mt-2">
           {userPrompt.length} characters
         </p>
       </div>
 
-      {/* Hint */}
-      <div>
-        <Button
-          variant="ghost"
-          onClick={onToggleHint}
-          className="text-amber-600 hover:bg-amber-50 hover:text-amber-700 rounded-xl font-bold"
-        >
-          <Lightbulb className="w-4 h-4 mr-2" />
-          {showHint ? "Hide Hint" : "Need a Hint?"}
-        </Button>
-        {showHint && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="mt-2 bg-amber-50 border-2 border-amber-200 rounded-xl p-3"
-          >
-            <p className="text-amber-700 text-sm font-medium">💡 {hint}</p>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-3 pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="flex-1 font-bold py-6 rounded-2xl border-2"
-        >
-          Back
-        </Button>
+      {/* Action */}
+      <div className="pt-2">
         <Button
           onClick={onNext}
           disabled={userPrompt.trim().length < 10}
-          className="flex-[2] bg-green-500 hover:bg-green-600 text-white font-bold py-6 rounded-2xl shadow-[0_4px_0_0_rgb(22,163,74)] active:shadow-none active:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-6 rounded-2xl shadow-[0_4px_0_0_rgb(22,163,74)] active:shadow-none active:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="text-lg">Submit for AI Review</span>
           <ChevronRight className="w-5 h-5 ml-2 stroke-[3px]" />
@@ -621,7 +528,10 @@ function FeedbackView({
               </span>
               <span className="text-2xl text-slate-400 font-bold">/100</span>
             </div>
-            <p className="text-slate-600 font-medium">{aiScore.feedback}</p>
+            <p className="text-slate-600 font-medium">
+              <strong>FEEDBACK: </strong>
+              {aiScore.feedback}
+            </p>
           </div>
         </motion.div>
       )}
@@ -777,6 +687,145 @@ function FeedbackView({
             <span>Got It!</span>
           </Button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Review View - For viewing completed cards
+interface ReviewViewProps {
+  scenario: string;
+  brokenPrompt: string | null;
+  userInstruction: string;
+  goldPrompt: string;
+  commonMistakes: string[];
+  onClose: () => void;
+  onPracticeAgain: () => void;
+}
+
+function ReviewView({
+  scenario,
+  brokenPrompt,
+  userInstruction,
+  goldPrompt,
+  commonMistakes,
+  onClose,
+  onPracticeAgain,
+}: ReviewViewProps) {
+  const [showMistakes, setShowMistakes] = useState(false);
+
+  return (
+    <div className="space-y-5">
+      {/* Completed badge */}
+      <div className="flex items-center gap-2 bg-green-50 border-2 border-green-200 rounded-2xl px-4 py-3">
+        <Check className="w-5 h-5 text-green-600 stroke-[3px]" />
+        <span className="text-green-700 font-bold">Completed!</span>
+      </div>
+
+      {/* Scenario */}
+      <div>
+        <h3 className="text-slate-400 text-xs font-black mb-2 uppercase tracking-wide">
+          Scenario
+        </h3>
+        <p className="text-slate-700 text-lg font-semibold leading-relaxed">
+          {scenario}
+        </p>
+      </div>
+
+      {/* Broken Prompt (if exists) */}
+      {brokenPrompt && (
+        <div>
+          <h3 className="text-slate-400 text-xs font-black mb-2 uppercase tracking-wide">
+            Original Prompt
+          </h3>
+          <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+            <p className="text-red-700 font-mono text-sm">"{brokenPrompt}"</p>
+          </div>
+        </div>
+      )}
+
+      {/* Your Task */}
+      <div>
+        <h3 className="text-blue-600 text-xs font-black mb-2 uppercase tracking-wide">
+          ✏️ The Task Was
+        </h3>
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
+          <p className="text-blue-700 font-medium">{userInstruction}</p>
+        </div>
+      </div>
+
+      {/* Gold prompt */}
+      <div>
+        <h3 className="text-green-600 text-xs font-black mb-2 uppercase tracking-wide">
+          ✨ Example Great Prompt
+        </h3>
+        <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-4">
+          <p className="text-green-700 font-mono text-sm">"{goldPrompt}"</p>
+        </div>
+      </div>
+
+      {/* Common mistakes accordion */}
+      <div>
+        <Button
+          variant="ghost"
+          onClick={() => setShowMistakes(!showMistakes)}
+          className="w-full flex items-center justify-between p-4 bg-red-50 border-2 border-red-200 rounded-2xl text-red-600 hover:bg-red-100 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black uppercase tracking-wide">
+              ⚠️ Common Mistakes to Avoid
+            </span>
+          </div>
+          <ChevronDown
+            className={`w-5 h-5 transition-transform duration-200 ${
+              showMistakes ? "rotate-180" : ""
+            }`}
+          />
+        </Button>
+
+        <AnimatePresence>
+          {showMistakes && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-2 bg-red-50/50 border-2 border-red-100 rounded-2xl p-4">
+                <ul className="space-y-2">
+                  {commonMistakes.map((mistake, i) => (
+                    <li
+                      key={i}
+                      className="text-red-700 text-sm flex items-start gap-2"
+                    >
+                      <span className="text-red-400">•</span>
+                      {mistake}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-3 pt-2">
+        <Button
+          onClick={onClose}
+          variant="outline"
+          className="flex-1 font-bold py-6 rounded-2xl border-2"
+        >
+          <span className="text-lg">Close</span>
+        </Button>
+        <Button
+          onClick={onPracticeAgain}
+          className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-6 rounded-2xl shadow-[0_4px_0_0_rgb(37,99,235)] active:shadow-none active:translate-y-[4px] transition-all"
+        >
+          <RotateCcw className="w-5 h-5 mr-2 stroke-[3px]" />
+          <span className="text-lg">Practice Again</span>
+        </Button>
       </div>
     </div>
   );

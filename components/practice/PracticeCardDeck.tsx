@@ -1,5 +1,6 @@
 // Re-export from modular structure
-export { PracticeCardDeck } from "./PracticeCardDeck/PracticeCardDeck";
+// Re-export from modular structure
+// export { PracticeCardDeck } from "./PracticeCardDeck/PracticeCardDeck"; // Deleted legacy component
 export { BeginnerPracticeCardDeck } from "./PracticeCardDeck/BeginnerPracticeCardDeck";
 export { IntermediatePracticeCardDeck } from "./PracticeCardDeck/IntermediatePracticeCardDeck";
 export type {

@@ -59,8 +59,16 @@ export function BeginnerPracticeCardDeck({
   const user = useQuery(api.users.get, { id: userId }) as any;
   const age = user?.age ?? 25; // Default to adult if no age
 
-  console.log("BeginnerPracticeCardDeck: User:", user);
-  console.log("BeginnerPracticeCardDeck: Age:", age);
+  // Load saved progress from Convex
+  const savedProgress = useQuery(api.practiceZoneProgress.getProgress, {
+    userId,
+    difficulty: "beginner",
+    track,
+  });
+
+  // Mutations for saving progress
+  const saveAnswer = useMutation(api.practiceZoneProgress.saveAnswer);
+  const resetProgress = useMutation(api.practiceZoneProgress.resetProgress);
 
   // Load questions from static files
   const practiceItems = useMemo(() => {
@@ -85,6 +93,9 @@ export function BeginnerPracticeCardDeck({
     correctAnswers: 0,
   });
 
+  // Track if we've initialized from saved progress
+  const hasInitializedFromProgress = useRef(false);
+
   const [isViewingAttempted, setIsViewingAttempted] = useState(false);
   const [shuffledOrder, setShuffledOrder] = useState<number[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -95,6 +106,27 @@ export function BeginnerPracticeCardDeck({
       setShuffledOrder(practiceItems.map((_, i) => i));
     }
   }, [practiceItems, shuffledOrder.length]);
+
+  // Initialize state from saved progress (only once when data loads)
+  useEffect(() => {
+    if (
+      savedProgress &&
+      !hasInitializedFromProgress.current &&
+      practiceItems.length > 0
+    ) {
+      hasInitializedFromProgress.current = true;
+      const completedIds = savedProgress.completedQuestionIds || [];
+      if (completedIds.length > 0) {
+        setState((s) => ({
+          ...s,
+          answeredCards: new Set(completedIds),
+          score: savedProgress.totalScore || 0,
+          correctAnswers: savedProgress.correctAnswers || 0,
+          showLevelComplete: completedIds.length >= practiceItems.length,
+        }));
+      }
+    }
+  }, [savedProgress, practiceItems.length]);
 
   // Get cards in shuffled order
   const cardsToDisplay = useMemo(() => {
@@ -162,10 +194,22 @@ export function BeginnerPracticeCardDeck({
         scoreChange = 25; // Partial credit
       }
 
+      const newStreak = isCorrect ? state.streak + 1 : 0;
       const newAnsweredCards = new Set(state.answeredCards);
       newAnsweredCards.add(card._id);
 
       const allAnswered = newAnsweredCards.size >= practiceItems.length;
+
+      // Save to Convex (fire and forget)
+      saveAnswer({
+        userId,
+        difficulty: "beginner",
+        track,
+        questionId: card._id,
+        score: scoreChange,
+        isCorrect,
+        currentStreak: newStreak,
+      }).catch(console.error);
 
       setState((s) => ({
         ...s,
@@ -173,14 +217,14 @@ export function BeginnerPracticeCardDeck({
         isTimerRunning: false,
         lastScoreChange: scoreChange,
         score: s.score + scoreChange,
-        streak: isCorrect ? s.streak + 1 : 0,
+        streak: newStreak,
         answeredCards: newAnsweredCards,
         justCompletedCard: card._id,
         correctAnswers: isCorrect ? s.correctAnswers + 1 : s.correctAnswers,
         showLevelComplete: allAnswered,
       }));
     },
-    [state, cardsToDisplay, practiceItems.length]
+    [state, cardsToDisplay, practiceItems.length, saveAnswer, userId, track]
   );
 
   const handleViewAnswer = useCallback(() => {
@@ -203,6 +247,14 @@ export function BeginnerPracticeCardDeck({
   }, [shuffledOrder]);
 
   const handleReset = useCallback(() => {
+    // Reset in Convex
+    resetProgress({
+      userId,
+      difficulty: "beginner",
+      track,
+    }).catch(console.error);
+
+    // Reset local state
     setState({
       selectedCardIndex: null,
       selectedAnswer: null,
@@ -219,7 +271,8 @@ export function BeginnerPracticeCardDeck({
       correctAnswers: 0,
     });
     setShuffledOrder(practiceItems.map((_, i) => i));
-  }, [practiceItems]);
+    hasInitializedFromProgress.current = true; // Prevent re-init from old data
+  }, [practiceItems, resetProgress, userId, track]);
 
   const toggleStats = useCallback(() => {
     setState((s) => ({ ...s, showStats: !s.showStats }));

@@ -1,20 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "convex/react";
-import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Shuffle, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ArrowLeft, ArrowRight, Shuffle } from "lucide-react";
+import { DOMAINS, TRACKS } from "@/lib/practice/types";
 
 interface DuelTopicSelectionProps {
   userId: Id<"users">;
-  onSelectTrack: (
-    trackId: Id<"practiceTracks"> | null,
-    trackName: string
-  ) => void;
+  onSelectTrack: (trackSlug: string, trackName: string) => void;
   onCancel: () => void;
 }
 
@@ -23,36 +18,20 @@ export function DuelTopicSelection({
   onSelectTrack,
   onCancel,
 }: DuelTopicSelectionProps) {
-  const [selectedDomainId, setSelectedDomainId] =
-    useState<Id<"practiceDomains"> | null>(null);
+  const [selectedDomainId, setSelectedDomainId] = useState<string | null>(null);
 
-  const domains = useQuery(api.practiceDomains.listWithUnlockStatus, {
-    userId,
-  }) as any;
-  const tracks = useQuery(
-    api.practiceTracks.listByDomainWithProgress,
-    selectedDomainId ? { domainId: selectedDomainId, userId } : "skip"
-  ) as any;
+  // Use local constants
+  const domains = DOMAINS;
+  const tracks = TRACKS;
 
   // Random mix option
   const handleRandomMix = () => {
-    onSelectTrack(null, "Random Mix");
+    onSelectTrack("random", "Random Mix");
   };
-
-  // Loading state
-  if (!domains) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
-      </div>
-    );
-  }
 
   // Step 1: Domain selection
   if (!selectedDomainId) {
-    const unlockedDomains = domains.filter(
-      (d: any) => d.isUnlocked || d.isStarter
-    );
+    const visibleDomains = domains.filter((d) => d.slug !== "specialized"); // Filter out specialized if needed
 
     return (
       <div className="space-y-4">
@@ -90,10 +69,10 @@ export function DuelTopicSelection({
 
         {/* Domain Grid */}
         <div className="grid grid-cols-2 gap-3 max-h-[280px] overflow-y-auto pr-1">
-          {unlockedDomains.map((domain: any) => (
+          {visibleDomains.map((domain) => (
             <button
-              key={domain._id}
-              onClick={() => setSelectedDomainId(domain._id)}
+              key={domain.slug}
+              onClick={() => setSelectedDomainId(domain.slug)}
               className="p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 hover:shadow-md transition-all text-left group"
             >
               <div className="flex items-start gap-3">
@@ -103,7 +82,7 @@ export function DuelTopicSelection({
                     {domain.title}
                   </div>
                   <div className="text-xs text-slate-500">
-                    {domain.trackCount} tracks
+                    Select to view tracks
                   </div>
                 </div>
               </div>
@@ -121,7 +100,8 @@ export function DuelTopicSelection({
   }
 
   // Step 2: Track selection
-  const selectedDomain = domains.find((d: any) => d._id === selectedDomainId);
+  const selectedDomain = domains.find((d) => d.slug === selectedDomainId);
+  const domainTracks = tracks.filter((t) => t.domainId === selectedDomainId);
 
   return (
     <div className="space-y-4">
@@ -146,40 +126,26 @@ export function DuelTopicSelection({
         Select a Track
       </div>
 
-      {!tracks ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-600"></div>
-        </div>
-      ) : (
-        <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
-          {tracks.map((track: any) => (
-            <button
-              key={track._id}
-              onClick={() => onSelectTrack(track._id, track.title)}
-              className="w-full p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md transition-all text-left group"
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl">{track.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-slate-800">{track.title}</div>
-                  <div className="text-sm text-slate-500 line-clamp-1">
-                    {track.description}
-                  </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="secondary" className="text-xs bg-slate-100">
-                      {track.levelCount} levels
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs bg-slate-100">
-                      {track.totalChallenges} questions
-                    </Badge>
-                  </div>
+      <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+        {domainTracks.map((track) => (
+          <button
+            key={track.slug}
+            onClick={() => onSelectTrack(track.slug, track.title)}
+            className="w-full p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md transition-all text-left group"
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">{track.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-slate-800">{track.title}</div>
+                <div className="text-sm text-slate-500 line-clamp-1">
+                  {track.description}
                 </div>
-                <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-500 transition-colors mt-1" />
               </div>
-            </button>
-          ))}
-        </div>
-      )}
+              <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-500 transition-colors mt-1" />
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

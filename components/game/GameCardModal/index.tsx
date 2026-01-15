@@ -28,8 +28,15 @@ export function GameCardModal({
 
   // For duel mode: ALWAYS use rate type UI (Bad/Almost/Good) to match Practice Zone
   // For practice mode: check actual item type
+  // Determine card type properly (Legacy vs New)
+  const task = card.tasks?.[0];
+  const legacyParams = card.params;
+
   const isRateType =
-    mode === "duel" ? true : !card.params?.options || card.type === "rate";
+    mode === "duel"
+      ? task?.type === "rate" ||
+        (!task && (!legacyParams?.options || card.type === "rate"))
+      : !legacyParams?.options || card.type === "rate";
   const hasAnswered = selectedAnswer !== null;
 
   return (
@@ -115,15 +122,26 @@ function CardFront({
   onClose,
   onAnswerSelect,
 }: CardFrontProps) {
-  // Get scenario, prompt, and options from params
-  const scenario = card.params?.scenario || (card as any).scenario;
+  // Get scenario, prompt, and options from params OR new task structure
+  const task = card.tasks?.[0]; // New structure
+  const legacyParams = card.params; // Legacy structure
+
+  const scenario =
+    task?.scenario ||
+    card.scenario ||
+    legacyParams?.scenario ||
+    (card as any).scenario;
+
   const prompt =
-    card.params?.prompt ||
-    card.params?.question ||
+    task?.text || // New structure
+    legacyParams?.prompt ||
+    legacyParams?.question ||
     (card as any).prompt ||
     (card as any).question ||
-    scenario; // Fallback to scenario if no prompt exists
-  const options = card.params?.options || (card as any).options || [];
+    scenario;
+
+  const options =
+    task?.options || legacyParams?.options || (card as any).options || [];
 
   // For rate type display: show scenario (if separate from prompt) and prompt
   // If prompt IS the scenario, don't show scenario separately

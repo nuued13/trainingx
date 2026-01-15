@@ -124,6 +124,41 @@ export const createRoom = mutation({
   },
 });
 
+// Create a room with explicit questions (Server Action / Local File support)
+export const createWithQuestions = mutation({
+  args: {
+    userId: v.id("users"),
+    questions: v.array(v.any()), // Array of full question objects
+    trackSlug: v.string(), // "clarity", "context", etc.
+    minPlayers: v.optional(v.number()),
+    maxPlayers: v.optional(v.number()),
+    itemCount: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const userId = args.userId;
+
+    // Create room
+    const roomId = await ctx.db.insert("practiceDuels", {
+      hostId: userId,
+      participants: [userId],
+      itemIds: [], // Empty for local-file duels
+      questions: args.questions,
+      status: "lobby",
+      scores: {},
+      startedAt: Date.now(),
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      minPlayers: args.minPlayers || 2,
+      maxPlayers: args.maxPlayers || 10,
+      readyPlayers: [],
+      trackSlug: args.trackSlug,
+    });
+
+    await upsertDuelMember(ctx, roomId, userId, "lobby");
+
+    return { roomId };
+  },
+});
+
 // Join a room
 export const joinRoom = mutation({
   args: {
@@ -344,8 +379,17 @@ export const submitAttempt = mutation({
       throw new Error("Not a participant");
     }
 
-    if (!room.itemIds.includes(args.itemId)) {
-      throw new Error("Item not part of this room");
+    if (room.questions && room.questions.length > 0) {
+      // Local questions mode
+      const question = room.questions.find((q: any) => q.id === args.itemId);
+      if (!question) {
+        throw new Error("Question not found in this room");
+      }
+    } else {
+      // Legacy mode
+      if (!room.itemIds.includes(args.itemId)) {
+        throw new Error("Item not part of this room");
+      }
     }
 
     // Check if already attempted
@@ -465,7 +509,19 @@ export const getRoomDetails = query({
       .withIndex("by_duel", (q) => q.eq("duelId", args.roomId))
       .collect();
 
-    const items = await Promise.all(room.itemIds.map((id) => ctx.db.get(id)));
+    let items: any[] = [];
+    if (room.questions && room.questions.length > 0) {
+      // Use embedded questions (local-first mode)
+      items = room.questions.map((q: any) => ({
+        ...q,
+        _id: q.id, // Map local ID to _id for frontend compatibility
+      }));
+    } else {
+      // Legacy mode: fetch from practiceItems
+      items = (
+        await Promise.all(room.itemIds.map((id) => ctx.db.get(id)))
+      ).filter((i) => i !== null);
+    }
 
     const participants = await Promise.all(
       room.participants.map((id) => ctx.db.get(id))
