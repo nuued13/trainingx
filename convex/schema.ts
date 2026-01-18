@@ -128,8 +128,17 @@ export default defineSchema({
     tags: v.array(v.string()),
     isActive: v.boolean()
   }).index("by_category", ["category"]).index("by_type", ["type"]),
-
-  // Assessment attempts and results
+// Assessment Questions (age-branched)
+assessment_questions: defineTable({
+id: v.number(),
+ageGroup: v.string(),
+question: v.string(),
+options: v.array(v.object({
+text: v.string(),
+skill: v.string(),
+weight: v.number()
+}))
+}),  // Assessment attempts and results
   assessmentAttempts: defineTable({
     userId: v.id("users"),
     assessmentId: v.id("assessments"),
