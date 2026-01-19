@@ -13,7 +13,7 @@ export const generateAIMatches = action({
       skills: v.optional(v.any()),
     }),
   },
-  handler: async (ctx, { quizAnswers, userProfile }) => {
+  handler: async (ctx, args) => {
     const systemPrompt = `You are an expert AI career advisor. Based on the user's quiz responses and profile, generate 5 highly personalized AI career opportunities that perfectly match their preferences, skills, and goals.
 
 Each opportunity should be unique, specific, and actionable. Include a mix of types based on their preferences (full-time careers, freelance gigs, business ideas, or specialized trades).
@@ -98,7 +98,7 @@ Generate 5 personalized AI career opportunities and 10-12 focused skill suggesti
         skillSuggestions: Array.isArray(skillSuggestions)
           ? skillSuggestions
           : [],
-        quizAnswers: quizAnswers,
+        quizAnswers: args.quizAnswers,
       });
     }
 
@@ -107,7 +107,7 @@ Generate 5 personalized AI career opportunities and 10-12 focused skill suggesti
         ? opportunities
         : [opportunities],
       skillSuggestions: Array.isArray(skillSuggestions) ? skillSuggestions : [],
-    };
+    } as const;
   },
 });
 
