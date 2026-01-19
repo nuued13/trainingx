@@ -181,6 +181,36 @@ weight: v.number()
     aiModel: v.string()
   }).index("by_user", ["userId"]),
 
+  // AI Matching Results (new personalized matching system)
+  aiMatchingResults: defineTable({
+    userId: v.id("users"),
+    opportunities: v.array(v.object({
+      id: v.string(),
+      title: v.string(),
+      type: v.string(),
+      location: v.string(),
+      salaryRange: v.string(),
+      employmentType: v.string(),
+      seniority: v.string(),
+      description: v.string(),
+      impactHighlights: v.array(v.string()),
+      keyTechnologies: v.array(v.string()),
+      requiredSkills: v.array(v.string()),
+      whyPerfectMatch: v.string(),
+      nextSteps: v.string(),
+      remotePolicy: v.string(),
+      promptScoreMin: v.number(),
+      skillThresholds: v.any(),
+    })),
+    skillSuggestions: v.array(v.object({
+      name: v.string(),
+      category: v.string(),
+      why: v.string(),
+    })),
+    quizAnswers: v.any(),
+    generatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
   // Custom AI assistants (GPTs)
   customAssistants: defineTable({
     name: v.string(),

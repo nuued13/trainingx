@@ -87,10 +87,13 @@ export default function MatchingPage() {
 
     const hasStoredMatches =
       storedMatches &&
+      "opportunities" in storedMatches &&
       storedMatches.opportunities &&
       storedMatches.opportunities.length > 0;
     const isStoredMatchesFresh =
       hasStoredMatches &&
+      storedMatches &&
+      "generatedAt" in storedMatches &&
       storedMatches.generatedAt > (quizResults.completedAt || 0);
 
     if (isStoredMatchesFresh) {
