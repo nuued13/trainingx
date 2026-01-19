@@ -603,11 +603,11 @@ export default function AICareerCoachPage() {
   const clearConversation = useMutation(api.careerCoach.db.clearConversation);
 
   // Load existing conversation
-  useEffect(() => {
-    if (storedConversation?.messages) {
-      setMessages(storedConversation.messages as Message[]);
-    }
-  }, [storedConversation]);
+//   useEffect(() => {
+//     if (storedConversation?.messages) {
+//       setMessages(storedConversation.messages as Message[]);
+//     }
+//   }, [storedConversation]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
