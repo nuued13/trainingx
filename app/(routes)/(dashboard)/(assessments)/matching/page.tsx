@@ -65,8 +65,16 @@ export default function MatchingPage() {
           skills: userStats.skills,
         },
       });
+
+      // Add type assertion to tell TypeScript the expected shape
+      const typedResult = result as {
+        opportunities: AIOpportunity[];
+        skillSuggestions: SkillSuggestion[];
+      };
+
       // We set local state for immediate feedback, but the query will also update
-      applyMatches(result);
+    applyMatches(typedResult);
+//   applyMatches(result);
     } catch (error) {
       console.error("Failed to generate AI matches:", error);
     } finally {
