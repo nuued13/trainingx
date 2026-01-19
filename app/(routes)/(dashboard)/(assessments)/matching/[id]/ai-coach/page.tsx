@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
@@ -62,10 +63,20 @@ export default function CareerCoachPage() {
   const askCoach = useAction(api.aiMatching.askCareerCoach);
 
   // Find the specific opportunity from the stored matches
-  const opportunity = useMemo(() => {
-    if (!storedMatches?.opportunities) return null;
-    return storedMatches.opportunities.find((opp: any) => opp.id === matchId);
-  }, [storedMatches, matchId]);
+//   const opportunity = useMemo(() => {
+//     if (!storedMatches || !("opportunities" in storedMatches) || !storedMatches.opportunities) return null;
+//     return storedMatches.opportunities.find((opp: any) => opp.id === matchId);
+//   }, [storedMatches, matchId]);
+
+    const opportunity = useMemo(() => {
+    if (!storedMatches || !("opportunities" in storedMatches) || !storedMatches.opportunities) return null;
+    
+    // Add Array.isArray check and type assertion
+    const opps = storedMatches.opportunities;
+    if (!Array.isArray(opps)) return null;
+    
+    return (opps as any[]).find((opp: any) => opp.id === matchId);
+    }, [storedMatches, matchId]);
 
   useEffect(() => {
     if (scrollRef.current) {
