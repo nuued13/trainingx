@@ -166,7 +166,7 @@ export function PathwayQuiz({
         </h2>
       </div>
 
-      {adultQ.type === "text" ? (
+      {adultQ.type === "text" || (adultQ.type !== "choice" && adultQ.options.length === 0) ? (
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
@@ -198,9 +198,8 @@ export function PathwayQuiz({
               variant="primary"
               onClick={() => {
                 const v = textValue.trim();
-                if (v) handleAnswerWithReset(v);
+                handleAnswerWithReset(v || "");
               }}
-              disabled={!textValue.trim()}
               className="gap-2"
             >
               {questionNumber === totalQuestions ? "Submit" : "Next"}
