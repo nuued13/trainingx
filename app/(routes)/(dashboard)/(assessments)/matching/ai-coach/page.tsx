@@ -42,26 +42,26 @@ export default function GeneralCareerCoachPage() {
   const askCoach = useAction(api.aiMatching.askCareerCoach);
 
   // Initialize chat based on whether user has matches
-  useEffect(() => {
-    if (storedMatches !== undefined && !hasInitialized) {
-      const hasMatches =
-        storedMatches?.opportunities && storedMatches.opportunities.length > 0;
+//   useEffect(() => {
+//     if (storedMatches !== undefined && !hasInitialized) {
+//       const hasMatches =
+//         storedMatches?.opportunities && storedMatches.opportunities.length > 0;
 
-      const initialMessage = hasMatches
-        ? "Hi! I see you've already taken the quiz and have some exciting matches. I can help you compare them, plan your next steps, or answer any questions about your career path. What's on your mind?"
-        : "Hi! I'm your AI Career Coach. It looks like you haven't taken the matching quiz yet, but that's okay! I can help you figure out what kind of AI career might suit you. Tell me a bit about your interests or background.";
+//       const initialMessage = hasMatches
+//         ? "Hi! I see you've already taken the quiz and have some exciting matches. I can help you compare them, plan your next steps, or answer any questions about your career path. What's on your mind?"
+//         : "Hi! I'm your AI Career Coach. It looks like you haven't taken the matching quiz yet, but that's okay! I can help you figure out what kind of AI career might suit you. Tell me a bit about your interests or background.";
 
-      setMessages([
-        {
-          id: "welcome",
-          role: "assistant",
-          content: initialMessage,
-          createdAt: Date.now(),
-        },
-      ]);
-      setHasInitialized(true);
-    }
-  }, [storedMatches, hasInitialized]);
+//       setMessages([
+//         {
+//           id: "welcome",
+//           role: "assistant",
+//           content: initialMessage,
+//           createdAt: Date.now(),
+//         },
+//       ]);
+//       setHasInitialized(true);
+//     }
+//   }, [storedMatches, hasInitialized]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -93,7 +93,7 @@ export default function GeneralCareerCoachPage() {
       const responseContent = await askCoach({
         // No specific opportunity title/desc
         userSkills: userStats?.skills,
-        allMatches: storedMatches?.opportunities,
+        // allMatches: storedMatches?.opportunities,
         messages: conversationHistory,
       });
 
@@ -139,9 +139,11 @@ export default function GeneralCareerCoachPage() {
   }
 
   // Dynamic suggestions
-  const hasMatches =
-    storedMatches?.opportunities && storedMatches.opportunities.length > 0;
-  const suggestions = hasMatches
+    const hasMatches = true; // temporarily force true
+    //   const hasMatches =
+    //     storedMatches?.opportunities && storedMatches.opportunities.length > 0;
+  
+    const suggestions = hasMatches
     ? [
         "Compare my top matches",
         "Which role pays the best?",
