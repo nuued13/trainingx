@@ -16,6 +16,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const getAppURL = () => {
+  if (typeof window === "undefined") return "https://staging.trainingx.ai";
+  return window.location.origin;
+};
+
+const normalizeRedirect = (value?: string | null): string => {
+  const appURL = getAppURL();
+  if (!value) return `${appURL}/dashboard`;
+  
+  // If it's a relative path, use app URL
+  if (value.startsWith("/")) {
+    return `${appURL}${value}`;
+  }
+  
+  // If it's already an absolute URL, use it as-is
+  if (value.startsWith("http")) {
+    return value;
+  }
+  
+  return `${appURL}/dashboard`;
+};
+
 const GENDER_OPTIONS = [
   { value: "female", label: "Female" },
   { value: "male", label: "Male" },
@@ -43,12 +65,13 @@ export default function CompleteProfilePage() {
   useEffect(() => {
     if (isLoading || !isAuthenticated || !user) return;
     if (user.needsProfileCompletion !== true) {
-      const redirectTo =
-        sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
+      const redirectTo = normalizeRedirect(
+        sessionStorage.getItem("redirectAfterLogin")
+      );
       sessionStorage.removeItem("redirectAfterLogin");
-      setLocation(redirectTo);
+      window.location.href = redirectTo;
     }
-  }, [isAuthenticated, isLoading, setLocation, user]);
+  }, [isAuthenticated, isLoading, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -103,14 +126,16 @@ export default function CompleteProfilePage() {
             setSubmitting(true);
             completeProfile({ name: trimmedName, age: parsedAge, gender })
               .then(() => {
-                const redirectTo =
-                  sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
+                const redirectTo = normalizeRedirect(
+                  sessionStorage.getItem("redirectAfterLogin")
+                );
                 sessionStorage.removeItem("redirectAfterLogin");
                 const destination =
-                  redirectTo === "/complete-profile" || redirectTo === "/auth"
-                    ? "/dashboard"
+                  redirectTo.includes("/complete-profile") ||
+                  redirectTo.includes("/auth")
+                    ? normalizeRedirect(null)
                     : redirectTo;
-                setLocation(destination);
+                window.location.href = destination;
               })
               .catch((error) => {
                 console.error(error);
