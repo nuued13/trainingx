@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, Loader2, PenLine, Send } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { YouthQuestion } from "@/data/youth-questions";
@@ -34,6 +34,7 @@ export function PathwayQuiz({
 }: PathwayQuizProps) {
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [otherText, setOtherText] = useState("");
+  const [textValue, setTextValue] = useState("");
 
   const handleAnswerWithReset = (answer: string) => {
     setShowOtherInput(false);
@@ -46,6 +47,12 @@ export function PathwayQuiz({
       handleAnswerWithReset(`other:${otherText.trim()}`);
     }
   };
+
+  useEffect(() => {
+    setShowOtherInput(false);
+    setOtherText("");
+    setTextValue("");
+  }, [question?.id]);
 
   if (isCalculating) {
     return (
@@ -159,72 +166,118 @@ export function PathwayQuiz({
         </h2>
       </div>
 
-      {/* Multi-choice Options - Duolingo style */}
-      <div
-        className={`grid gap-4 pt-4 ${
-          adultQ.options.length > 4
-            ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
-            : "grid-cols-1 sm:grid-cols-2"
-        }`}
-      >
-        {adultQ.options.map((option) => {
-          const Icon = option.icon;
-          return (
-            <AdultOptionCard
-              key={option.id}
-              icon={Icon}
-              label={option.label}
-              description={option.description}
-              onClick={() => handleAnswerWithReset(option.value)}
-            />
-          );
-        })}
-
-        {/* Other Option */}
-        {shouldShowOther && !showOtherInput && (
-          <OtherOptionCard onClick={() => setShowOtherInput(true)} />
-        )}
-      </div>
-
-      {/* Expandable Text Input for "Other" */}
-      {showOtherInput && (
+      {adultQ.type === "text" ? (
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="flex flex-col sm:flex-row gap-3 items-stretch"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4 pt-4"
         >
-          <div className="flex-1">
-            <input
-              type="text"
-              value={otherText}
-              onChange={(e) => setOtherText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleOtherSubmit()}
-              placeholder="Type your answer..."
-              autoFocus
-              className="w-full px-4 py-4 rounded-2xl border-2 border-b-4 border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-300 transition-all text-lg font-semibold"
-            />
+          <div className="flex items-start justify-between gap-4">
+            <p className="text-sm text-slate-600">
+              {adultQ.helperText || "Optional context to tailor your matches"}
+            </p>
+            <span className="text-xs font-bold uppercase tracking-widest text-blue-500">
+              Optional
+            </span>
           </div>
-          <div className="flex gap-2">
+          <textarea
+            value={textValue}
+            onChange={(e) => setTextValue(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                const v = textValue.trim();
+                if (v) handleAnswerWithReset(v);
+              }
+            }}
+            placeholder={adultQ.placeholder || "Add any notes or specifics here"}
+            className="w-full min-h-[160px] rounded-2xl border-2 border-slate-200 bg-white/90 ring-0 px-4 py-3 text-base text-slate-800 placeholder:text-slate-400 focus:border-blue-300 focus:ring-0"
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400">Cmd/Ctrl + Enter to continue</span>
             <JuicyButton
-              variant="outline"
+              variant="primary"
               onClick={() => {
-                setShowOtherInput(false);
-                setOtherText("");
+                const v = textValue.trim();
+                if (v) handleAnswerWithReset(v);
               }}
-            >
-              Cancel
-            </JuicyButton>
-            <JuicyButton
-              variant="success"
-              onClick={handleOtherSubmit}
-              disabled={!otherText.trim()}
+              disabled={!textValue.trim()}
               className="gap-2"
             >
-              Submit
+              {questionNumber === totalQuestions ? "Submit" : "Next"}
               <Send className="h-4 w-4" />
             </JuicyButton>
           </div>
         </motion.div>
+      ) : (
+        <>
+          {/* Multi-choice Options - Duolingo style */}
+          <div
+            className={`grid gap-4 pt-4 ${
+              adultQ.options.length > 4
+                ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+                : "grid-cols-1 sm:grid-cols-2"
+            }`}
+          >
+            {adultQ.options.map((option) => {
+              const Icon = option.icon;
+              return (
+                <AdultOptionCard
+                  key={option.id}
+                  icon={Icon}
+                  label={option.label}
+                  description={option.description}
+                  onClick={() => handleAnswerWithReset(option.value)}
+                />
+              );
+            })}
+
+            {/* Other Option */}
+            {shouldShowOther && !showOtherInput && (
+              <OtherOptionCard onClick={() => setShowOtherInput(true)} />
+            )}
+          </div>
+
+          {/* Expandable Text Input for "Other" */}
+          {showOtherInput && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="flex flex-col sm:flex-row gap-3 items-stretch"
+            >
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={otherText}
+                  onChange={(e) => setOtherText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleOtherSubmit()}
+                  placeholder="Type your answer..."
+                  autoFocus
+                  className="w-full px-4 py-4 rounded-2xl border-2 border-b-4 border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-300 transition-all text-lg font-semibold"
+                />
+              </div>
+              <div className="flex gap-2">
+                <JuicyButton
+                  variant="outline"
+                  onClick={() => {
+                    setShowOtherInput(false);
+                    setOtherText("");
+                  }}
+                >
+                  Cancel
+                </JuicyButton>
+                <JuicyButton
+                  variant="success"
+                  onClick={handleOtherSubmit}
+                  disabled={!otherText.trim()}
+                  className="gap-2"
+                >
+                  Submit
+                  <Send className="h-4 w-4" />
+                </JuicyButton>
+              </div>
+            </motion.div>
+          )}
+        </>
       )}
     </motion.div>
   );
