@@ -14,15 +14,19 @@ export default function ResultsTeaserPage() {
   const [mounted, setMounted] = useState(false);
   
   const currentUser = useQuery(api.users.viewer);
-  const latestAssessment = useQuery(
-    api.assessments.getLatestAssessment,
-    currentUser ? { userId: currentUser._id } : "skip"
-  );
+  // TODO: Re-enable when assessments API exposes a latest-assessment helper
+  // const latestAssessment = useQuery(
+  //   api.assessments.getLatestAssessment,
+  //   currentUser ? { userId: currentUser._id } : "skip"
+  // );
+  const latestAssessment = null;
   
-  const thumbprint = useQuery(
-    api.users.getUserThumbprint,
-    currentUser ? { userId: currentUser._id } : "skip"
-  );
+  // TODO: Re-enable when user thumbprint query is exposed
+  // const thumbprint = useQuery(
+  //   api.users.getUserThumbprint,
+  //   currentUser ? { userId: currentUser._id } : "skip"
+  // );
+  const thumbprint = null;
   
   // TODO: Re-enable when pathways table is added to schema
   // const topPathway = useQuery(
@@ -35,7 +39,7 @@ export default function ResultsTeaserPage() {
     setMounted(true);
   }, []);
 
-  if (!mounted || !currentUser || !latestAssessment || !thumbprint) {
+  if (!mounted || !currentUser) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-pulse text-xl">Loading your results...</div>
@@ -43,7 +47,7 @@ export default function ResultsTeaserPage() {
     );
   }
 
-  const { scores } = thumbprint;
+  const scores = thumbprint?.scores ?? {};
   const topMatch = topPathway?.[0];
 
   return (
@@ -67,24 +71,27 @@ export default function ResultsTeaserPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(scores).map(([skill, score]) => (
-              <div key={skill} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium capitalize">
-                    {skill.replace(/([A-Z])/g, ' $1').trim()}
-                  </span>
-                  <Badge variant={score >= 80 ? "default" : "secondary"}>
-                    {score}%
-                  </Badge>
+            {Object.entries(scores).map(([skill, score]) => {
+              const numericScore = typeof score === "number" ? score : 0;
+              return (
+                <div key={skill} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium capitalize">
+                      {skill.replace(/([A-Z])/g, ' $1').trim()}
+                    </span>
+                    <Badge variant={numericScore >= 80 ? "default" : "secondary"}>
+                      {numericScore}%
+                    </Badge>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full"
+                      style={{ width: `${numericScore}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full"
-                    style={{ width: `${score}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
