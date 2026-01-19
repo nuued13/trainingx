@@ -13,6 +13,28 @@ import { useLocation } from "wouter";
 import { useAuthActions } from "@convex-dev/auth/react";
 import toast from "react-hot-toast";
 
+const getAppURL = () => {
+  if (typeof window === "undefined") return "https://staging.trainingx.ai";
+  return window.location.origin;
+};
+
+const normalizeRedirect = (value?: string | null): string => {
+  const appURL = getAppURL();
+  if (!value) return `${appURL}/dashboard`;
+  
+  // If it's a relative path, use app URL
+  if (value.startsWith("/")) {
+    return `${appURL}${value}`;
+  }
+  
+  // If it's already an absolute URL, use it as-is
+  if (value.startsWith("http")) {
+    return value;
+  }
+  
+  return `${appURL}/dashboard`;
+};
+
 export default function AuthPage() {
   const [step, setStep] = useState<"signIn" | { email: string } | "forgot">(
     "signIn"
@@ -27,18 +49,18 @@ export default function AuthPage() {
       console.log("Auth page: User is authenticated, redirecting...");
       const needsProfileCompletion = user.needsProfileCompletion === true;
       const redirectTo = needsProfileCompletion
-        ? "/complete-profile"
-        : sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
+        ? normalizeRedirect("/complete-profile")
+        : normalizeRedirect(sessionStorage.getItem("redirectAfterLogin"));
       if (!needsProfileCompletion) {
         sessionStorage.removeItem("redirectAfterLogin");
       }
       // Small delay to ensure auth state is fully propagated
       setTimeout(() => {
         console.log("Auth page: Redirecting to", redirectTo);
-        setLocation(redirectTo);
+        window.location.href = redirectTo;
       }, 100);
     }
-  }, [isAuthenticated, isLoading, setLocation, user]);
+  }, [isAuthenticated, isLoading, user]);
 
   if (isLoading) {
     return (
