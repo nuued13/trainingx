@@ -402,68 +402,71 @@ export default function OpportunityDetailsPage() {
     userId ? { userId } : "skip"
   );
 
-  const storedRoadmap = useQuery(
-    api.aiMatching.getOpportunityRoadmap,
-    userId && matchId ? { opportunityId: matchId, userId } : "skip"
-  );
+//   const storedRoadmap = useQuery(
+//     api.aiMatching.getOpportunityRoadmap,
+//     userId && matchId ? { opportunityId: matchId, userId } : "skip"
+//   );
 
-  const generateRoadmap = useAction(api.aiMatching.generateOpportunityRoadmap);
-  const updateStepStatus = useMutation(api.aiMatching.updateRoadmapStepStatus);
+//   const generateRoadmap = useAction(api.aiMatching.generateOpportunityRoadmap);
+//   const updateStepStatus = useMutation(api.aiMatching.updateRoadmapStepStatus);
 
-  // Find the specific opportunity from the stored matches
-  const opportunity = useMemo((): AIOpportunity | null => {
-    if (!storedMatches?.opportunities) return null;
-    const found = storedMatches.opportunities.find(
-      (opp: any) => opp.id === matchId
-    );
-    return found as AIOpportunity | null;
-  }, [storedMatches, matchId]);
+//   // Find the specific opportunity from the stored matches
+//   const opportunity = useMemo((): AIOpportunity | null => {
+//     if (!storedMatches?.opportunities) return null;
+//     const found = storedMatches.opportunities.find(
+//       (opp: any) => opp.id === matchId
+//     );
+//     return found as AIOpportunity | null;
+//   }, [storedMatches, matchId]);
+
+  const opportunity: AIOpportunity | null = null; // Commented out query logic
 
   const matchMeta = useMemo(() => {
     if (!opportunity || !userStats) return null;
     return computeMatchMeta(opportunity, userStats);
   }, [opportunity, userStats]);
 
-  const handleGenerateRoadmap = async () => {
-    if (!opportunity || isGeneratingRoadmap) return;
+//   const handleGenerateRoadmap = async () => {
+//     if (!opportunity || isGeneratingRoadmap) return;
 
-    setIsGeneratingRoadmap(true);
-    try {
-      await generateRoadmap({
-        opportunityId: opportunity.id,
-        opportunityTitle: opportunity.title,
-        opportunityDescription: opportunity.description,
-        requiredSkills: opportunity.requiredSkills,
-        userSkills: userStats?.skills,
-      });
-    } catch (error) {
-      console.error("Failed to generate roadmap:", error);
-    } finally {
-      setIsGeneratingRoadmap(false);
-    }
-  };
+//     setIsGeneratingRoadmap(true);
+//     try {
+//       await generateRoadmap({
+//         opportunityId: opportunity.id,
+//         opportunityTitle: opportunity.title,
+//         opportunityDescription: opportunity.description,
+//         requiredSkills: opportunity.requiredSkills,
+//         userSkills: userStats?.skills,
+//       });
+//     } catch (error) {
+//       console.error("Failed to generate roadmap:", error);
+//     } finally {
+//       setIsGeneratingRoadmap(false);
+//     }
+//   };
 
-  const handleStepClick = async (
-    phaseId: string,
-    stepId: string,
-    isCompleted: boolean
-  ) => {
-    if (!storedRoadmap?._id) return;
+//   const handleStepClick = async (
+//     phaseId: string,
+//     stepId: string,
+//     isCompleted: boolean
+//   ) => {
+//     if (!storedRoadmap?._id) return;
 
-    try {
-      await updateStepStatus({
-        roadmapId: storedRoadmap._id,
-        phaseId,
-        stepId,
-        isCompleted,
-      });
-    } catch (error) {
-      console.error("Failed to update step status:", error);
-    }
-  };
+//     try {
+//       await updateStepStatus({
+//         roadmapId: storedRoadmap._id,
+//         phaseId,
+//         stepId,
+//         isCompleted,
+//       });
+//     } catch (error) {
+//       console.error("Failed to update step status:", error);
+//     }
+//   };
 
   // Loading state
-  if (!userId || userStats === undefined || storedMatches === undefined) {
+  if (!userId || userStats === undefined) {
+//   if (!userId || userStats === undefined || storedMatches === undefined) {
     return (
       <SidebarLayout>
         <div className="min-h-screen flex items-center justify-center bg-slate-50/50">
