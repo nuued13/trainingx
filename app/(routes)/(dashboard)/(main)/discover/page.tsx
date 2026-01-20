@@ -222,6 +222,8 @@ export default function DiscoverPage() {
           _dominantPath: results.dominantPath,
         },
       });
+      // Clear in-progress state after successful save
+      localStorage.removeItem(STORAGE_KEY);
     } catch (error) {
       console.error("Failed to save quiz results:", error);
       localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
@@ -252,6 +254,8 @@ export default function DiscoverPage() {
           _dominantPath: results.dominantPath,
         },
       });
+      // Clear in-progress state after successful save
+      localStorage.removeItem(STORAGE_KEY);
     } catch (error) {
       console.error("Failed to save quiz results:", error);
       localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
@@ -280,6 +284,8 @@ export default function DiscoverPage() {
           _adultType: state.adultType || "professional",
         },
       });
+      // Clear in-progress state after successful save
+      localStorage.removeItem(STORAGE_KEY);
     } catch (error) {
       console.error("Failed to save quiz results:", error);
       localStorage.setItem("pathway_quiz_results", JSON.stringify(payload));
@@ -287,8 +293,9 @@ export default function DiscoverPage() {
   };
 
   const handleSignUp = () => {
-    // Redirect to sign up, the results are already saved in localStorage
-    router.push("/sign-up?redirect=/discover/results");
+    // Save redirect path and navigate to auth
+    sessionStorage.setItem("redirectAfterLogin", "/discover/results");
+    router.push("/auth");
   };
 
   const progress =

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import {
   ArrowRight,
   ChevronRight,
@@ -43,12 +43,26 @@ export default function YouthResultsPage() {
 
   const [results, setResults] = useState<UnifiedResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [savingToConvex, setSavingToConvex] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
-  // Try to get results from Convex if logged in
-  const quizResults = useQuery(
+  const saveQuizResult = useMutation(api.quizResults.saveQuizResult);
+
+  // Try to get pathway results from Convex if logged in
+  const quizResultsPathway = useQuery(
     api.quizResults.getLatestQuizResult,
     userId ? { userId, quizType: "pathway" } : "skip"
   );
+
+  // Try to get matching results from Convex if logged in (for adults)
+  const quizResultsMatching = useQuery(
+    api.quizResults.getLatestQuizResult,
+    userId ? { userId, quizType: "matching" } : "skip"
+  );
+
+  // Use the latest result from either type
+  const quizResults = quizResultsPathway || quizResultsMatching;
 
   useEffect(() => {
     if (authLoading) return;
@@ -60,22 +74,25 @@ export default function YouthResultsPage() {
     }
 
     // Try to get results from Convex
-    if (quizResults !== undefined) {
-      if (quizResults?.answers) {
+    if (quizResultsPathway !== undefined || quizResultsMatching !== undefined) {
+      const latestResult = quizResultsPathway || quizResultsMatching;
+      if (latestResult?.answers) {
         // Parse the stored results
-        const rawScores = quizResults.answers._scores;
+        const rawScores = latestResult.answers._scores;
         const scores =
           typeof rawScores === "string"
             ? JSON.parse(rawScores)
             : rawScores || {};
 
-        const rawFilters = quizResults.answers._filters;
+        const rawFilters = latestResult.answers._filters;
         const filters =
-          typeof rawFilters === "string" ? JSON.parse(rawFilters) : rawFilters;
+          typeof rawFilters === "string"
+            ? JSON.parse(rawFilters)
+            : rawFilters;
 
-        const dominantPath = quizResults.answers._dominantPath as string;
+        const dominantPath = latestResult.answers._dominantPath as string;
         const ageGroup =
-          (quizResults.answers._ageGroup as "kid" | "teen") || "teen";
+          (latestResult.answers._ageGroup as "kid" | "teen") || "teen";
 
         setResults({
           scores,
@@ -86,7 +103,95 @@ export default function YouthResultsPage() {
       }
       setIsLoading(false);
     }
-  }, [authLoading, userId, quizResults, router]);
+  }, [authLoading, userId, quizResultsPathway, quizResultsMatching, router]);
+
+  // Save localStorage data to Convex
+  const saveLocalStorageToConvex = async () => {
+    const stored = localStorage.getItem("pathway_quiz_results");
+    if (!stored || !userId) return;
+
+    try {
+      setSavingToConvex(true);
+      const retryCountKey = "assessment_save_retry_count";
+      let currentRetry = parseInt(localStorage.getItem(retryCountKey) || "0", 10);
+
+      // If 10+ retries, only save on manual click
+      if (currentRetry >= 10 && !savingToConvex) {
+        setSaveError(true);
+        return;
+      }
+
+      const parsed = JSON.parse(stored);
+      if (!parsed.results) {
+        setSavingToConvex(false);
+        return;
+      }
+
+      const res = parsed.results;
+      const ageGroup = parsed.type as "kid" | "teen" | "adult";
+      let quizType = "pathway";
+      let payload: any = {
+        userId,
+        quizType,
+        answers: { ...res.answers },
+      };
+
+      // Convert ISO timestamp to number and add metadata
+      const completedAtTime = new Date(parsed.completedAt).getTime();
+
+      if (ageGroup === "kid" || ageGroup === "teen") {
+        payload.answers._ageGroup = ageGroup;
+        payload.answers._scores = JSON.stringify(res.scores);
+        payload.answers._dominantPath = res.dominantPath;
+        if (ageGroup === "teen" && res.filters) {
+          payload.answers._filters = JSON.stringify(res.filters);
+        }
+      } else if (ageGroup === "adult") {
+        quizType = "matching";
+        payload.quizType = quizType;
+        payload.answers._adultType = parsed.adultType || "professional";
+      }
+
+      // Save to Convex
+      await saveQuizResult(payload);
+
+      // Success - clear all localStorage keys and analytics
+      localStorage.removeItem("pathway_quiz_results");
+      localStorage.removeItem("pathway_quiz_state");
+      localStorage.removeItem(retryCountKey);
+
+      // Track success
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "assessment_results_saved", {
+          ageGroup,
+          quizType,
+        });
+      }
+
+      setSaveError(false);
+      setSavingToConvex(false);
+    } catch (error) {
+      console.error("Failed to save assessment results to Convex:", error);
+
+      // Increment retry count
+      const retryCountKey = "assessment_save_retry_count";
+      let currentRetry = parseInt(localStorage.getItem(retryCountKey) || "0", 10);
+      currentRetry++;
+      localStorage.setItem(retryCountKey, currentRetry.toString());
+      setRetryCount(currentRetry);
+
+      // Track failure
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "assessment_save_failed", {
+          error: (error as Error).message,
+          retryCount: currentRetry,
+        });
+      }
+
+      setSaveError(true);
+      setSavingToConvex(false);
+    }
+  };
 
   // Also check localStorage for results (in case they just completed the quiz)
   useEffect(() => {
@@ -104,14 +209,28 @@ export default function YouthResultsPage() {
             ageGroup: parsed.type === "kid" ? "kid" : "teen",
           });
           setIsLoading(false);
-          // Clear localStorage after loading
-          localStorage.removeItem("pathway_quiz_results");
+
+          // If user is authenticated, save to Convex (silent in background)
+          if (userId) {
+            // Load retry count from localStorage
+            const retryCountKey = "assessment_save_retry_count";
+            const storedRetry = parseInt(
+              localStorage.getItem(retryCountKey) || "0",
+              10
+            );
+            setRetryCount(storedRetry);
+
+            // Attempt save only if under retry limit or user is manually retrying
+            if (storedRetry < 10) {
+              saveLocalStorageToConvex();
+            }
+          }
         }
       } catch {
         // Invalid data
       }
     }
-  }, [results]);
+  }, [results, userId]);
 
   if (isLoading || authLoading) {
     return (
@@ -175,6 +294,35 @@ export default function YouthResultsPage() {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-12 max-w-4xl space-y-8">
+        {/* Error Banner - Save to Convex Failures */}
+        {saveError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 border-2 border-b-4 border-red-300 rounded-2xl p-4"
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex-1">
+                <p className="text-sm font-bold text-red-900">
+                  {retryCount < 3
+                    ? "We couldn't save your results. Please try again."
+                    : retryCount < 10
+                      ? "We're having trouble saving your results. Please check your internet connection and try again."
+                      : "We're still having trouble saving your results. Please manually click retry to continue."}
+                </p>
+              </div>
+              <JuicyButton
+                variant="danger"
+                size="sm"
+                onClick={saveLocalStorageToConvex}
+                disabled={savingToConvex}
+              >
+                {savingToConvex ? "Retrying..." : "Retry"}
+              </JuicyButton>
+            </div>
+          </motion.div>
+        )}
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
