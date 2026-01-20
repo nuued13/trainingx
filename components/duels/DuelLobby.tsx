@@ -361,9 +361,9 @@ export function DuelLobby({ roomId, onStart }: DuelLobbyProps) {
                     <p className="text-gray-600">Topic</p>
                     <p
                       className="font-bold text-xs truncate"
-                      title={room.trackId ? "Selected Track" : "Random Mix"}
+                      title={(room as any).trackId ? "Selected Track" : "Random Mix"}
                     >
-                      {room.trackId ? "Selected" : "Random Mix"}
+                      {(room as any).trackId ? "Selected" : "Random Mix"}
                     </p>
                   </div>
                   <div>

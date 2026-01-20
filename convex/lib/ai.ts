@@ -358,6 +358,7 @@ export const logAICall = internalMutation({
   handler: async (ctx, args) => {
     await ctx.db.insert("aiLogs", {
       ...args,
+      type: "ai_call", // Default type for generic AI calls
       createdAt: Date.now(),
     });
   },

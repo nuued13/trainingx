@@ -27,7 +27,7 @@ export const seedStarterDomain = mutation({
     });
 
     // Create Track 1: Prompt Engineering Fundamentals
-    const track1Id = await ctx.db.insert("practiceTracks", {
+    const track1Id = await (ctx.db.insert as any)("practiceTracks", {
       domainId,
       slug: "prompt-engineering-fundamentals",
       title: "Prompt Engineering Fundamentals",
@@ -47,6 +47,9 @@ export const seedStarterDomain = mutation({
     const level1Id = await ctx.db.insert("practiceLevels", {
       trackId: track1Id,
       levelNumber: 1,
+      name: "Fundamentals",
+      order: 1,
+      difficulty: 1,
       title: "Prompt Engineering Fundamentals",
       description: "Master clarity, specificity, context, roles, and output formatting",
       challengeCount: 32,
@@ -64,6 +67,7 @@ export const seedStarterDomain = mutation({
       description: "Master ChatGPT, Claude, and other AI tools",
       icon: "🤖",
       order: 2,
+      level: 2,
       levelCount: 1,
       totalChallenges: 30,
       estimatedHours: 0.67,
@@ -77,6 +81,9 @@ export const seedStarterDomain = mutation({
     await ctx.db.insert("practiceLevels", {
       trackId: track2Id,
       levelNumber: 1,
+      name: "Tool Fundamentals",
+      order: 1,
+      difficulty: 1,
       title: "AI Tool Mastery",
       description: "Master ChatGPT, Claude, Gemini - features, strengths, and when to use each",
       challengeCount: 30,
@@ -94,6 +101,7 @@ export const seedStarterDomain = mutation({
       description: "Learn reusable prompt patterns for common tasks",
       icon: "📚",
       order: 3,
+      level: 3,
       levelCount: 1,
       totalChallenges: 24,
       estimatedHours: 0.58,
@@ -107,6 +115,9 @@ export const seedStarterDomain = mutation({
     await ctx.db.insert("practiceLevels", {
       trackId: track3Id,
       levelNumber: 1,
+      name: "Pattern Library",
+      order: 1,
+      difficulty: 2,
       title: "Prompt Patterns Library",
       description: "Reusable patterns: templates, personas, chain-of-thought, few-shot, and meta-prompting",
       challengeCount: 24,
@@ -124,6 +135,7 @@ export const seedStarterDomain = mutation({
       description: "Master chain-of-thought, self-consistency, and reasoning strategies",
       icon: "🧠",
       order: 4,
+      level: 4,
       levelCount: 1,
       totalChallenges: 28,
       estimatedHours: 0.7,
@@ -136,6 +148,9 @@ export const seedStarterDomain = mutation({
     await ctx.db.insert("practiceLevels", {
       trackId: track4Id,
       levelNumber: 1,
+      name: "Advanced Techniques",
+      order: 1,
+      difficulty: 3,
       title: "Advanced Prompting Techniques",
       description: "Chain-of-thought, self-consistency, tree-of-thought, and complex reasoning",
       challengeCount: 28,
@@ -153,6 +168,7 @@ export const seedStarterDomain = mutation({
       description: "Learn to refine, test, and debug prompts systematically",
       icon: "🔧",
       order: 5,
+      level: 5,
       levelCount: 1,
       totalChallenges: 26,
       estimatedHours: 0.65,
@@ -165,6 +181,9 @@ export const seedStarterDomain = mutation({
     await ctx.db.insert("practiceLevels", {
       trackId: track5Id,
       levelNumber: 1,
+      name: "Optimization & Debugging",
+      order: 1,
+      difficulty: 2,
       title: "Prompt Optimization & Debugging",
       description: "Iterative refinement, A/B testing, error analysis, and systematic debugging",
       challengeCount: 26,
@@ -182,6 +201,7 @@ export const seedStarterDomain = mutation({
       description: "Master conversation flow, context windows, and memory techniques",
       icon: "💭",
       order: 6,
+      level: 6,
       levelCount: 1,
       totalChallenges: 22,
       estimatedHours: 0.55,
@@ -194,6 +214,9 @@ export const seedStarterDomain = mutation({
     await ctx.db.insert("practiceLevels", {
       trackId: track6Id,
       levelNumber: 1,
+      name: "Context & Memory",
+      order: 1,
+      difficulty: 2,
       title: "Context Management & Memory",
       description: "Context windows, conversation state, memory techniques, and multi-turn interactions",
       challengeCount: 22,
@@ -211,6 +234,7 @@ export const seedStarterDomain = mutation({
       description: "Understand AI limitations, biases, and responsible usage",
       icon: "🛡️",
       order: 7,
+      level: 7,
       levelCount: 1,
       totalChallenges: 20,
       estimatedHours: 0.5,
@@ -223,6 +247,9 @@ export const seedStarterDomain = mutation({
     await ctx.db.insert("practiceLevels", {
       trackId: track7Id,
       levelNumber: 1,
+      name: "Safety & Ethics",
+      order: 1,
+      difficulty: 1,
       title: "Safety, Ethics & Bias",
       description: "AI limitations, bias detection, ethical considerations, and responsible prompting",
       challengeCount: 20,
@@ -240,6 +267,7 @@ export const seedStarterDomain = mutation({
       description: "Work with images, audio, video, and mixed media inputs",
       icon: "🎬",
       order: 8,
+      level: 8,
       levelCount: 1,
       totalChallenges: 25,
       estimatedHours: 0.62,
@@ -252,6 +280,9 @@ export const seedStarterDomain = mutation({
     await ctx.db.insert("practiceLevels", {
       trackId: track8Id,
       levelNumber: 1,
+      name: "Multimodal Basics",
+      order: 1,
+      difficulty: 2,
       title: "Multimodal Prompting",
       description: "Image analysis, vision prompts, audio processing, and cross-modal reasoning",
       challengeCount: 25,

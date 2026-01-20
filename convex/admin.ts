@@ -421,26 +421,26 @@ export const getAICostStats = query({
     // Combine all logs
     const allLogs = [...normalizedOldLogs, ...newLogs];
 
-    const totalCost = allLogs.reduce((sum, log) => sum + (log.cost || 0), 0);
+    const totalCost = allLogs.reduce((sum, log: any) => sum + (log.cost || 0), 0);
     const totalTokens = allLogs.reduce(
-      (sum, log) => sum + (log.totalTokens || 0),
+      (sum, log: any) => sum + (log.totalTokens || log.tokens || 0),
       0
     );
     const avgLatency =
       allLogs.length > 0
-        ? allLogs.reduce((sum, log) => sum + (log.latencyMs || 0), 0) /
+        ? allLogs.reduce((sum, log: any) => sum + (log.latencyMs || 0), 0) /
           allLogs.length
         : 0;
     const successRate =
       allLogs.length > 0
-        ? (allLogs.filter((log) => log.success).length / allLogs.length) * 100
+        ? (allLogs.filter((log: any) => log.success).length / allLogs.length) * 100
         : 100;
 
     // Cost by day
     const byDay: Record<string, number> = {};
     for (const log of allLogs) {
-      const date = new Date(log.createdAt).toISOString().split("T")[0];
-      byDay[date] = (byDay[date] || 0) + (log.cost || 0);
+      const date = new Date((log as any).createdAt).toISOString().split("T")[0];
+      byDay[date] = (byDay[date] || 0) + ((log as any).cost || 0);
     }
     const costByDay = Object.entries(byDay)
       .map(([date, cost]) => ({ date, cost: Math.round(cost * 100) / 100 }))
@@ -449,10 +449,10 @@ export const getAICostStats = query({
     // Cost by provider
     const byProvider: Record<string, { count: number; cost: number }> = {};
     for (const log of allLogs) {
-      const provider = log.provider || "unknown";
+      const provider = (log as any).provider || "unknown";
       if (!byProvider[provider]) byProvider[provider] = { count: 0, cost: 0 };
       byProvider[provider].count++;
-      byProvider[provider].cost += log.cost || 0;
+      byProvider[provider].cost += (log as any).cost || 0;
     }
     const costByProvider = Object.entries(byProvider).map(
       ([provider, data]) => ({
@@ -468,12 +468,12 @@ export const getAICostStats = query({
       { count: number; cost: number; tokens: number }
     > = {};
     for (const log of allLogs) {
-      const feature = log.feature || "unknown";
+      const feature = (log as any).feature || "unknown";
       if (!byFeature[feature])
         byFeature[feature] = { count: 0, cost: 0, tokens: 0 };
       byFeature[feature].count++;
-      byFeature[feature].cost += log.cost || 0;
-      byFeature[feature].tokens += log.totalTokens || 0;
+      byFeature[feature].cost += (log as any).cost || 0;
+      byFeature[feature].tokens += (log as any).totalTokens || (log as any).tokens || 0;
     }
     const costByFeature = Object.entries(byFeature)
       .map(([feature, data]) => ({
@@ -525,20 +525,19 @@ export const getModerationStats = query({
       .query("moderationQueue")
       .withIndex("by_status", (q) => q.eq("status", "pending"))
       .collect();
-
     // Calculate stats
-    const approved = logs.filter((l) => l.finalDecision === "approved").length;
-    const rejected = logs.filter((l) => l.finalDecision === "rejected").length;
+    const approved = logs.filter((l: any) => (l.finalDecision || l.resolution) === "approved").length;
+    const rejected = logs.filter((l: any) => (l.finalDecision || l.resolution) === "rejected").length;
     const escalated = logs.filter(
-      (l) => l.finalDecision === "escalated"
+      (l: any) => (l.finalDecision || l.resolution) === "escalated"
     ).length;
 
     const avgLatency =
       logs.length > 0
-        ? logs.reduce((sum, l) => sum + l.totalLatencyMs, 0) / logs.length
+        ? logs.reduce((sum, l: any) => sum + (l.totalLatencyMs || 0), 0) / logs.length
         : 0;
 
-    const totalCost = logs.reduce((sum, l) => sum + l.estimatedCost, 0);
+    const totalCost = logs.reduce((sum, l: any) => sum + (l.estimatedCost || 0), 0);
 
     // Moderation by day
     const byDay: Record<
@@ -546,23 +545,24 @@ export const getModerationStats = query({
       { approved: number; rejected: number; escalated: number }
     > = {};
     for (const log of logs) {
-      const date = new Date(log.createdAt).toISOString().split("T")[0];
+      const logAny = log as any;
+      const date = new Date(logAny.createdAt).toISOString().split("T")[0];
       if (!byDay[date])
         byDay[date] = { approved: 0, rejected: 0, escalated: 0 };
-      if (log.finalDecision === "approved") byDay[date].approved++;
-      if (log.finalDecision === "rejected") byDay[date].rejected++;
-      if (log.finalDecision === "escalated") byDay[date].escalated++;
+      if ((logAny.finalDecision || logAny.resolution) === "approved") byDay[date].approved++;
+      if ((logAny.finalDecision || logAny.resolution) === "rejected") byDay[date].rejected++;
+      if ((logAny.finalDecision || logAny.resolution) === "escalated") byDay[date].escalated++;
     }
 
     const moderationByDay = Object.entries(byDay)
       .map(([date, counts]) => ({ date, ...counts }))
       .sort((a, b) => a.date.localeCompare(b.date));
-
     // Top flagged categories (from rejected posts)
     const categoryCount: Record<string, number> = {};
     for (const log of logs) {
-      if (log.textResult?.flaggedCategories) {
-        for (const cat of log.textResult.flaggedCategories) {
+      const logAny = log as any;
+      if (logAny.textResult?.flaggedCategories) {
+        for (const cat of logAny.textResult.flaggedCategories) {
           categoryCount[cat] = (categoryCount[cat] || 0) + 1;
         }
       }

@@ -7,6 +7,7 @@ export default defineSchema({
   users: defineTable({
     name: v.optional(v.string()),
     image: v.optional(v.string()),
+    customImageId: v.optional(v.id("_storage")),
     email: v.optional(v.string()),
     emailVerificationTime: v.optional(v.number()),
     phone: v.optional(v.string()),
@@ -14,6 +15,9 @@ export default defineSchema({
     isAnonymous: v.optional(v.boolean()),
     // Custom field.
     favoriteColor: v.optional(v.string()),
+    age: v.optional(v.number()),
+    gender: v.optional(v.string()),
+    needsProfileCompletion: v.optional(v.boolean()),
   })
     .index("email", ["email"])
     .index("phone", ["phone"]),
@@ -39,6 +43,7 @@ export default defineSchema({
 
   // Projects and exercises (generic)
   projects: defineTable({
+    slug: v.string(),
     title: v.string(),
     description: v.string(),
     difficulty: v.string(),
@@ -47,6 +52,7 @@ export default defineSchema({
     tags: v.array(v.string()),
     authorId: v.id("users"),
     isPublished: v.boolean(),
+    starterPrompt: v.optional(v.string()),
     steps: v.array(v.object({
       title: v.string(),
       content: v.string(),
@@ -56,7 +62,7 @@ export default defineSchema({
     })),
     requirements: v.array(v.string()),
     learningObjectives: v.array(v.string())
-  }).index("by_category", ["category"]).index("by_difficulty", ["difficulty"]),
+  }).index("by_category", ["category"]).index("by_difficulty", ["difficulty"]).index("by_slug", ["slug"]),
 
   // Practice Zone projects (from projects-seed.json)
   practiceProjects: defineTable({
@@ -234,12 +240,15 @@ weight: v.number()
     authorId: v.id("users"),
     category: v.string(),
     tags: v.array(v.string()),
+    media: v.optional(v.array(v.any())), // Array of media objects { type: "image" | "video", url: string }
     upvotes: v.number(),
     downvotes: v.number(),
+    bookmarks: v.optional(v.number()), // Number of bookmarks
     viewCount: v.number(),
     replyCount: v.number(),
     isPinned: v.boolean(),
     isLocked: v.boolean(),
+    moderationStatus: v.optional(v.string()), // "approved" | "flagged" | "pending"
     createdAt: v.number(),
     updatedAt: v.number()
   }).index("by_category", ["category"]).index("by_author", ["authorId"]).index("latest", ["createdAt"]),
@@ -298,6 +307,160 @@ weight: v.number()
       score: v.optional(v.number())
     }))
   }).index("by_user", ["userId"]).index("by_verification", ["verificationCode"]),
+
+  // Practice Levels (difficulty levels or skill progression)
+  practiceLevels: defineTable({
+    name: v.string(),
+    description: v.optional(v.string()),
+    difficulty: v.number(), // 1-5 or similar scale
+    order: v.number(),
+    trackId: v.optional(v.id("practiceTracks")),
+    levelNumber: v.optional(v.number()),
+    title: v.optional(v.string()),
+    challengeCount: v.optional(v.number()),
+    estimatedMinutes: v.optional(v.number()),
+    requiredScore: v.optional(v.number()),
+    difficultyRange: v.optional(v.object({
+      min: v.number(),
+      max: v.number(),
+    })),
+    status: v.optional(v.string()),
+    createdBy: v.optional(v.id("users")),
+    isUserGenerated: v.optional(v.boolean()),
+  })
+    .index("by_difficulty", ["difficulty"])
+    .index("by_order", ["order"])
+    .index("by_track", ["trackId"])
+    .index("by_track_level", ["trackId", "levelNumber"]),
+
+  // Practice Domains (curriculum areas)
+  practiceDomains: defineTable({
+    slug: v.string(),
+    title: v.string(),
+    description: v.string(),
+    icon: v.optional(v.string()),
+    color: v.optional(v.string()),
+    status: v.string(), // "draft" | "live" | "archived"
+    createdBy: v.optional(v.id("users")),
+    trackCount: v.optional(v.number()),
+    isStarter: v.optional(v.boolean()),
+    order: v.optional(v.number()),
+    isUserGenerated: v.optional(v.boolean()),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"]),
+
+  // Domain Assessments (certification tests)
+  domainAssessments: defineTable({
+    domainId: v.id("practiceDomains"),
+    title: v.string(),
+    description: v.string(),
+    passingScore: v.number(),
+    timeLimit: v.optional(v.number()), // in minutes
+    questionCount: v.optional(v.number()),
+    maxAttempts: v.optional(v.number()),
+    cooldownHours: v.optional(v.number()),
+    status: v.string(), // "draft" | "live" | "archived"
+  })
+    .index("by_domain", ["domainId"])
+    .index("by_status", ["status"]),
+
+  // Domain Assessment Questions
+  domainAssessmentQuestions: defineTable({
+    assessmentId: v.id("domainAssessments"),
+    type: v.string(), // "multiple-choice" | "prompt-engineering" | "scenario"
+    order: v.number(),
+    scenario: v.optional(v.string()),
+    question: v.string(),
+    options: v.optional(v.array(v.object({
+      id: v.string(),
+      text: v.string(),
+      isCorrect: v.boolean(),
+    }))),
+    promptGoal: v.optional(v.string()),
+    promptRubric: v.optional(v.object({
+      criteria: v.array(v.object({
+        name: v.string(),
+        weight: v.number(),
+        description: v.string(),
+      })),
+    })),
+    idealAnswer: v.optional(v.string()),
+    points: v.number(),
+    difficulty: v.string(),
+    tags: v.array(v.string()),
+    status: v.string(), // "draft" | "live"
+  })
+    .index("by_assessment", ["assessmentId"])
+    .index("by_type", ["type"])
+    .index("by_difficulty", ["difficulty"]),
+
+  // Domain Assessment Attempts (user test submissions)
+  domainAssessmentAttempts: defineTable({
+    userId: v.id("users"),
+    assessmentId: v.id("domainAssessments"),
+    questionIds: v.optional(v.array(v.id("domainAssessmentQuestions"))),
+    attemptNumber: v.optional(v.number()),
+    answers: v.array(v.object({
+      questionId: v.any(), // Can be string or Id
+      answer: v.optional(v.any()),
+      response: v.optional(v.any()),
+      score: v.number(),
+      correct: v.optional(v.boolean()),
+      isCorrect: v.optional(v.boolean()),
+      aiEvaluation: v.optional(v.object({
+        rationale: v.string(),
+        rubricScores: v.any(),
+      })),
+    })),
+    totalScore: v.optional(v.number()),
+    passed: v.optional(v.boolean()),
+    startedAt: v.number(),
+    completedAt: v.optional(v.number()),
+    timeSpent: v.optional(v.number()),
+    tabSwitchCount: v.optional(v.number()),
+    flaggedForReview: v.optional(v.boolean()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_assessment", ["assessmentId"])
+    .index("by_user_assessment", ["userId", "assessmentId"]),
+
+  // Domain Certificates (AI Career Readiness and domain-specific)
+  domainCertificates: defineTable({
+    userId: v.id("users"),
+    domainId: v.id("practiceDomains"),
+    assessmentAttemptId: v.id("domainAssessmentAttempts"),
+    certificateId: v.string(),
+    userName: v.string(),
+    score: v.number(),
+    issuedAt: v.number(),
+    pdfUrl: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_certificate_id", ["certificateId"])
+    .index("by_domain", ["domainId"]),
+
+  // Certificate counters for sequential ID generation
+  certificateCounters: defineTable({
+    year: v.number(),
+    lastNumber: v.number(),
+  })
+    .index("by_year", ["year"]),
+
+  // Custom Domain Requests (user-generated curriculum requests)
+  customDomainRequests: defineTable({
+    userId: v.id("users"),
+    manifesto: v.string(),
+    status: v.string(), // "queued" | "generating" | "calibrating" | "live" | "failed"
+    progress: v.number(),
+    logs: v.array(v.string()),
+    domainId: v.optional(v.id("practiceDomains")),
+    errorMessage: v.optional(v.string()),
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"]),
 
   // Learning paths and recommendations
   learningPaths: defineTable({
@@ -467,10 +630,19 @@ weight: v.number()
     order: v.number(),
     tags: v.array(v.string()),
     status: v.string(), // "draft" | "live" | "archived"
+    domainId: v.optional(v.id("practiceDomains")),
+    levelCount: v.optional(v.number()),
+    totalChallenges: v.optional(v.number()),
+    estimatedHours: v.optional(v.number()),
+    difficulty: v.optional(v.string()),
+    prerequisites: v.optional(v.array(v.string())),
+    createdBy: v.optional(v.id("users")),
+    isUserGenerated: v.optional(v.boolean()),
   })
     .index("by_slug", ["slug"])
     .index("by_level", ["level"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_domain", ["domainId"]),
 
   // Practice Scenarios (reusable context shells)
   practiceScenarios: defineTable({
@@ -526,6 +698,9 @@ weight: v.number()
   practiceItems: defineTable({
     templateId: v.id("practiceItemTemplates"),
     scenarioId: v.optional(v.id("practiceScenarios")),
+    levelId: v.optional(v.id("practiceLevels")),
+    type: v.optional(v.string()), // "rate" | "multiple-choice" | "prompt-draft" etc.
+    category: v.optional(v.string()), // "custom" | "standard" etc.
     params: v.any(),
     version: v.string(),
     elo: v.number(),
@@ -539,7 +714,8 @@ weight: v.number()
     .index("by_template", ["templateId"])
     .index("by_scenario", ["scenarioId"])
     .index("by_status", ["status"])
-    .index("by_difficulty", ["difficultyBand"]),
+    .index("by_difficulty", ["difficultyBand"])
+    .index("by_level", ["levelId"]),
 
   // Practice Activities (project step definitions)
   practiceActivities: defineTable({
@@ -813,6 +989,9 @@ weight: v.number()
     hostId: v.id("users"), // Room creator
     participants: v.array(v.id("users")), // All players in room
     itemIds: v.array(v.id("practiceItems")),
+    trackId: v.optional(v.id("practiceTracks")),
+    trackSlug: v.optional(v.string()),
+    questions: v.optional(v.any()), // For local-file duels
     status: v.string(), // "lobby" | "open" | "active" | "completed" | "expired"
     scores: v.object({}), // Map of userId -> score (stored as strings)
     rankings: v.optional(v.array(v.object({
@@ -975,4 +1154,226 @@ weight: v.number()
     .index("by_referrer", ["referrerId"])
     .index("by_code", ["referralCode"])
     .index("by_status", ["status"]),
+
+  // AI Logs (for tracking AI API calls and usage)
+  aiLogs: defineTable({
+    type: v.string(), // "prompt_completion", "image_generation", etc.
+    model: v.optional(v.string()),
+    prompt: v.optional(v.string()),
+    response: v.optional(v.string()),
+    tokens: v.optional(v.number()),
+    cost: v.optional(v.number()),
+    userId: v.optional(v.id("users")),
+    createdAt: v.number(),
+    metadata: v.optional(v.object({})),
+    feature: v.optional(v.string()), // "moderation", "matching", "evaluation", etc.
+    provider: v.optional(v.string()), // "openai", "anthropic", etc.
+    promptTokens: v.optional(v.number()),
+    completionTokens: v.optional(v.number()),
+    totalTokens: v.optional(v.number()),
+    latencyMs: v.optional(v.number()),
+    success: v.optional(v.boolean()),
+    errorMessage: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_createdAt", ["createdAt"])
+    .index("by_type", ["type"]),
+
+  // Moderation Audit Logs
+  moderationAuditLog: defineTable({
+    action: v.string(), // "flagged", "approved", "rejected", "warning", etc.
+    targetType: v.string(), // "post", "comment", "user", "content", etc.
+    targetId: v.string(),
+    reason: v.optional(v.string()),
+    moderatorId: v.optional(v.id("users")),
+    severity: v.optional(v.string()), // "low", "medium", "high", "critical"
+    resolved: v.boolean(),
+    createdAt: v.number(),
+    resolvedAt: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    // Legacy fields for compatibility
+    contentId: v.optional(v.id("posts")),
+    reasoning: v.optional(v.string()),
+    commentId: v.optional(v.id("comments")),
+    textResult: v.optional(v.object({
+      model: v.optional(v.string()),
+      latencyMs: v.optional(v.number()),
+      approved: v.optional(v.boolean()),
+      tokensUsed: v.optional(v.number()),
+      flaggedCategories: v.optional(v.array(v.string())),
+    })),
+    mediaResult: v.optional(v.object({})),
+    textChecked: v.optional(v.boolean()),
+    mediaChecked: v.optional(v.boolean()),
+  })
+    .index("by_date", ["createdAt"])
+    .index("by_targetType", ["targetType"])
+    .index("by_resolved", ["resolved"]),
+
+  // Moderation Queue
+  moderationQueue: defineTable({
+    targetType: v.string(), // "post", "comment", "user", "content", etc.
+    targetId: v.string(),
+    content: v.optional(v.string()),
+    reportedBy: v.optional(v.id("users")),
+    reportReason: v.optional(v.string()),
+    status: v.string(), // "pending", "reviewing", "approved", "rejected"
+    priority: v.optional(v.string()), // "low", "medium", "high", "urgent"
+    assignedTo: v.optional(v.id("users")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    resolution: v.optional(v.string()),
+    // Legacy fields for compatibility
+    contentType: v.optional(v.string()),
+    authorId: v.optional(v.id("users")),
+    text: v.optional(v.string()),
+    textModerationResult: v.optional(v.object({
+      approved: v.boolean(),
+      categories: v.optional(v.array(v.string())),
+      scores: v.optional(v.object({})),
+      reasoning: v.optional(v.string()),
+    })),
+  })
+    .index("by_status", ["status"])
+    .index("by_priority", ["priority"])
+    .index("by_createdAt", ["createdAt"]),
+
+  // Opportunity Roadmaps (learning paths for career opportunities)
+  opportunityRoadmaps: defineTable({
+    userId: v.id("users"),
+    opportunityId: v.string(),
+    title: v.optional(v.string()),
+    milestones: v.optional(v.array(v.object({
+      title: v.string(),
+      description: v.optional(v.string()),
+      dueDate: v.optional(v.number()),
+      completed: v.boolean(),
+    }))),
+    progress: v.number(), // 0-100
+    status: v.string(), // "active", "completed", "abandoned"
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_user_opportunity", ["userId", "opportunityId"])
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"]),
+
+  // Career Coach Conversations
+  careerCoachConversations: defineTable({
+    userId: v.id("users"),
+    messages: v.array(v.object({
+      role: v.string(), // "user" or "assistant"
+      content: v.string(),
+      timestamp: v.number(),
+    })),
+    topic: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_updatedAt", ["updatedAt"]),
+
+  // User Track Progress (learning progress tracking)
+  userTrackProgress: defineTable({
+    userId: v.id("users"),
+    trackId: v.id("practiceTracks"),
+    progress: v.number(), // 0-100
+    percentComplete: v.optional(v.number()), // Legacy field - same as progress
+    totalChallenges: v.optional(v.number()),
+    completedChallenges: v.optional(v.number()),
+    totalChallengesCompleted: v.optional(v.number()), // Same as completedChallenges
+    completedLevels: v.optional(v.number()), // Number of completed levels
+    currentLevel: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    lastAccessedAt: v.number(),
+    status: v.string(), // "not_started", "in_progress", "completed"
+  })
+    .index("by_user_track", ["userId", "trackId"])
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_track", ["trackId"]),
+
+  // User Level Progress (level completion tracking)
+  userLevelProgress: defineTable({
+    userId: v.id("users"),
+    levelId: v.id("practiceLevels"),
+    challengesCompleted: v.number(),
+    completedChallengeIds: v.array(v.id("practiceItems")),
+    totalChallenges: v.number(),
+    percentComplete: v.number(),
+    averageScore: v.number(),
+    status: v.string(), // "in_progress", "completed"
+  })
+    .index("by_user_level", ["userId", "levelId"])
+    .index("by_user", ["userId"])
+    .index("by_level", ["levelId"])
+    .index("by_status", ["status"]),
+
+  // User Domain Unlocks (domain access tracking)
+  userDomainUnlocks: defineTable({
+    userId: v.id("users"),
+    domainId: v.id("practiceDomains"),
+    unlockedAt: v.number(),
+    unlockedBy: v.string(), // "assessment", "admin", "purchase", etc.
+  })
+    .index("by_user_domain", ["userId", "domainId"])
+    .index("by_user", ["userId"])
+    .index("by_domain", ["domainId"]),
+
+  // Feedback (user feedback submissions)
+  feedback: defineTable({
+    userId: v.id("users"),
+    sentiment: v.string(), // "positive" | "negative" | "neutral"
+    score: v.optional(v.number()),
+    tags: v.array(v.string()),
+    message: v.optional(v.string()),
+    contactOk: v.boolean(),
+    contactEmail: v.optional(v.string()),
+    page: v.optional(v.string()),
+    feature: v.optional(v.string()),
+    env: v.optional(v.object({
+      userAgent: v.optional(v.string()),
+      viewport: v.optional(v.string()),
+    })),
+    reward: v.optional(v.object({
+      xp: v.number(),
+      badgeAwarded: v.optional(v.string()),
+    })),
+    status: v.string(), // "new" | "reviewed" | "resolved"
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_createdAt", ["createdAt"]),
+
+  // User Bookmarks (post saving)
+  userBookmarks: defineTable({
+    userId: v.id("users"),
+    postId: v.id("posts"),
+    createdAt: v.number(),
+  })
+    .index("by_user_post", ["userId", "postId"])
+    .index("by_user", ["userId"])
+    .index("by_post", ["postId"]),
+
+  // Practice Zone Progress (user progress in practice zones by difficulty/track)
+  practiceZoneProgress: defineTable({
+    userId: v.id("users"),
+    difficulty: v.string(), // "beginner" | "intermediate" | "advanced"
+    track: v.string(), // Track slug
+    completedQuestionIds: v.array(v.string()),
+    scores: v.optional(v.object({})), // Map of questionId -> score
+    totalScore: v.number(),
+    correctAnswers: v.number(),
+    bestStreak: v.number(),
+    attempts: v.number(),
+    lastPlayedAt: v.number(),
+    currentLevel: v.optional(v.number()),
+    totalExperience: v.optional(v.number()),
+    learningGoals: v.optional(v.array(v.any())),
+  })
+    .index("by_user", ["userId"])
+    .index("by_difficulty", ["difficulty"])
+    .index("by_user_difficulty_track", ["userId", "difficulty", "track"]),
 });

@@ -244,6 +244,7 @@ export const logModerationCall = internalMutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("aiLogs", {
+      type: "moderation",
       feature: args.feature,
       provider: "openai",
       model: args.model,
@@ -276,6 +277,8 @@ export const queueForReview = internalMutation({
   },
   handler: async (ctx, args) => {
     const queueId = await ctx.db.insert("moderationQueue", {
+      targetType: args.contentType,
+      targetId: args.authorId.toString(),
       contentType: args.contentType,
       authorId: args.authorId,
       text: `${args.title}\n\n${args.content}`,
@@ -287,6 +290,7 @@ export const queueForReview = internalMutation({
       },
       status: "pending",
       createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
 
     // TODO: Optionally notify moderators here (webhook, email, etc.)
@@ -330,8 +334,14 @@ export const createAuditLog = internalMutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("moderationAuditLog", {
-      ...args,
+      action: args.action || "flagged",
+      targetType: args.contentId ? "post" : (args.commentId ? "comment" : "content"),
+      targetId: (args.contentId || args.commentId || "").toString(),
+      reason: args.reasoning,
+      resolved: false,
       createdAt: Date.now(),
+      // Legacy fields
+      ...args,
     });
   },
 });
@@ -372,14 +382,14 @@ export const getModerationStats = internalQuery({
 
     return {
       total: logs.length,
-      approved: logs.filter((l) => l.finalDecision === "approved").length,
-      rejected: logs.filter((l) => l.finalDecision === "rejected").length,
-      escalated: logs.filter((l) => l.finalDecision === "escalated").length,
+      approved: logs.filter((l: any) => l.finalDecision === "approved" || l.action === "approved").length,
+      rejected: logs.filter((l: any) => l.finalDecision === "rejected" || l.action === "rejected").length,
+      escalated: logs.filter((l: any) => l.finalDecision === "escalated").length,
       avgLatencyMs:
         logs.length > 0
-          ? logs.reduce((sum, l) => sum + l.totalLatencyMs, 0) / logs.length
+          ? logs.reduce((sum, l: any) => sum + (l.totalLatencyMs || 0), 0) / logs.length
           : 0,
-      totalCost: logs.reduce((sum, l) => sum + l.estimatedCost, 0),
+      totalCost: logs.reduce((sum, l: any) => sum + (l.estimatedCost || 0), 0),
     };
   },
 });

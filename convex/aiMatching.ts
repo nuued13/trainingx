@@ -14,6 +14,7 @@ export const generateAIMatches = action({
     }),
   },
   handler: async (ctx, args) => {
+    const { quizAnswers, userProfile } = args;
     const systemPrompt = `You are an expert AI career advisor. Based on the user's quiz responses and profile, generate 5 highly personalized AI career opportunities that perfectly match their preferences, skills, and goals.
 
 Each opportunity should be unique, specific, and actionable. Include a mix of types based on their preferences (full-time careers, freelance gigs, business ideas, or specialized trades).
@@ -453,8 +454,16 @@ export const saveOpportunityRoadmap = mutation({
     return await ctx.db.insert("opportunityRoadmaps", {
       userId,
       opportunityId,
-      ...roadmap,
-      generatedAt: Date.now(),
+      title: roadmap.goalTitle,
+      milestones: roadmap.phases.map(phase => ({
+        title: phase.title,
+        description: phase.description,
+        completed: false,
+      })),
+      status: "active",
+      progress: 0,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
   },
 });
@@ -500,53 +509,29 @@ export const updateRoadmapStepStatus = mutation({
       throw new Error("Roadmap not found");
     }
 
-    // Update the step completion status
-    const updatedPhases = roadmap.phases.map((phase) => {
-      if (phase.id === phaseId) {
-        return {
-          ...phase,
-          steps: phase.steps.map((step: any) => {
-            if (step.id === stepId) {
-              return { ...step, isCompleted };
-            }
-            return step;
-          }),
-        };
-      }
-      return phase;
-    });
-
-    // Check if phase should be completed or next phase unlocked
-    const currentPhaseIndex = updatedPhases.findIndex((p) => p.id === phaseId);
-    if (currentPhaseIndex >= 0) {
-      const currentPhase = updatedPhases[currentPhaseIndex];
-      const allRequiredStepsComplete = currentPhase.steps
-        .filter((s: any) => s.isRequired)
-        .every((s: any) => s.isCompleted);
-
-      if (allRequiredStepsComplete && currentPhase.status === "current") {
-        // Mark current phase as completed
-        updatedPhases[currentPhaseIndex] = {
-          ...currentPhase,
-          status: "completed",
-        };
-
-        // Unlock next phase if exists
-        if (currentPhaseIndex + 1 < updatedPhases.length) {
-          updatedPhases[currentPhaseIndex + 1] = {
-            ...updatedPhases[currentPhaseIndex + 1],
-            status: "current",
-          };
+    // For the simplified schema, update milestones if it matches the phaseId
+    if (roadmap.milestones) {
+      const updatedMilestones = roadmap.milestones.map(m => {
+        if (m.title === phaseId) {
+          return { ...m, completed: isCompleted };
         }
-      }
+        return m;
+      });
+
+      // Calculate progress
+      const completedCount = updatedMilestones.filter(m => m.completed).length;
+      const progress = Math.round((completedCount / updatedMilestones.length) * 100);
+
+      await ctx.db.patch(roadmapId, {
+        milestones: updatedMilestones,
+        progress,
+        status: progress === 100 ? "completed" : "active",
+        updatedAt: Date.now(),
+        completedAt: progress === 100 ? Date.now() : undefined,
+      });
     }
 
-    await ctx.db.patch(roadmapId, {
-      phases: updatedPhases,
-      updatedAt: Date.now(),
-    });
-
-    return { success: true };
+    return roadmapId;
   },
 });
 

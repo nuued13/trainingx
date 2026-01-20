@@ -37,7 +37,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   useEffect(() => {
     if (isLoading || !isAuthenticated) return;
-    if (!user?.needsProfileCompletion) return;
+    if (!(user as any)?.needsProfileCompletion) return;
     if (location === '/complete-profile') return;
 
     const shouldStoreRedirect =
@@ -51,7 +51,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     isLoading,
     location,
     setLocation,
-    user?.needsProfileCompletion,
+    (user as any)?.needsProfileCompletion,
   ]);
 
   const value: AuthContext = {

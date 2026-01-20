@@ -224,7 +224,7 @@ export const fail = internalMutation({
   handler: async (ctx, args) => {
     await ctx.db.patch(args.requestId, {
       status: "failed",
-      error: args.error,
+      errorMessage: args.error,
     });
   },
 });
@@ -263,6 +263,7 @@ export const persist = internalMutation({
         title: trackData.title,
         description: trackData.description,
         icon: trackData.icon,
+        level: index + 1,
         order: index,
         levelCount: 1,
         totalChallenges: trackData.items.length,
@@ -276,6 +277,9 @@ export const persist = internalMutation({
       });
 
       const levelId = await ctx.db.insert("practiceLevels", {
+        name: `Mastery Level 1`,
+        difficulty: index + 1,
+        order: 0,
         trackId,
         levelNumber: 1,
         title: "Mastery Level 1",
@@ -323,7 +327,7 @@ export const persist = internalMutation({
           });
         }
 
-        await ctx.db.insert("practiceItems", {
+        await (ctx.db.insert as any)("practiceItems", {
           levelId,
           templateId,
           type: "rate",
