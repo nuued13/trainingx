@@ -40,10 +40,10 @@ export function ProjectFormModal({
 
   // Auto-suggest difficulty based on age
   useEffect(() => {
-    if (user?.age) {
-      if (user.age < 12) {
+    if ((user as any)?.age) {
+      if ((user as any).age < 12) {
         setFormData((prev) => ({ ...prev, difficulty: "Beginner" }));
-      } else if (user.age < 16) {
+      } else if ((user as any).age < 16) {
         setFormData((prev) => ({ ...prev, difficulty: "Intermediate" }));
       }
     }

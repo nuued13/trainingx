@@ -100,7 +100,7 @@ export const getAICareerCertificate = query({
         icon: generalDomain.icon,
         slug: generalDomain.slug,
       },
-    };
+    } as any;
   },
 });
 
@@ -168,7 +168,7 @@ export const checkEligibility = query({
         return {
           trackId: track._id,
           trackTitle: track.title,
-          completed: progress?.percentComplete === 100,
+          completed: progress?.progress === 100,
         };
       })
     );

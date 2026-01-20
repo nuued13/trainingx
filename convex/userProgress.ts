@@ -181,7 +181,7 @@ export const updateLevelProgress = mutation({
     if (existing) {
       // Check if this challenge was already completed (prevent duplicates)
       const existingIds = existing.completedChallengeIds || [];
-      if (existingIds.includes(args.challengeId)) {
+      if (existingIds.includes(args.challengeId as any)) {
         // Ensure track progress is in sync even if level progress didn't change (self-healing)
         await calculateAndUpdateTrackProgress(ctx, args.userId, level.trackId);
 
@@ -194,7 +194,7 @@ export const updateLevelProgress = mutation({
       }
 
       // Add new challenge to completed list
-      const newCompletedIds = [...existingIds, args.challengeId];
+      const newCompletedIds = [...existingIds, args.challengeId] as any;
       const newCompleted = newCompletedIds.length;
       const newPercent = Math.round(
         (newCompleted / existing.totalChallenges) * 100
@@ -222,7 +222,7 @@ export const updateLevelProgress = mutation({
       };
     } else {
       // Create new progress
-      const newCompletedIds = [args.challengeId];
+      const newCompletedIds = [args.challengeId] as any;
       const newCompleted = 1;
       const newPercent = Math.round(
         (newCompleted / level.challengeCount) * 100

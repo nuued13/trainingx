@@ -14,7 +14,7 @@ export const list = query({
     }
 
     if (args.difficultyLevel) {
-      tasks = tasks.filter((t) => t.difficultyLevel === args.difficultyLevel);
+      tasks = tasks.filter((t) => t.difficulty === (args.difficultyLevel as any));
     }
 
     return tasks;

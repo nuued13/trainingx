@@ -115,13 +115,13 @@ export function BeginnerPracticeCardDeck({
       practiceItems.length > 0
     ) {
       hasInitializedFromProgress.current = true;
-      const completedIds = savedProgress.completedQuestionIds || [];
+      const completedIds = (savedProgress as any).completedQuestionIds || [];
       if (completedIds.length > 0) {
         setState((s) => ({
           ...s,
           answeredCards: new Set(completedIds),
-          score: savedProgress.totalScore || 0,
-          correctAnswers: savedProgress.correctAnswers || 0,
+          score: (savedProgress as any).totalScore || 0,
+          correctAnswers: (savedProgress as any).correctAnswers || 0,
           showLevelComplete: completedIds.length >= practiceItems.length,
         }));
       }

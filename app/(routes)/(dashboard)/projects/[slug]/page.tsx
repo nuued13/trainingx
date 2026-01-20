@@ -52,8 +52,8 @@ export default function ProjectDetailPage() {
   }
 
   // Workaround for missing fields
-  const difficultyLevel = project.difficultyLevel || 1;
-  const xpReward = project.xpReward || 100;
+  const difficultyLevel = (project.difficulty === "Hard" ? 3 : project.difficulty === "Medium" ? 2 : 1) || 1;
+  const xpReward = 100;
   // Deterministic image placeholder based on category
   const defaultImage =
     project.category === "AI"
@@ -61,7 +61,7 @@ export default function ProjectDetailPage() {
       : project.category === "Game"
         ? "/images/projects/space-shooter.webp"
         : "/images/projects/dentist.webp";
-  const imageUrl = project.imageUrl || defaultImage;
+  const imageUrl = defaultImage;
 
   return (
     <SidebarLayout>
@@ -99,18 +99,18 @@ export default function ProjectDetailPage() {
             </div>
 
             {/* Starter Prompt Section */}
-            {project.starterPrompt && (
+            {project.description && (
               <div className="bg-white rounded-3xl border-2 border-slate-200 p-5 shadow-sm">
                 <h3 className="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-2">
-                  <span className="text-xl">⚡️</span> Starter Prompt
+                  <span className="text-xl">⚡️</span> Project Description
                 </h3>
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 font-mono text-sm md:text-base text-slate-600 leading-relaxed mb-4">
-                  "{project.starterPrompt}"
+                  "{project.description}"
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-blue-500 uppercase tracking-wide">
                   <span>💡 Tip:</span>
                   <span className="text-slate-400 font-medium normal-case tracking-normal">
-                    Copy this into AI Studio to kickstart your project.
+                    Use this as inspiration for your AI prompts.
                   </span>
                 </div>
               </div>

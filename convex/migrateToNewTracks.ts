@@ -98,6 +98,7 @@ export const migrateToNewTracks = mutation({
         title: trackData.title,
         description: trackData.description,
         icon: trackData.icon,
+        level: trackData.order + 1, // Add level field based on order
         order: trackData.order,
         levelCount: 1,
         totalChallenges: 8, // 8 questions per track
@@ -112,10 +113,13 @@ export const migrateToNewTracks = mutation({
 
       // Create single level for each track
       await ctx.db.insert("practiceLevels", {
+        name: `${trackData.title} - Beginner`,
         trackId,
         levelNumber: 1,
         title: `${trackData.title} - Beginner`,
         description: trackData.description,
+        order: 1,
+        difficulty: 1, // Beginner difficulty
         challengeCount: 8,
         estimatedMinutes: 15,
         requiredScore: 70,

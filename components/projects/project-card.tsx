@@ -27,10 +27,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
   };
 
   const difficultyLevel =
-    project.difficultyLevel || difficultyMap[project.difficulty] || 1;
-  const xpReward = project.xpReward || xpMap[project.difficulty] || 100;
+    (project as any).difficultyLevel || difficultyMap[project.difficulty] || 1;
+  const xpReward = (project as any).xpReward || xpMap[project.difficulty] || 100;
   // Use _id as slug if slug is missing (legacy schema)
-  const slug = project.slug || project._id;
+  const slug = (project as any).slug || project._id;
 
   // Deterministic image placeholder based on category
   const defaultImage =
@@ -40,7 +40,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         ? "/images/projects/space-shooter.webp"
         : "/images/projects/dentist.webp";
 
-  const imageUrl = project.imageUrl || defaultImage;
+  const imageUrl = (project as any).imageUrl || defaultImage;
 
   return (
     <motion.div

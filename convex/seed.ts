@@ -472,6 +472,7 @@ export const seedVibecoding = mutation({
     for (const project of VIBE_PROJECTS) {
       await ctx.db.insert("projects", {
         ...project,
+        slug: `${project.title.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
         authorId: systemUserId,
         steps: [], // Default steps
       });

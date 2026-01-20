@@ -236,12 +236,12 @@ export function Assessment({ userId, domainId, onBack }: AssessmentProps) {
             description: assessment.description,
             timeLimit: assessment.timeLimit,
             passingScore: assessment.passingScore,
-            questionCount: assessment.questionCount,
-            maxAttempts: assessment.maxAttempts,
+            questionCount: (assessment as any).questionCount || 0,
+            maxAttempts: (assessment as any).maxAttempts || 3,
           }}
           attemptNumber={canTake.attemptNumber || 1}
           attemptsRemaining={
-            canTake.attemptsRemaining || assessment.maxAttempts
+            canTake.attemptsRemaining || (assessment as any).maxAttempts || 3
           }
           onStart={handleStart}
           onBack={onBack}
@@ -326,7 +326,7 @@ export function Assessment({ userId, domainId, onBack }: AssessmentProps) {
             finalResult.passed ? handleViewCertificate : undefined
           }
           onBack={onBack}
-          cooldownHours={assessment.cooldownHours}
+          cooldownHours={(assessment as any).cooldownHours || 0}
         />
       );
 
@@ -341,7 +341,7 @@ export function Assessment({ userId, domainId, onBack }: AssessmentProps) {
           score={certificate.score}
           issuedAt={certificate.issuedAt}
           verificationCode={
-            certificate.certificateId || certificate.verificationCode || ""
+            certificate.certificateId || (certificate as any).verificationCode || ""
           }
           onBack={onBack}
           onDownload={() => {
@@ -351,7 +351,7 @@ export function Assessment({ userId, domainId, onBack }: AssessmentProps) {
           onShare={() => {
             // Copy verification link
             const certId =
-              certificate.certificateId || certificate.verificationCode;
+              certificate.certificateId || (certificate as any).verificationCode;
             const url = `${window.location.origin}/verify/${certId}`;
             navigator.clipboard.writeText(url);
             alert("Certificate link copied to clipboard!");
