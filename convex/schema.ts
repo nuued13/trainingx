@@ -945,4 +945,59 @@ weight: v.number()
     .index("by_referrer", ["referrerId"])
     .index("by_code", ["referralCode"])
     .index("by_status", ["status"]),
+
+  // ===== ASSESSMENT SESSION FLOW =====
+  
+  // Assessment Sessions (captures user assessment completion with digital thumbprint)
+  assessmentSessions: defineTable({
+    userId: v.optional(v.string()), // Optional for anonymous users
+    answers: v.array(v.any()), // Raw answer data from assessment
+    digitalThumbprint: v.object({
+      skills: v.array(v.string()), // List of identified skills
+      weights: v.record(v.string(), v.number()), // Skill -> weight/score mapping
+    }),
+    sessionToken: v.string(), // Unique identifier for tracking (for anonymous users)
+    completedAt: v.number(),
+    createdAt: v.number(),
+    seenPathwayIds: v.array(v.string()), // Track which pathways user has seen
+  })
+    .index("by_user", ["userId"])
+    .index("by_token", ["sessionToken"])
+    .index("by_completed", ["completedAt"]),
+
+  // Success Pathways (career/learning paths matched to user skills)
+  successPathways: defineTable({
+    title: v.string(),
+    description: v.string(),
+    category: v.string(), // One of 4 main categories
+    difficulty: v.string(), // "beginner" | "intermediate" | "advanced"
+    requiredSkills: v.array(v.string()), // Skills needed for this pathway
+    skillWeights: v.record(v.string(), v.number()), // Importance of each skill
+    sections: v.object({
+      overview: v.string(),
+      whyThisPath: v.string(),
+      skillsYouHave: v.array(v.string()),
+      skillsToLearn: v.array(v.string()),
+      nextSteps: v.array(v.string()),
+      resources: v.optional(v.array(v.object({
+        title: v.string(),
+        url: v.string(),
+        type: v.string(), // "course" | "article" | "video" | "tool"
+      }))),
+    }),
+    estimatedTimeMonths: v.number(), // How long to complete this pathway
+    salaryRange: v.optional(v.object({
+      min: v.number(),
+      max: v.number(),
+      currency: v.string(),
+    })),
+    demandLevel: v.string(), // "high" | "medium" | "low"
+    tags: v.array(v.string()),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_category", ["category"])
+    .index("by_difficulty", ["difficulty"])
+    .index("by_active", ["isActive"]),
 });
