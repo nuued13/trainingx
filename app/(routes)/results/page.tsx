@@ -92,7 +92,7 @@ export default function ResultsPage() {
         <Card className="text-center">
           <CardContent className="pt-8 pb-8">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">You've explored all your pathway matches!</h2>
+            <h2 className="text-2xl font-bold mb-2">You&apos;ve explored all your pathway matches!</h2>
             <p className="text-muted-foreground mb-6">
               Ready to start your learning journey?
             </p>

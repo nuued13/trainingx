@@ -74,8 +74,8 @@ export default function LearningZonePage() {
           Welcome to Your Learning Zone! 🎉
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          You've taken an important first step in your AI journey. Based on your assessment, 
-          we've found {matchStats.totalMatches} personalized pathways designed just for you.
+          You&apos;ve taken an important first step in your AI journey. Based on your assessment, 
+          we&apos;ve found {matchStats.totalMatches} personalized pathways designed just for you.
         </p>
       </div>
 
@@ -204,7 +204,7 @@ export default function LearningZonePage() {
             <p className="text-lg opacity-90 mb-6 max-w-2xl mx-auto">
               {matchStats.unseenMatches > 0 
                 ? `You still have ${matchStats.unseenMatches} pathways waiting to be discovered!`
-                : "You've explored all your matches. Time to choose your path!"
+                : "You&apos;ve explored all your matches. Time to choose your path!"
               }
             </p>
             <div className="flex gap-4 justify-center">
