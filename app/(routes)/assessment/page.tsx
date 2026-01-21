@@ -12,6 +12,8 @@ import { WelcomeScreen } from "@/components/assessment/WelcomeScreen";
 import { QuestionCard } from "@/components/assessment/QuestionCard";
 import { ResultsScreen } from "@/components/assessment/ResultsScreen";
 import { calculateAssessmentResults } from "@/lib/assessmentUtils";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 type AssessmentStep = "welcome" | "questions" | "results";
 
@@ -24,6 +26,9 @@ export default function AssessmentLite() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [showFeedback, setShowFeedback] = useState(false);
+  
+  // Convex mutation for creating assessment session
+  const createSession = useMutation(api.assessmentSessions.createSession);
 
   // Skip welcome screen if user is authenticated
   useEffect(() => {
@@ -47,7 +52,7 @@ export default function AssessmentLite() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!showFeedback) {
       setShowFeedback(true);
       return;
@@ -57,11 +62,46 @@ export default function AssessmentLite() {
       setCurrentQuestion(currentQuestion + 1);
       setShowFeedback(false);
     } else {
+      // Assessment completed - create session and redirect to results
       trackEvent("lite_assessment_complete", {
         name: userName,
         email: userEmail,
       });
-      setStep("results");
+      
+      // Calculate results to generate digital thumbprint
+      const results = calculateResults();
+      
+      // Convert skills object to array of skill names
+      const skillsArray = Object.keys(results.skills);
+      
+      // Convert skills object to weights record
+      const skillWeights: Record<string, number> = results.skills;
+      
+      try {
+        // Create assessment session with digital thumbprint
+        const session = await createSession({
+          userId: user?.id || undefined,
+          answers: Object.entries(answers).map(([qIndex, optionIndex]) => ({
+            questionIndex: parseInt(qIndex),
+            optionIndex,
+            question: questions[parseInt(qIndex)],
+            selectedOption: questions[parseInt(qIndex)].type === "multiple-choice" 
+              ? questions[parseInt(qIndex)].options[optionIndex]
+              : null
+          })),
+          digitalThumbprint: {
+            skills: skillsArray,
+            weights: skillWeights,
+          },
+        });
+        
+        // Redirect to results page with sessionId
+        setLocation(`/results?sessionId=${session.sessionId}`);
+      } catch (error) {
+        console.error("Failed to create assessment session:", error);
+        // Fallback to old flow if session creation fails
+        setStep("results");
+      }
     }
   };
 
