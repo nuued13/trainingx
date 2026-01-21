@@ -23,7 +23,7 @@ const generatedImage =
 
 export default function MatchingPage() {
   const { user } = useAuth();
-//   const userId = user?._id as any;
+  const userId = user?._id as any;
 
   // Add a mock userId for testing without login
   const testUserId = userId || "test-user-123";
