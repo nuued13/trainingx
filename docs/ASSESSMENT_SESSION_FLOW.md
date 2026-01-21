@@ -11,7 +11,7 @@ This feature implements a complete assessment → results → learning zone flow
 
 ### Database Schema
 - `assessmentSessions`: Stores completed assessments with digital thumbprints
-- `successPathways`: Contains 20+ career/learning pathways across 4 categories
+- `successPathways`: Contains 17 career/learning pathways across 4 categories
 
 ### Flow
 1. User completes assessment
@@ -119,7 +119,12 @@ normalized to 0-100 scale
 
 ## Seeded Pathways
 
-The seed file includes 20+ pathways covering:
+The seed file includes 17 pathways covering:
+- 5 Creative & Design pathways
+- 5 Technical & Development pathways  
+- 3 Business & Strategy pathways
+- 4 Data & Analytics pathways
+- Beginner, intermediate, and advanced difficulty levels
 - Beginner, intermediate, and advanced difficulty levels
 - Salary ranges from $45k-$170k
 - Time to learn: 4-12 months
