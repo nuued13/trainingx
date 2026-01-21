@@ -50,7 +50,7 @@ export const getMatchesForSession = query({
 
     // Filter out pathways the user has already seen
     const unseenPathways = allPathways.filter(
-      (pathway) => !session.seenPathwayIds.includes(pathway._id)
+      (pathway) => !session.seenPathwayIds.includes(pathway._id.toString())
     );
 
     // If no unseen pathways, return null
@@ -98,7 +98,7 @@ export const getTopMatches = query({
 
     // Filter out pathways the user has already seen
     const unseenPathways = allPathways.filter(
-      (pathway) => !session.seenPathwayIds.includes(pathway._id)
+      (pathway) => !session.seenPathwayIds.includes(pathway._id.toString())
     );
 
     // Calculate match scores for all unseen pathways
@@ -134,7 +134,7 @@ export const getSessionMatchStats = query({
 
     // Filter out pathways the user has already seen
     const unseenPathways = allPathways.filter(
-      (pathway) => !session.seenPathwayIds.includes(pathway._id)
+      (pathway) => !session.seenPathwayIds.includes(pathway._id.toString())
     );
 
     // Group by category

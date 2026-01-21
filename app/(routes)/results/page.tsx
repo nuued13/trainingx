@@ -34,7 +34,7 @@ export default function ResultsPage() {
   const markAsSeen = useMutation(api.assessmentSessions.markPathwayAsSeen);
 
   useEffect(() => {
-    // Show signup gate after viewing 3 pathways for anonymous users
+    // Show signup gate after viewing 2 pathways for anonymous users
     if (session && !session.userId && session.seenPathwayIds.length >= 2) {
       setShowSignupGate(true);
     }
@@ -318,7 +318,7 @@ export default function ResultsPage() {
       {/* Progress indicator */}
       {session.seenPathwayIds.length > 0 && (
         <p className="text-center text-sm text-muted-foreground mt-6">
-          You've viewed {session.seenPathwayIds.length + 1} pathway{session.seenPathwayIds.length !== 0 ? 's' : ''}
+          You&apos;ve viewed {session.seenPathwayIds.length + 1} pathway{session.seenPathwayIds.length + 1 !== 1 ? 's' : ''}
         </p>
       )}
     </div>
