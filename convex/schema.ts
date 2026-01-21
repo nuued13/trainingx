@@ -144,7 +144,24 @@ text: v.string(),
 skill: v.string(),
 weight: v.number()
 }))
-}),  // Assessment attempts and results
+}),
+
+  // Digital Thumbprint assessment results
+  assessment_results: defineTable({
+    userId: v.id("users"),
+    scores: v.any(), // Record<string, number> for skill scores
+    completedAt: v.number(),
+    answers: v.array(v.object({
+      questionId: v.number(),
+      selectedOption: v.object({
+        text: v.string(),
+        skill: v.string(),
+        weight: v.number()
+      })
+    }))
+  }).index("by_user", ["userId"]),
+
+  // Assessment attempts and results
   assessmentAttempts: defineTable({
     userId: v.id("users"),
     assessmentId: v.id("assessments"),
