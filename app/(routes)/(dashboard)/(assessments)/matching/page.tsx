@@ -24,22 +24,16 @@ const generatedImage =
 export default function MatchingPage() {
   const { user } = useAuth();
   const userId = user?._id as any;
-
-  // Add a mock userId for testing without login
-  const testUserId = userId || "test-user-123";
-
   const { userStats } = useUserStats();
 
   const quizResults = useQuery(
     api.quizResults.getLatestQuizResult,
-    testUserId ? { userId: testUserId, quizType: "matching" } : "skip"
-    // userId ? { userId, quizType: "matching" } : "skip"
+    userId ? { userId, quizType: "matching" } : "skip"
   );
 
   const storedMatches = useQuery(
     api.aiMatching.getAIMatches,
-    // userId ? { userId } : "skip"
-    testUserId ? { userId: testUserId } : "skip"
+    userId ? { userId } : "skip"
   );
 
   const [aiOpportunities, setAIOpportunities] = useState<AIOpportunity[]>([]);
