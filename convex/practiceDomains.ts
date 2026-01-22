@@ -12,7 +12,7 @@ export const list = query({
       .order("asc")
       .collect();
 
-    return domains.sort((a, b) => a.order - b.order);
+    return domains.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   },
 });
 
@@ -53,7 +53,7 @@ export const listWithUnlockStatus = query({
       isUnlocked: true, // Always unlocked as per user request
     }));
 
-    return domainsWithStatus.sort((a, b) => a.order - b.order);
+    return domainsWithStatus.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   },
 });
 

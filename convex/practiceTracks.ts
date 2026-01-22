@@ -117,7 +117,7 @@ export const getTrackDetails = query({
 
     return {
       ...track,
-      levels: levelsWithProgress.sort((a, b) => a.levelNumber - b.levelNumber),
+      levels: levelsWithProgress.sort((a, b) => (a.levelNumber ?? 0) - (b.levelNumber ?? 0)),
       progress: trackProgress,
     };
   },

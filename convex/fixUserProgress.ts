@@ -36,19 +36,19 @@ export const fixAllUserProgress = mutation({
       let currentLevel = 1;
 
       for (const level of levels) {
-        totalChallenges += level.challengeCount;
+        totalChallenges += level.challengeCount ?? 0;
         const lp = levelMap.get(level._id);
         if (lp) {
           completedChallenges += lp.challengesCompleted;
           if (lp.status === "in_progress") {
-            currentLevel = Math.max(currentLevel, level.levelNumber);
+            currentLevel = Math.max(currentLevel, level.levelNumber ?? 1);
           }
         }
       }
 
       const percentComplete =
         totalChallenges > 0
-          ? Math.round((completedChallenges / totalChallenges) * 100)
+          ? Math.round((completedChallenges / (totalChallenges || 1)) * 100)
           : 0;
 
       // Update if changed

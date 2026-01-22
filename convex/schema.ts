@@ -18,6 +18,7 @@ export default defineSchema({
     favoriteColor: v.optional(v.string()),
     age: v.optional(v.number()),
     location: v.optional(v.string()),
+    gender: v.optional(v.string()),
     needsProfileCompletion: v.optional(v.boolean()),
     preAssessmentCompleted: v.optional(v.boolean()),
     recommendedPath: v.optional(v.string()), // "Entrepreneur" | "Career" | "Side Hustle" | "Early Stage"
@@ -71,7 +72,11 @@ export default defineSchema({
       order: v.number()
     })),
     requirements: v.array(v.string()),
-    learningObjectives: v.array(v.string())
+    learningObjectives: v.array(v.string()),
+    difficultyLevel: v.optional(v.number()),
+    imageUrl: v.optional(v.string()),
+    techStack: v.optional(v.array(v.string())),
+    xpReward: v.optional(v.number()),
   }).index("by_category", ["category"]).index("by_difficulty", ["difficulty"]).index("by_slug", ["slug"]),
 
   // Practice Zone projects (from projects-seed.json)
@@ -235,11 +240,11 @@ weight: v.number()
       promptScoreMin: v.number(),
       skillThresholds: v.any(),
     })),
-    skillSuggestions: v.array(v.object({
+    skillSuggestions: v.optional(v.array(v.object({
       name: v.string(),
       category: v.string(),
       why: v.string(),
-    })),
+    }))),
     quizAnswers: v.any(),
     generatedAt: v.number(),
   }).index("by_user", ["userId"]),
@@ -337,10 +342,10 @@ weight: v.number()
 
   // Practice Levels (difficulty levels or skill progression)
   practiceLevels: defineTable({
-    name: v.string(),
+    name: v.optional(v.string()),
     description: v.optional(v.string()),
-    difficulty: v.number(), // 1-5 or similar scale
-    order: v.number(),
+    difficulty: v.optional(v.number()), // 1-5 or similar scale
+    order: v.optional(v.number()),
     trackId: v.optional(v.id("practiceTracks")),
     levelNumber: v.optional(v.number()),
     title: v.optional(v.string()),
@@ -629,6 +634,7 @@ weight: v.number()
     weeklyPracticeMinutes: v.optional(v.number()),
     communityScore: v.optional(v.number()),
     totalScore: v.optional(v.number()),
+    xp: v.optional(v.number()),
     communityActivity: v.object({
       postsCreated: v.number(),
       upvotesReceived: v.number(),
@@ -670,7 +676,7 @@ weight: v.number()
     slug: v.string(),
     title: v.string(),
     description: v.string(),
-    level: v.number(),
+    level: v.optional(v.number()),
     icon: v.optional(v.string()),
     order: v.number(),
     tags: v.array(v.string()),
@@ -755,6 +761,8 @@ weight: v.number()
     createdBy: v.id("users"),
     createdAt: v.number(),
     status: v.string(), // "live" | "retired" | "experimental"
+    isUserGenerated: v.optional(v.boolean()),
+    generationRequestId: v.optional(v.string()),
   })
     .index("by_template", ["templateId"])
     .index("by_scenario", ["scenarioId"])
@@ -1038,7 +1046,7 @@ weight: v.number()
     trackSlug: v.optional(v.string()),
     questions: v.optional(v.any()), // For local-file duels
     status: v.string(), // "lobby" | "open" | "active" | "completed" | "expired"
-    scores: v.object({}), // Map of userId -> score (stored as strings)
+    scores: v.any(), // Map of userId -> score (stored as strings)
     rankings: v.optional(v.array(v.object({
       userId: v.id("users"),
       score: v.number(),
@@ -1202,7 +1210,7 @@ weight: v.number()
 
   // AI Logs (for tracking AI API calls and usage)
   aiLogs: defineTable({
-    type: v.string(), // "prompt_completion", "image_generation", etc.
+    type: v.optional(v.string()), // "prompt_completion", "image_generation", etc.
     model: v.optional(v.string()),
     prompt: v.optional(v.string()),
     response: v.optional(v.string()),
@@ -1210,7 +1218,7 @@ weight: v.number()
     cost: v.optional(v.number()),
     userId: v.optional(v.id("users")),
     createdAt: v.number(),
-    metadata: v.optional(v.object({})),
+    metadata: v.optional(v.any()),
     feature: v.optional(v.string()), // "moderation", "matching", "evaluation", etc.
     provider: v.optional(v.string()), // "openai", "anthropic", etc.
     promptTokens: v.optional(v.number()),
@@ -1344,7 +1352,7 @@ weight: v.number()
     userId: v.id("users"),
     levelId: v.id("practiceLevels"),
     challengesCompleted: v.number(),
-    completedChallengeIds: v.array(v.id("practiceItems")),
+    completedChallengeIds: v.optional(v.array(v.id("practiceItems"))),
     totalChallenges: v.number(),
     percentComplete: v.number(),
     averageScore: v.number(),
@@ -1408,7 +1416,7 @@ weight: v.number()
     difficulty: v.string(), // "beginner" | "intermediate" | "advanced"
     track: v.string(), // Track slug
     completedQuestionIds: v.array(v.string()),
-    scores: v.optional(v.object({})), // Map of questionId -> score
+    scores: v.optional(v.any()), // Map of questionId -> score
     totalScore: v.number(),
     correctAnswers: v.number(),
     bestStreak: v.number(),

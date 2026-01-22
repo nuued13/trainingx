@@ -183,7 +183,9 @@ export const updateLevelProgress = mutation({
       const existingIds = existing.completedChallengeIds || [];
       if (existingIds.includes(args.challengeId as any)) {
         // Ensure track progress is in sync even if level progress didn't change (self-healing)
-        await calculateAndUpdateTrackProgress(ctx, args.userId, level.trackId);
+        if (level.trackId) {
+          await calculateAndUpdateTrackProgress(ctx, args.userId, level.trackId);
+        }
 
         // Already completed, just return current state
         return {
@@ -208,24 +210,27 @@ export const updateLevelProgress = mutation({
         completedChallengeIds: newCompletedIds,
         percentComplete: newPercent,
         averageScore: newAvgScore,
-        status: newPercent >= level.requiredScore ? "completed" : "in_progress",
+        status: newPercent >= (level.requiredScore ?? 100) ? "completed" : "in_progress",
       });
 
       // Update track progress
-      await calculateAndUpdateTrackProgress(ctx, args.userId, level.trackId);
+      if (level.trackId) {
+        await calculateAndUpdateTrackProgress(ctx, args.userId, level.trackId);
+      }
       await updateSkillRatings();
 
       return {
         levelId: args.levelId,
         percentComplete: newPercent,
-        status: newPercent >= level.requiredScore ? "completed" : "in_progress",
+        status: newPercent >= (level.requiredScore ?? 100) ? "completed" : "in_progress",
       };
     } else {
       // Create new progress
       const newCompletedIds = [args.challengeId] as any;
       const newCompleted = 1;
+      const challengeCount = level.challengeCount ?? 1;
       const newPercent = Math.round(
-        (newCompleted / level.challengeCount) * 100
+        (newCompleted / challengeCount) * 100
       );
 
       await ctx.db.insert("userLevelProgress", {
@@ -233,20 +238,22 @@ export const updateLevelProgress = mutation({
         levelId: args.levelId,
         challengesCompleted: newCompleted,
         completedChallengeIds: newCompletedIds,
-        totalChallenges: level.challengeCount,
+        totalChallenges: challengeCount,
         percentComplete: newPercent,
         averageScore: args.score, // Fixed typo: was args.score, assuming it's correct
-        status: newPercent >= level.requiredScore ? "completed" : "in_progress",
+        status: newPercent >= (level.requiredScore ?? 100) ? "completed" : "in_progress",
       });
 
       // Update track progress
-      await calculateAndUpdateTrackProgress(ctx, args.userId, level.trackId);
+      if (level.trackId) {
+        await calculateAndUpdateTrackProgress(ctx, args.userId, level.trackId);
+      }
       await updateSkillRatings();
 
       return {
         levelId: args.levelId,
         percentComplete: newPercent,
-        status: newPercent >= level.requiredScore ? "completed" : "in_progress",
+        status: newPercent >= (level.requiredScore ?? 100) ? "completed" : "in_progress",
       };
     }
   },
@@ -277,7 +284,7 @@ export const resetLevelProgress = mutation({
         status: "in_progress",
       });
 
-      if (level) {
+      if (level?.trackId) {
         await calculateAndUpdateTrackProgress(ctx, args.userId, level.trackId);
       }
     }
@@ -316,8 +323,8 @@ export const getOverallProgress = query({
     let completedTracks = 0;
 
     trackProgress.forEach((tp) => {
-      totalChallenges += tp.totalChallenges;
-      completedChallenges += tp.totalChallengesCompleted;
+      totalChallenges += tp.totalChallenges ?? 0;
+      completedChallenges += tp.totalChallengesCompleted ?? 0;
       totalTracks += 1;
       if (tp.percentComplete === 100) {
         completedTracks += 1;

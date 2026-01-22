@@ -333,15 +333,14 @@ export const createAuditLog = internalMutation({
     estimatedCost: v.number(),
   },
   handler: async (ctx, args) => {
+    const { action, contentType, contentId, commentId, authorId, textChecked, mediaChecked, textResult, mediaResult, finalDecision, reasoning, totalLatencyMs, estimatedCost } = args;
     await ctx.db.insert("moderationAuditLog", {
-      action: args.action || "flagged",
-      targetType: args.contentId ? "post" : (args.commentId ? "comment" : "content"),
-      targetId: (args.contentId || args.commentId || "").toString(),
-      reason: args.reasoning,
+      action: action || "flagged",
+      targetType: contentId ? "post" : (commentId ? "comment" : "content"),
+      targetId: (contentId || commentId || "").toString(),
+      reason: reasoning,
       resolved: false,
       createdAt: Date.now(),
-      // Legacy fields
-      ...args,
     });
   },
 });
