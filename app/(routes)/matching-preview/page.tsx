@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,11 +26,8 @@ import {
   CheckCircle2,
   Circle,
   Loader2,
-  Lock,
   Sparkles,
 } from "lucide-react";
-
-const STORAGE_KEY = "matching-preview-state";
 
 type AnswerMap = Record<string, string[]>;
 type Stage = "questions" | "processing" | "results";
@@ -45,6 +42,9 @@ export default function MatchingPreviewPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const savePathRecommendation = useMutation(api.pathRecommendations.saveUserPathRecommendation);
+  const partialAssessment = useQuery(api.partialAssessments.getForUser);
+  const savePartialAssessment = useMutation(api.partialAssessments.savePartialAssessment);
+  const clearPartialAssessment = useMutation(api.partialAssessments.clearPartialAssessment);
   
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -52,6 +52,30 @@ export default function MatchingPreviewPage() {
   const [processingStep, setProcessingStep] = useState(0);
   const [selectedOpportunityId, setSelectedOpportunityId] = useState<string | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [hydratedFromServer, setHydratedFromServer] = useState(false);
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const wasAuthenticated = useRef(false);
+  const hasSavedRecommendation = useRef(false);
+  const isPaid = user?.isPaid === true;
+
+  const withRetry = async <T,>(fn: () => Promise<T>) => {
+    const delays = [200, 500];
+    let lastError: unknown;
+
+    for (let i = 0; i < delays.length + 1; i++) {
+      try {
+        return await fn();
+      } catch (err) {
+        lastError = err;
+        const delay = delays[i];
+        if (delay) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    throw lastError;
+  };
 
   // Apply a body class so we can visually disable sidebar links in preview mode.
   useEffect(() => {
@@ -62,33 +86,30 @@ export default function MatchingPreviewPage() {
     };
   }, []);
 
-  // Load persisted state
+  // Hydrate from Convex partial assessment if present
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    try {
-      const parsed = JSON.parse(raw) as {
-        answers: AnswerMap;
-        currentIndex: number;
-        stage: Stage;
-      };
-      setAnswers(parsed.answers || {});
-      setCurrentIndex(parsed.currentIndex || 0);
-      setStage(parsed.stage || "questions");
-    } catch (err) {
-      console.warn("Failed to parse preview state", err);
+    if (!isAuthenticated) {
+      return;
     }
-  }, []);
+    if (partialAssessment === undefined) return;
 
-  // Persist state
+    if (partialAssessment) {
+      setAnswers((partialAssessment as any).answers || {});
+      setCurrentIndex((partialAssessment as any).currentIndex || 0);
+      const stageFromServer = (partialAssessment as any).currentStage as Stage;
+      setStage(stageFromServer || "questions");
+      setShowResumePrompt(true);
+    }
+
+    setHydratedFromServer(true);
+  }, [isAuthenticated, partialAssessment]);
+
+  // Track auth transitions for logout redirect handling
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ answers, currentIndex, stage })
-    );
-  }, [answers, currentIndex, stage]);
+    if (isAuthenticated) {
+      wasAuthenticated.current = true;
+    }
+  }, [isAuthenticated]);
 
   const introMetadata = useMemo(() => deriveIntroMetadata(introQuestions, answers), [answers]);
 
@@ -165,6 +186,22 @@ export default function MatchingPreviewPage() {
     setCurrentIndex((idx) => Math.max(0, idx - 1));
   };
 
+  const handleStartFresh = async () => {
+    setAnswers({});
+    setCurrentIndex(0);
+    setStage("questions");
+
+    await withRetry(() => clearPartialAssessment({})).catch(() => {
+      // Silent failure per requirements
+    });
+
+    setShowResumePrompt(false);
+  };
+
+  const handleResume = () => {
+    setShowResumePrompt(false);
+  };
+
   const runProcessing = () => {
     setStage("processing");
     setProcessingStep(0);
@@ -238,25 +275,65 @@ export default function MatchingPreviewPage() {
     </Card>
   );
 
-  const renderResults = () => {
-    // Save path recommendation immediately when results display
-    useEffect(() => {
-      if (stage === "results" && user?._id && inferredPath && !saveLoading) {
-        setSaveLoading(true);
-        savePathRecommendation({
-          userId: user._id as any,
-          pathName: inferredPath,
-        })
-          .then(() => {
-            setSaveLoading(false);
-          })
-          .catch((error) => {
-            console.error("Failed to save path recommendation:", error);
-            setSaveLoading(false);
-          });
-      }
-    }, [stage, user?._id, inferredPath, saveLoading]);
+  // Auto-save after each answer/stage change with small backoff retries
+  useEffect(() => {
+    if (!hydratedFromServer) return;
+    if (!isAuthenticated || !user?._id) return;
+    if (stage === "results") return;
 
+    withRetry(() =>
+      savePartialAssessment({
+        answers,
+        currentIndex,
+        currentStage: stage,
+      })
+    ).catch(() => {
+      // Silent failure per requirements; retries already attempted
+    });
+  }, [answers, currentIndex, stage, hydratedFromServer, isAuthenticated, savePartialAssessment, user?._id]);
+
+  // Persist final recommendation and clear partial data once results are ready
+  useEffect(() => {
+    if (stage !== "results") return;
+    if (!user?._id || !inferredPath || saveLoading) return;
+    if (hasSavedRecommendation.current) return;
+
+    setSaveLoading(true);
+    savePathRecommendation({
+      userId: user._id as any,
+      pathName: inferredPath,
+    })
+      .then(() => {
+        hasSavedRecommendation.current = true;
+        return withRetry(() => clearPartialAssessment({})).catch(() => {
+          // Silent failure per requirements
+        });
+      })
+      .finally(() => setSaveLoading(false))
+      .catch((error) => {
+        console.error("Failed to save path recommendation:", error);
+      });
+  }, [stage, user?._id, inferredPath, saveLoading, savePathRecommendation, clearPartialAssessment]);
+
+  // Auth and completion guards
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      const target = wasAuthenticated.current ? "/" : "/auth";
+      router.push(target);
+      return;
+    }
+
+    const isCompleted = user?.needsProfileCompletion === false;
+    const viewingResults = stage === "results";
+
+    if (isCompleted && !viewingResults) {
+      router.push("/dashboard");
+    }
+  }, [authLoading, isAuthenticated, router, user?.needsProfileCompletion, stage]);
+
+  const renderResults = () => {
     return (
     <div className="space-y-6">
       {pathRecommendation && (
@@ -284,62 +361,66 @@ export default function MatchingPreviewPage() {
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Starter projects</div>
-                <ul className="space-y-2 text-sm text-slate-700">
-                  {pathRecommendation.projects.map((project) => (
-                    <li key={project} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5" />
-                      <span>{project}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Next steps</div>
-                <ul className="space-y-2 text-sm text-slate-700">
-                  {pathRecommendation.nextSteps.map((step) => (
-                    <li key={step} className="flex items-start gap-2">
-                      <ArrowRight className="h-4 w-4 text-blue-500 mt-0.5" />
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Earning potential</div>
-                <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
-                  <div className="text-sm font-semibold text-slate-900">
-                    ${pathRecommendation.earningPotential.min.toLocaleString()} - ${
-                      pathRecommendation.earningPotential.max.toLocaleString()
-                    } {pathRecommendation.earningPotential.timeframe}
-                  </div>
-                  <div className="text-xs text-slate-600 mt-1">
-                    {pathRecommendation.earningPotential.description}
+            {isPaid && (
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Starter projects</div>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    {pathRecommendation.projects.map((project) => (
+                      <li key={project} className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5" />
+                        <span>{project}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Next steps</div>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    {pathRecommendation.nextSteps.map((step) => (
+                      <li key={step} className="flex items-start gap-2">
+                        <ArrowRight className="h-4 w-4 text-blue-500 mt-0.5" />
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Earning potential</div>
+                  <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                    <div className="text-sm font-semibold text-slate-900">
+                      ${pathRecommendation.earningPotential.min.toLocaleString()} - ${
+                        pathRecommendation.earningPotential.max.toLocaleString()
+                      } {pathRecommendation.earningPotential.timeframe}
+                    </div>
+                    <div className="text-xs text-slate-600 mt-1">
+                      {pathRecommendation.earningPotential.description}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       )}
 
-      <Card className="border-slate-200 shadow-sm">
-        <CardContent className="p-6 flex items-center justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-blue-700 font-semibold">
-              <Sparkles className="h-5 w-5" /> Want to see your full profile?
+      {!isPaid && (
+        <Card className="border-slate-200 shadow-sm">
+          <CardContent className="p-6 flex items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-blue-700 font-semibold">
+                <Sparkles className="h-5 w-5" /> Want to see your full profile?
+              </div>
+              <div className="text-sm text-slate-600">
+                Unlock full analytics, coaching, and your personalized roadmap.
+              </div>
             </div>
-            <div className="text-sm text-slate-600">
-              Unlock full analytics, coaching, and your personalized roadmap.
-            </div>
-          </div>
-          <Button asChild>
-            <a href="/upgrade">Click Here to Upgrade</a>
-          </Button>
-        </CardContent>
-      </Card>
+            <Button asChild>
+              <a href="/upgrade">Click Here to Upgrade</a>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
     </div>
     );
@@ -395,6 +476,29 @@ export default function MatchingPreviewPage() {
 
 
           </div>
+
+          {showResumePrompt && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <Card className="w-full max-w-md shadow-xl">
+                <CardHeader>
+                  <CardTitle className="text-lg">Pick up where you left off?</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-slate-600">
+                    We found your in-progress assessment. You can resume or start fresh.
+                  </p>
+                  <div className="flex items-center gap-3 justify-end">
+                    <Button variant="ghost" onClick={handleStartFresh}>
+                      Start Fresh
+                    </Button>
+                    <Button onClick={handleResume}>
+                      Resume Assessment
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {showQuestions && currentQuestion && (
             <div className="space-y-4">

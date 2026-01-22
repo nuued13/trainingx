@@ -54,6 +54,7 @@ import type * as otp_TwilioOTP from "../otp/TwilioOTP.js";
 import type * as otp_TwilioSDK from "../otp/TwilioSDK.js";
 import type * as otp_TwilioVerify from "../otp/TwilioVerify.js";
 import type * as otp_VerificationCodeEmail from "../otp/VerificationCodeEmail.js";
+import type * as partialAssessments from "../partialAssessments.js";
 import type * as passwordReset_PasswordResetEmail from "../passwordReset/PasswordResetEmail.js";
 import type * as passwordReset_ResendOTPPasswordReset from "../passwordReset/ResendOTPPasswordReset.js";
 import type * as pathRecommendations from "../pathRecommendations.js";
@@ -136,6 +137,7 @@ declare const fullApi: ApiFromModules<{
   "otp/TwilioSDK": typeof otp_TwilioSDK;
   "otp/TwilioVerify": typeof otp_TwilioVerify;
   "otp/VerificationCodeEmail": typeof otp_VerificationCodeEmail;
+  partialAssessments: typeof partialAssessments;
   "passwordReset/PasswordResetEmail": typeof passwordReset_PasswordResetEmail;
   "passwordReset/ResendOTPPasswordReset": typeof passwordReset_ResendOTPPasswordReset;
   pathRecommendations: typeof pathRecommendations;

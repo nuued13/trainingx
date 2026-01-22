@@ -13,6 +13,7 @@ interface User {
   location?: string;
   needsProfileCompletion?: boolean;
   isAnonymous?: boolean;
+  isPaid?: boolean;
 }
 
 interface AuthContext {
@@ -42,58 +43,38 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   useEffect(() => {
     if (isLoading || !isAuthenticated) return;
-    if (!(user as any)?.needsProfileCompletion) return;
-    if (location === '/signup') return;
 
-    const shouldStoreRedirect = location !== '/signup';
-    const hasStored = !!sessionStorage.getItem('redirectAfterLogin');
+    const needsPreAssessment = user?.needsProfileCompletion === true;
 
-    // If coming directly from /auth and the user needs to complete profile,
-    // default the post-profile destination to dashboard.
-    if (!hasStored && location === '/auth') {
-      sessionStorage.setItem('redirectAfterLogin', '/dashboard');
-    } else if (shouldStoreRedirect && !hasStored && location !== '/auth') {
-      sessionStorage.setItem('redirectAfterLogin', location);
+    // If the user still needs to complete the pre-assessment, always send them to matching preview.
+    if (needsPreAssessment) {
+      sessionStorage.removeItem('redirectAfterLogin');
+      if (location !== '/matching-preview') {
+        setLocation('/matching-preview');
+      }
+      return;
     }
-    setLocation('/signup');
+
+    // If they land on matching-preview but have already completed it, move them to the dashboard.
+    if (!needsPreAssessment && location === '/matching-preview') {
+      setLocation('/dashboard');
+      return;
+    }
+
+    // If there is a stored redirect (set before login), honor it once.
+    const stored = sessionStorage.getItem('redirectAfterLogin');
+    if (stored) {
+      sessionStorage.removeItem('redirectAfterLogin');
+      if (location !== stored) {
+        setLocation(stored);
+      }
+    }
   }, [
     isAuthenticated,
     isLoading,
     location,
     setLocation,
-    (user as any)?.needsProfileCompletion,
-  ]);
-
-  // Gate: require pre-assessment before accessing the platform
-  useEffect(() => {
-    if (isLoading || !isAuthenticated) return;
-    // If profile needs completion, let the other effect handle it first
-    if ((user as any)?.needsProfileCompletion) return;
-
-    const preDone = (user as any)?.preAssessmentCompleted === true;
-    if (preDone) return;
-
-    // Allow access to root, auth, signup, and matching-preview without redirect
-    const isAllowedRoute =
-      location === '/' ||
-      location === '/auth' ||
-      location === '/signup' ||
-      location === '/matching-preview';
-    if (isAllowedRoute) return;
-
-    // Store intended destination once if not already set
-    if (!sessionStorage.getItem('redirectAfterLogin')) {
-      sessionStorage.setItem('redirectAfterLogin', location);
-    }
-
-    setLocation('/matching-preview');
-  }, [
-    isAuthenticated,
-    isLoading,
-    location,
-    setLocation,
-    (user as any)?.preAssessmentCompleted,
-    (user as any)?.needsProfileCompletion,
+    user?.needsProfileCompletion,
   ]);
 
   const value: AuthContext = {

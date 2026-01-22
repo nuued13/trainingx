@@ -14,6 +14,7 @@ import { Link } from "wouter";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { useAuth } from "@/contexts/AuthContextProvider";
 
 interface AnimatedStatCardProps {
   icon: React.ElementType;
@@ -147,6 +148,21 @@ function AnimatedStatCard({
 }
 
 export default function Hero() {
+  const { isAuthenticated, user } = useAuth();
+  const needsPreAssessment = user?.needsProfileCompletion !== false;
+
+  const primaryHref = !isAuthenticated
+    ? "/auth"
+    : needsPreAssessment
+    ? "/matching-preview"
+    : "/dashboard";
+
+  const primaryLabel = !isAuthenticated
+    ? "Discover Your Success Pathway"
+    : needsPreAssessment
+    ? "Complete Pre-Assessment"
+    : "View Dashboard";
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden py-12">
       {/* Background Image */}
@@ -229,13 +245,13 @@ export default function Hero() {
 
           {/* CTAs */}
           <div className="flex flex-col lg:flex-row gap-4 justify-center items-center pt-8">
-            <Link href="/matching-preview" className={"w-full lg:w-auto"}>
+            <Link href={primaryHref} className={"w-full lg:w-auto"}>
               <Button
                 size="lg"
                 className="bg-white text-black border border-white font-semibold py-6 w-full lg:w-[300px] hover:bg-white/90"
                 data-testid="button-take-assessment"
               >
-                Discover Your Success Pathway
+                {primaryLabel}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
