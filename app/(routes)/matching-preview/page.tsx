@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  Circle,
   Loader2,
   Lock,
   Sparkles,
@@ -200,7 +201,7 @@ export default function MatchingPreviewPage() {
                       selected ? "bg-blue-500 text-white border-blue-500" : "border-slate-300"
                     )}
                   >
-                    {selected ? <CheckCircle2 className="h-4 w-4" /> : option.id.toUpperCase()}
+                    {selected ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
                   </div>
                   <div className="text-sm text-slate-800">{option.text}</div>
                 </div>
@@ -358,7 +359,7 @@ export default function MatchingPreviewPage() {
         }}
       >
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="mb-6 flex flex-col gap-3">
+          <div className="mb-3 flex flex-col gap-2">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm">
                 <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
@@ -366,33 +367,17 @@ export default function MatchingPreviewPage() {
                 </Badge>
                 <span className="text-slate-600">Login required to save and apply.</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="flex items-center gap-2 text-xl text-slate-500">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-slate-700">Step</span>
-                  <Badge variant="secondary" className="rounded-full">
+                  <Badge variant="secondary" className="rounded-full text-xl">
                     {Math.min(currentIndex + 1, totalSteps)} / {totalSteps}
                   </Badge>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              {visibleQuestions.map((q, idx) => (
-                <div
-                  key={q.id}
-                  className={cn(
-                    "h-8 min-w-[36px] px-3 rounded-full border text-xs flex items-center justify-center",
-                    idx === currentIndex
-                      ? "border-blue-500 text-blue-600 bg-blue-50"
-                      : idx < currentIndex
-                      ? "border-emerald-400 text-emerald-600 bg-emerald-50"
-                      : "border-slate-200 text-slate-500"
-                  )}
-                >
-                  {idx + 1}
-                </div>
-              ))}
-            </div>
+
           </div>
 
           {showQuestions && currentQuestion && (
