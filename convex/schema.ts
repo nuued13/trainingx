@@ -13,6 +13,7 @@ export default defineSchema({
     phone: v.optional(v.string()),
     phoneVerificationTime: v.optional(v.number()),
     isAnonymous: v.optional(v.boolean()),
+    isPaid: v.optional(v.boolean()),
     // Custom field.
     favoriteColor: v.optional(v.string()),
     age: v.optional(v.number()),
@@ -23,6 +24,13 @@ export default defineSchema({
   })
     .index("email", ["email"])
     .index("phone", ["phone"]),
+  partialAssessments: defineTable({
+    userId: v.id("users"),
+    answers: v.any(),
+    currentIndex: v.number(),
+    currentStage: v.string(),
+    lastUpdated: v.number(),
+  }).index("by_user", ["userId"]),
   messages: defineTable({
     userId: v.id("users"),
     body: v.string(),

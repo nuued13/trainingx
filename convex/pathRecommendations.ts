@@ -32,6 +32,7 @@ export const saveUserPathRecommendation = mutation({
     await ctx.db.patch(args.userId, {
       recommendedPath: args.pathName,
       preAssessmentCompleted: true,
+      needsProfileCompletion: false,
     });
     
     return { success: true, userId: args.userId, pathName: args.pathName };
