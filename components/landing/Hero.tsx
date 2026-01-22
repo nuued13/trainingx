@@ -229,7 +229,7 @@ export default function Hero() {
 
           {/* CTAs */}
           <div className="flex flex-col lg:flex-row gap-4 justify-center items-center pt-8">
-            <Link href="/discover" className={"w-full lg:w-auto"}>
+            <Link href="/matching-preview" className={"w-full lg:w-auto"}>
               <Button
                 size="lg"
                 className="bg-white text-black border border-white font-semibold py-6 w-full lg:w-[300px] hover:bg-white/90"

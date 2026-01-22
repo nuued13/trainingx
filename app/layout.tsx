@@ -59,6 +59,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${bricolageGrotesque.variable} ${spaceGrotesk.variable} relative`}
+      suppressHydrationWarning
     >
       <head>
         {IS_DEV && <meta name="robots" content="noindex, nofollow" />}

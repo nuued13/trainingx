@@ -3,13 +3,6 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { ConvexError } from "convex/values";
@@ -32,7 +25,6 @@ export function SignInWithPassword({
   const { signIn } = useAuthActions();
   const [flow, setFlow] = useState<"signIn" | "signUp">("signIn");
   const [submitting, setSubmitting] = useState(false);
-  const [gender, setGender] = useState("");
   return (
     <form
       className="flex flex-col"
@@ -51,7 +43,6 @@ export function SignInWithPassword({
         formData.set("email", normalizedEmail);
         const nameValue = (formData.get("name") || "").toString().trim();
         const ageValue = (formData.get("age") || "").toString().trim();
-        const genderValue = (formData.get("gender") || "").toString().trim();
         if (flow === "signUp" && !nameValue) {
           toast.error("Please enter your name to sign up.");
           setSubmitting(false);
@@ -69,14 +60,8 @@ export function SignInWithPassword({
             setSubmitting(false);
             return;
           }
-          if (!genderValue) {
-            toast.error("Please select your gender to sign up.");
-            setSubmitting(false);
-            return;
-          }
           formData.set("name", nameValue);
           formData.set("age", ageValue);
-          formData.set("gender", genderValue);
         }
         signIn(provider ?? "password", formData)
           .then(() => {
@@ -129,21 +114,6 @@ export function SignInWithPassword({
             className="mb-4"
             placeholder="Your age"
           />
-          <label>Gender</label>
-          <Select value={gender} onValueChange={setGender}>
-            <SelectTrigger className="mb-4 w-full">
-              <SelectValue placeholder="Select your gender" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="prefer-not-to-say">
-                Prefer not to say
-              </SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-          <input type="hidden" name="gender" value={gender} />
         </>
       )}
       <div className="flex items-center justify-between">

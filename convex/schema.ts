@@ -16,8 +16,10 @@ export default defineSchema({
     // Custom field.
     favoriteColor: v.optional(v.string()),
     age: v.optional(v.number()),
-    gender: v.optional(v.string()),
+    location: v.optional(v.string()),
     needsProfileCompletion: v.optional(v.boolean()),
+    preAssessmentCompleted: v.optional(v.boolean()),
+    recommendedPath: v.optional(v.string()), // "Entrepreneur" | "Career" | "Side Hustle" | "Early Stage"
   })
     .index("email", ["email"])
     .index("phone", ["phone"]),
@@ -495,6 +497,24 @@ weight: v.number()
     rating: v.number(),
     createdAt: v.number()
   }).index("by_category", ["category"]).index("by_difficulty", ["difficulty"]),
+
+  // Path recommendations for AI readiness quiz results (Entrepreneur, Career, Side Hustle, Early Stage)
+  pathways: defineTable({
+    path: v.string(), // "Entrepreneur" | "Career" | "Side Hustle" | "Early Stage"
+    title: v.string(),
+    description: v.string(),
+    descriptionUnder15: v.optional(v.string()),
+    descriptionAdult: v.optional(v.string()),
+    projects: v.array(v.string()), // Project titles for this path
+    nextSteps: v.array(v.string()),
+    earningPotential: v.object({
+      min: v.number(),
+      max: v.number(),
+      timeframe: v.string(), // e.g., "per month", "salary increase per year"
+      description: v.string(),
+    }),
+    createdAt: v.number(),
+  }).index("by_path", ["path"]),
 
   // User enrollments in learning paths
   enrollments: defineTable({

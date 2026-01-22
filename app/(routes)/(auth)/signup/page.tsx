@@ -31,9 +31,7 @@ const normalizeRedirect = (value?: string | null): string => {
   return `${appURL}/dashboard`;
 };
 
-const LOCATION_PLACEHOLDER = "Your location";
-
-export default function CompleteProfilePage() {
+export default function SignupPage() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [, setLocation] = useLocation();
   const completeProfile = useMutation(api.users.completeProfile);
@@ -41,6 +39,7 @@ export default function CompleteProfilePage() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [locationValue, setLocationValue] = useState("");
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -64,10 +63,10 @@ export default function CompleteProfilePage() {
   useEffect(() => {
     if (!user) return;
     setName((prev) => prev || user.name || "");
-    setLocationValue((prev) => prev || (user as any)?.location || "");
     setAge((prev) =>
       prev || (typeof user.age === "number" ? String(user.age) : "")
     );
+    setLocationValue((prev) => prev || user.location || "");
   }, [user]);
 
   if (isLoading || (isAuthenticated && !user)) {
@@ -123,7 +122,7 @@ export default function CompleteProfilePage() {
                 );
                 sessionStorage.removeItem("redirectAfterLogin");
                 const destination =
-                  redirectTo.includes("/complete-profile") ||
+                  redirectTo.includes("/signup") ||
                   redirectTo.includes("/auth")
                     ? normalizeRedirect(null)
                     : redirectTo;
@@ -161,10 +160,32 @@ export default function CompleteProfilePage() {
           <Input
             name="location"
             id="location"
-            className="mb-6"
-            placeholder={LOCATION_PLACEHOLDER}
+            className="mb-4"
+            placeholder="Your location"
             value={locationValue}
             onChange={(event) => setLocationValue(event.target.value)}
+          />
+          <label htmlFor="email">Email</label>
+          <Input
+            name="email"
+            id="email"
+            type="email"
+            className="mb-4"
+            autoComplete="email"
+            placeholder="Your email"
+            value={user?.email || ""}
+            disabled
+          />
+          <label htmlFor="password">Password</label>
+          <Input
+            name="password"
+            id="password"
+            type="password"
+            className="mb-6"
+            autoComplete="new-password"
+            placeholder="Create a password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
           />
           <Button type="submit" disabled={submitting}>
             Continue

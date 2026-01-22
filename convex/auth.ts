@@ -16,7 +16,6 @@ import { normalizeEmail } from "./normalizeEmail.js";
 
 const profileWithOptionalName = (params: Record<string, unknown>) => {
   const name = (params.name as string | undefined)?.trim();
-  const gender = (params.gender as string | undefined)?.trim();
   const ageParam = params.age;
   const ageValue =
     typeof ageParam === "number"
@@ -31,7 +30,6 @@ const profileWithOptionalName = (params: Record<string, unknown>) => {
   return {
     email: normalizeEmail(params.email as string),
     ...(name ? { name } : {}),
-    ...(gender ? { gender } : {}),
     ...(age !== undefined ? { age } : {}),
   };
 };

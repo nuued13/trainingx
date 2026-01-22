@@ -49,7 +49,7 @@ export default function AuthPage() {
       console.log("Auth page: User is authenticated, redirecting...");
       const needsProfileCompletion = user.needsProfileCompletion === true;
       const redirectTo = needsProfileCompletion
-        ? normalizeRedirect("/complete-profile")
+        ? normalizeRedirect("/signup")
         : normalizeRedirect(sessionStorage.getItem("redirectAfterLogin"));
       if (!needsProfileCompletion) {
         sessionStorage.removeItem("redirectAfterLogin");
@@ -73,6 +73,15 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="max-w-[420px] w-full flex flex-col gap-6">
+        <div>
+          <Button
+            variant="outline"
+            onClick={() => setLocation("/")}
+            className="gap-2"
+          >
+            ← Back to Home
+          </Button>
+        </div>
         {step === "signIn" ? (
           <>
             <div className="text-center">

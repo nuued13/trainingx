@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContextProvider";
+import { api } from "@/convex/_generated/api";
 import {
   quizQuestions,
   introQuestions,
@@ -38,11 +42,16 @@ const processingMessages = [
 ];
 
 export default function MatchingPreviewPage() {
+  const router = useRouter();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const savePathRecommendation = useMutation(api.pathRecommendations.saveUserPathRecommendation);
+  
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stage, setStage] = useState<Stage>("questions");
   const [processingStep, setProcessingStep] = useState(0);
   const [selectedOpportunityId, setSelectedOpportunityId] = useState<string | null>(null);
+  const [saveLoading, setSaveLoading] = useState(false);
 
   // Apply a body class so we can visually disable sidebar links in preview mode.
   useEffect(() => {
@@ -229,7 +238,26 @@ export default function MatchingPreviewPage() {
     </Card>
   );
 
-  const renderResults = () => (
+  const renderResults = () => {
+    // Save path recommendation immediately when results display
+    useEffect(() => {
+      if (stage === "results" && user?._id && inferredPath && !saveLoading) {
+        setSaveLoading(true);
+        savePathRecommendation({
+          userId: user._id as any,
+          pathName: inferredPath,
+        })
+          .then(() => {
+            setSaveLoading(false);
+          })
+          .catch((error) => {
+            console.error("Failed to save path recommendation:", error);
+            setSaveLoading(false);
+          });
+      }
+    }, [stage, user?._id, inferredPath, saveLoading]);
+
+    return (
     <div className="space-y-6">
       {pathRecommendation && (
         <Card className="border-slate-200 shadow-sm">
@@ -301,51 +329,39 @@ export default function MatchingPreviewPage() {
         <CardContent className="p-6 flex items-center justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-blue-700 font-semibold">
-              <Sparkles className="h-5 w-5" /> Preview Career Matches
+              <Sparkles className="h-5 w-5" /> Want to see your full profile?
             </div>
             <div className="text-sm text-slate-600">
-              Career-only matches are shown in preview. Full profile (all matches, skills, saved progress) unlocks after signup.
+              Unlock full analytics, coaching, and your personalized roadmap.
             </div>
           </div>
           <Button asChild>
-            <a href="/auth/register">Login / Sign Up</a>
+            <a href="/upgrade">Click Here to Upgrade</a>
           </Button>
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {unlockedOpportunities.map((opp) => (
-          <Card key={opp.id} className="border-slate-200 shadow-sm flex flex-col">
-            <CardContent className="p-5 flex-1 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold text-slate-900">{opp.title}</div>
-                <Badge variant={opp.unlocked ? "default" : "secondary"} className="flex items-center gap-1">
-                  {opp.unlocked ? <Sparkles className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-                  {opp.unlocked ? "Unlocked" : "Preview"}
-                </Badge>
-              </div>
-              <div className="text-xs text-slate-600 flex flex-wrap gap-2">
-                <Badge variant="outline">{opp.location}</Badge>
-                <Badge variant="outline">{opp.employmentType}</Badge>
-                <Badge variant="outline">{opp.remotePolicy}</Badge>
-              </div>
-              <div className="text-sm text-slate-700 line-clamp-3">{opp.description}</div>
-              <div className="text-xs text-slate-500">Unlocks at AI score {opp.unlockScore}+</div>
-              <Button
-                variant="secondary"
-                className="mt-auto"
-                onClick={() => setSelectedOpportunityId(opp.id)}
-              >
-                View details
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
     </div>
-  );
+    );
+  };
 
   const showQuestions = stage === "questions";
+
+  // Show loading while auth is being checked
+  if (authLoading) {
+    return (
+      <SidebarLayout>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+        </div>
+      </SidebarLayout>
+    );
+  }
+
+  // If not authenticated, don't render anything (redirect happens in useEffect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <SidebarLayout>

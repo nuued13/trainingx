@@ -23,34 +23,26 @@ export const completeProfile = mutation({
   args: {
     name: v.string(),
     age: v.number(),
-    gender: v.string(),
+    location: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Unauthenticated");
 
     const name = args.name.trim();
-    const gender = args.gender.trim();
+    const location = args.location.trim();
     const age = Math.floor(args.age);
-    const allowedGenders = new Set([
-      "female",
-      "male",
-      "prefer-not-to-say",
-      "other",
-    ]);
 
     if (!name) throw new Error("Name is required");
     if (!Number.isFinite(age) || age <= 0) {
       throw new Error("Age must be a positive number");
     }
-    if (!allowedGenders.has(gender)) {
-      throw new Error("Invalid gender");
-    }
+    if (!location) throw new Error("Location is required");
 
     await ctx.db.patch(userId, {
       name,
       age,
-      gender,
+      location,
       needsProfileCompletion: false,
     });
   },
