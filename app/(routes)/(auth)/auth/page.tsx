@@ -49,18 +49,36 @@ export default function AuthPage() {
       console.log("Auth page: User is authenticated, redirecting...");
       const needsProfileCompletion = user.needsProfileCompletion === true;
       const redirectTo = needsProfileCompletion
-        ? normalizeRedirect("/signup")
-        : normalizeRedirect(sessionStorage.getItem("redirectAfterLogin"));
+        ? "/signup"
+        : sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
       if (!needsProfileCompletion) {
         sessionStorage.removeItem("redirectAfterLogin");
       }
-      // Small delay to ensure auth state is fully propagated
-      setTimeout(() => {
-        console.log("Auth page: Redirecting to", redirectTo);
-        window.location.href = redirectTo;
-      }, 100);
+      
+      // Reset all forms and remove any beforeunload listeners
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        if (form instanceof HTMLFormElement) {
+          form.reset();
+          // Mark form as pristine
+          const inputs = form.querySelectorAll('input, textarea, select');
+          inputs.forEach(input => {
+            if (input instanceof HTMLInputElement || 
+                input instanceof HTMLTextAreaElement || 
+                input instanceof HTMLSelectElement) {
+              input.defaultValue = input.value;
+            }
+          });
+        }
+      });
+      
+      // Remove any beforeunload event listeners
+      window.onbeforeunload = null;
+      
+      // Use Next.js router for client-side navigation
+      setLocation(redirectTo);
     }
-  }, [isAuthenticated, isLoading, user]);
+  }, [isAuthenticated, isLoading, user, setLocation]);
 
   if (isLoading) {
     return (

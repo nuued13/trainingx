@@ -40,7 +40,7 @@ const processingMessages = [
 
 export default function MatchingPreviewPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated, isSavingBeforeLogout } = useAuth();
   const savePathRecommendation = useMutation(api.pathRecommendations.saveUserPathRecommendation);
   const partialAssessment = useQuery(api.partialAssessments.getForUser);
   const savePartialAssessment = useMutation(api.partialAssessments.savePartialAssessment);
@@ -54,8 +54,10 @@ export default function MatchingPreviewPage() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [hydratedFromServer, setHydratedFromServer] = useState(false);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const wasAuthenticated = useRef(false);
   const hasSavedRecommendation = useRef(false);
+  const hasPromptedRef = useRef(false);
   const isPaid = user?.isPaid === true;
 
   const withRetry = async <T,>(fn: () => Promise<T>) => {
@@ -81,24 +83,28 @@ export default function MatchingPreviewPage() {
   useEffect(() => {
     const cls = "preview-disable-sidebar-links";
     document.body.classList.add(cls);
+    setMounted(true);
     return () => {
       document.body.classList.remove(cls);
     };
   }, []);
 
-  // Hydrate from Convex partial assessment if present
+  // Hydrate once from Convex partial assessment if present
   useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
+    if (!isAuthenticated) return;
     if (partialAssessment === undefined) return;
 
-    if (partialAssessment) {
+    // Only hydrate on first load to avoid re-applying server state
+    if (!hydratedFromServer && partialAssessment) {
       setAnswers((partialAssessment as any).answers || {});
       setCurrentIndex((partialAssessment as any).currentIndex || 0);
       const stageFromServer = (partialAssessment as any).currentStage as Stage;
       setStage(stageFromServer || "questions");
-      setShowResumePrompt(true);
+
+      if (!hasPromptedRef.current) {
+        setShowResumePrompt(true);
+        hasPromptedRef.current = true;
+      }
     }
 
     setHydratedFromServer(true);
@@ -279,18 +285,29 @@ export default function MatchingPreviewPage() {
   useEffect(() => {
     if (!hydratedFromServer) return;
     if (!isAuthenticated || !user?._id) return;
+    if (authLoading) return; // Wait for auth to fully load
     if (stage === "results") return;
+    if (isSavingBeforeLogout) return; // Skip auto-save during logout
 
-    withRetry(() =>
-      savePartialAssessment({
-        answers,
-        currentIndex,
-        currentStage: stage,
-      })
-    ).catch(() => {
-      // Silent failure per requirements; retries already attempted
-    });
-  }, [answers, currentIndex, stage, hydratedFromServer, isAuthenticated, savePartialAssessment, user?._id]);
+    // Avoid recreating blank partial assessment right after Start Fresh
+    const isEmpty = Object.keys(answers).length === 0;
+    if (isEmpty && currentIndex === 0 && stage === "questions") return;
+
+    // Small delay to batch saves but still responsive
+    const timeoutId = setTimeout(() => {
+      withRetry(() =>
+        savePartialAssessment({
+          answers,
+          currentIndex,
+          currentStage: stage,
+        })
+      ).catch(() => {
+        // Silent failure per requirements; retries already attempted
+      });
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [answers, currentIndex, stage, hydratedFromServer, isAuthenticated, authLoading, savePartialAssessment, user?._id, isSavingBeforeLogout]);
 
   // Persist final recommendation and clear partial data once results are ready
   useEffect(() => {
@@ -308,6 +325,11 @@ export default function MatchingPreviewPage() {
         return withRetry(() => clearPartialAssessment({})).catch(() => {
           // Silent failure per requirements
         });
+      })
+      .then(() => {
+        // Wait for Convex cache to update with needsProfileCompletion: false
+        // Then the auth redirect effect will trigger and move user to dashboard
+        return new Promise(resolve => setTimeout(resolve, 1000));
       })
       .finally(() => setSaveLoading(false))
       .catch((error) => {
@@ -477,7 +499,7 @@ export default function MatchingPreviewPage() {
 
           </div>
 
-          {showResumePrompt && (
+          {mounted && showResumePrompt && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
               <Card className="w-full max-w-md shadow-xl">
                 <CardHeader>

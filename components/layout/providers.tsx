@@ -12,7 +12,9 @@ import { Router } from "wouter";
 import { usePathname, useRouter } from "next/navigation";
 import { PostHogProvider } from "@/lib/posthog";
 
-const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
+  unsavedChangesWarning: false,
+});
 
 // Custom hook for wouter to work with Next.js App Router
 const useNextjsLocation = () => {

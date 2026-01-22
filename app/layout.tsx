@@ -64,7 +64,7 @@ export default function RootLayout({
       <head>
         {IS_DEV && <meta name="robots" content="noindex, nofollow" />}
       </head>
-      <body className="font-sans antialiased relative">
+      <body className="font-sans antialiased relative" suppressHydrationWarning>
         {IS_DEV ? (
           <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
             <div className="text-center">
