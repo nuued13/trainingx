@@ -2,6 +2,7 @@ import { query, mutation, action, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal, api } from "./_generated/api";
 import { nextLeaderboardFields } from "./userStatsUtils";
+import { normalizeEmail } from "./normalizeEmail";
 
 // Get posts with optional filtering
 export const getPosts = query({
@@ -15,7 +16,7 @@ export const getPosts = query({
     const currentUser = identity
       ? await ctx.db
           .query("users")
-          .withIndex("email", (q) => q.eq("email", identity.email!))
+          .withIndex("email", (q) => q.eq("email", normalizeEmail(identity.email!)))
           .first()
       : null;
 

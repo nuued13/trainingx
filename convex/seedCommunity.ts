@@ -89,7 +89,6 @@ async function upsertUser(
         name: user.name,
         email: user.email,
         image: user.image,
-        isAnonymous: false,
       });
 
   const stats = await ctx.db

@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { normalizeEmail } from "./normalizeEmail";
 
 // Admin email allowlist - simple access control
 const ADMIN_EMAILS = [
@@ -16,7 +17,7 @@ async function requireAdmin(ctx: any): Promise<boolean> {
   const user = await ctx.db.get(userId);
   if (!user?.email) return false;
 
-  return ADMIN_EMAILS.includes(user.email);
+  return ADMIN_EMAILS.includes(normalizeEmail(user.email));
 }
 
 async function isAdmin(ctx: any): Promise<boolean> {
@@ -1018,7 +1019,7 @@ export const deleteUsersByEmail = mutation({
       // 1. Find ALL users with this email (handle duplicates)
       const users = await ctx.db
         .query("users")
-        .withIndex("email", (q) => q.eq("email", email))
+        .withIndex("email", (q) => q.eq("email", normalizeEmail(email)))
         .collect();
 
       if (users.length === 0) {

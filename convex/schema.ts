@@ -9,10 +9,7 @@ export default defineSchema({
     image: v.optional(v.string()),
     customImageId: v.optional(v.id("_storage")),
     email: v.optional(v.string()),
-    emailVerificationTime: v.optional(v.number()),
     phone: v.optional(v.string()),
-    phoneVerificationTime: v.optional(v.number()),
-    isAnonymous: v.optional(v.boolean()),
     isPaid: v.optional(v.boolean()),
     // Custom field.
     favoriteColor: v.optional(v.string()),

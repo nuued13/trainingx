@@ -3,7 +3,6 @@ import { INVALID_PASSWORD } from "./errors.js";
 import Google from "@auth/core/providers/google";
 import Resend from "@auth/core/providers/resend";
 import Apple from "@auth/core/providers/apple";
-import { Anonymous } from "@convex-dev/auth/providers/Anonymous";
 import { Password } from "@convex-dev/auth/providers/Password";
 import { ConvexError } from "convex/values";
 import { convexAuth } from "@convex-dev/auth/server";
@@ -119,37 +118,36 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       reset: ResendOTPPasswordReset,
       profile: profileWithOptionalName,
     }),
-    Password<DataModel>({
-      id: "password-code",
-      reset: ResendOTPPasswordReset,
-      verify: ResendOTP,
-      profile: profileWithOptionalName,
-    }),
-    // This one only makes sense with routing, ignore for now:
-    Password<DataModel>({
-      id: "password-link",
-      verify: Resend,
-      profile: profileWithOptionalName,
-    }),
-    Anonymous,
   ],
   callbacks: {
     async afterUserCreatedOrUpdated(ctx, { userId, existingUserId, type, provider }) {
+      console.log("[AUTH] User creation/update event", {
+        userId,
+        existingUserId,
+        type,
+        provider: provider.id,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Fetch the created/updated user to verify data
+      const user = await ctx.db.get(userId);
+      console.log("[AUTH] User data after creation/update", {
+        userId,
+        email: user?.email,
+        name: user?.name,
+        needsProfileCompletion: user?.needsProfileCompletion,
+      });
+
       const isOAuth =
         type === "oauth" || provider.type === "oauth" || provider.type === "oidc";
       if (existingUserId === null && isOAuth) {
+        console.log("[AUTH] Setting needsProfileCompletion for new OAuth user", {
+          userId,
+        });
         await ctx.db.patch(userId, { needsProfileCompletion: true });
       }
 
-      // Set emailVerificationTime when email OTP is verified
-      if (type === "verification" && provider.id === "resend-otp") {
-        await ctx.db.patch(userId, { emailVerificationTime: Date.now() });
-      }
-
-      // Set phoneVerificationTime when phone OTP is verified
-      if (type === "verification" && provider.id === "twilio-otp") {
-        await ctx.db.patch(userId, { phoneVerificationTime: Date.now() });
-      }
+      console.log("[AUTH] User creation/update completed", { userId });
     },
   },
 });

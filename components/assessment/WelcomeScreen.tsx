@@ -39,6 +39,10 @@ const features = [
   },
 ];
 
+const normalizeEmail = (email: string) => {
+  return email.trim().toLowerCase();
+};
+
 export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -46,7 +50,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (userName.trim() && userEmail.trim()) {
-      onStart(userName, userEmail);
+      onStart(userName, normalizeEmail(userEmail));
     }
   };
 

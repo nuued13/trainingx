@@ -453,7 +453,6 @@ export const seedVibecoding = mutation({
       const userId = await ctx.db.insert("users", {
         name: "System Admin",
         email: "admin@vibecoding.ai",
-        isAnonymous: false,
       });
       user = await ctx.db.get(userId);
     }
