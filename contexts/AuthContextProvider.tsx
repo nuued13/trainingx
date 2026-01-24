@@ -12,6 +12,7 @@ interface User {
   image?: string;
   age?: number;
   location?: string;
+  assessmentStarted?: boolean;
   needsProfileCompletion?: boolean;
   isAnonymous?: boolean;
   isPaid?: boolean;
