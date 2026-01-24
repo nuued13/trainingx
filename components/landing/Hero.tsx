@@ -158,7 +158,7 @@ export default function Hero() {
     : "/dashboard";
 
   const primaryLabel = !isAuthenticated
-    ? "Discover Your Success Pathway"
+    ? "Take Free Assessment"
     : needsPreAssessment
     ? "Complete Pre-Assessment"
     : "View Dashboard";

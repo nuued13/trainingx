@@ -48,6 +48,18 @@ export const completeProfile = mutation({
   },
 });
 
+export const markAssessmentStarted = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Unauthenticated");
+
+    await ctx.db.patch(userId, {
+      assessmentStarted: true,
+    });
+  },
+});
+
 export const generateUploadUrl = mutation(async (ctx) => {
   return await ctx.storage.generateUploadUrl();
 });

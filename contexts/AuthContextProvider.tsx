@@ -116,10 +116,19 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     if (isLoading || !isAuthenticated) return;
 
     const needsPreAssessment = user?.needsProfileCompletion === true;
+    const hasStartedAssessment = user?.assessmentStarted === true;
 
-    // If the user still needs to complete the pre-assessment, always send them to matching preview.
-    // But allow them to stay on the home page ("/"), auth pages, upgrade/pricing pages
-    if (needsPreAssessment) {
+    // If user needs pre-assessment but hasn't started it, send to intro page
+    if (needsPreAssessment && !hasStartedAssessment) {
+      sessionStorage.removeItem('redirectAfterLogin');
+      if (location !== '/assessment-intro' && location !== '/' && !location.startsWith('/auth') && location !== '/upgrade' && location !== '/pricing') {
+        setLocation('/assessment-intro');
+      }
+      return;
+    }
+
+    // If user needs pre-assessment and has started it, send to matching preview
+    if (needsPreAssessment && hasStartedAssessment) {
       sessionStorage.removeItem('redirectAfterLogin');
       if (location !== '/matching-preview' && location !== '/' && !location.startsWith('/auth') && location !== '/upgrade' && location !== '/pricing') {
         setLocation('/matching-preview');
@@ -127,8 +136,8 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       return;
     }
 
-    // If they land on matching-preview but have already completed it, move them to the dashboard.
-    if (!needsPreAssessment && location === '/matching-preview') {
+    // If they land on assessment-intro or matching-preview but have already completed it, move them to the dashboard.
+    if (!needsPreAssessment && (location === '/assessment-intro' || location === '/matching-preview')) {
       setLocation('/dashboard');
       return;
     }
@@ -147,6 +156,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     location,
     setLocation,
     user?.needsProfileCompletion,
+    user?.assessmentStarted,
   ]);
 
   const value: AuthContext = {

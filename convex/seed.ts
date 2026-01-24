@@ -481,3 +481,23 @@ export const seedVibecoding = mutation({
     return `Seeding Complete: Deleted ${existing.length}, Inserted ${VIBE_PROJECTS.length} projects owned by ${user.name}.`;
   },
 });
+
+export const backfillAssessmentStarted = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+    let updated = 0;
+
+    for (const user of users) {
+      if (user.assessmentStarted === undefined) {
+        await ctx.db.patch(user._id, {
+          assessmentStarted: false,
+        });
+        updated++;
+      }
+    }
+
+    console.log(`[Backfill] assessmentStarted set to false for ${updated} users`);
+    return { updated, message: `Backfilled assessmentStarted for ${updated} users` };
+  },
+});

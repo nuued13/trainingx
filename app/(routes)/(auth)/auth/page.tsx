@@ -56,17 +56,19 @@ export default function AuthPage() {
       }
       
       // Reset all forms and remove any beforeunload listeners
-      const forms = document.querySelectorAll('form');
-      forms.forEach(form => {
+      const forms = document.querySelectorAll("form");
+      forms.forEach((form) => {
         if (form instanceof HTMLFormElement) {
           form.reset();
           // Mark form as pristine
-          const inputs = form.querySelectorAll('input, textarea, select');
-          inputs.forEach(input => {
-            if (input instanceof HTMLInputElement || 
-                input instanceof HTMLTextAreaElement || 
-                input instanceof HTMLSelectElement) {
+          const inputs = form.querySelectorAll("input, textarea, select");
+          inputs.forEach((input) => {
+            if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
               input.defaultValue = input.value;
+            } else if (input instanceof HTMLSelectElement) {
+              Array.from(input.options).forEach((option, index) => {
+                option.defaultSelected = index === input.selectedIndex;
+              });
             }
           });
         }

@@ -22,6 +22,7 @@ export default defineSchema({
     needsProfileCompletion: v.optional(v.boolean()),
     preAssessmentCompleted: v.optional(v.boolean()),
     recommendedPath: v.optional(v.string()), // "Entrepreneur" | "Career" | "Side Hustle" | "Early Stage"
+    assessmentStarted: v.optional(v.boolean()), // Has user started the assessment intro
   })
     .index("email", ["email"])
     .index("phone", ["phone"]),
