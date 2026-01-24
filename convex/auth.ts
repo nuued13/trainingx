@@ -140,6 +140,16 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       if (existingUserId === null && isOAuth) {
         await ctx.db.patch(userId, { needsProfileCompletion: true });
       }
+
+      // Set emailVerificationTime when email OTP is verified
+      if (type === "verification" && provider.id === "resend-otp") {
+        await ctx.db.patch(userId, { emailVerificationTime: Date.now() });
+      }
+
+      // Set phoneVerificationTime when phone OTP is verified
+      if (type === "verification" && provider.id === "twilio-otp") {
+        await ctx.db.patch(userId, { phoneVerificationTime: Date.now() });
+      }
     },
   },
 });

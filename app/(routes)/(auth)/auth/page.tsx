@@ -48,9 +48,19 @@ export default function AuthPage() {
     if (!isLoading && isAuthenticated && user) {
       console.log("Auth page: User is authenticated, redirecting...");
       const needsProfileCompletion = user.needsProfileCompletion === true;
-      const redirectTo = needsProfileCompletion
-        ? "/signup"
-        : sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
+      const assessmentStarted = user.assessmentStarted === true;
+      
+      let redirectTo: string;
+      
+      if (needsProfileCompletion) {
+        redirectTo = "/signup";
+      } else if (!assessmentStarted) {
+        // New user has completed profile but not started assessment
+        redirectTo = "/assessment-intro";
+      } else {
+        redirectTo = sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
+      }
+      
       if (!needsProfileCompletion) {
         sessionStorage.removeItem("redirectAfterLogin");
       }
