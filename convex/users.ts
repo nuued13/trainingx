@@ -306,15 +306,24 @@ export const completeProject = mutation({
         });
       }
 
-      // Track score earned
-      await ctx.runMutation(api.quests.updateQuestProgress, {
+        await ctx.runMutation(api.quests.updateQuestProgress, {
         userId,
         eventType: "score_earned",
         eventData: { score: finalScore },
       });
     } catch (error) {
-      // Don't fail the completion if quest update fails
       console.error("Failed to update quest progress:", error);
+    }
+
+    try {
+      await ctx.runMutation(api.certificates.checkAndIssueCertificates, {
+        userId,
+        promptScore: stats.promptScore,
+        completedProjects: [...completedProjects, projectResult].length,
+        assessmentComplete: stats.assessmentComplete || false,
+      });
+    } catch (error) {
+      console.error("Failed to check certificates:", error);
     }
 
     return stats._id;
@@ -363,6 +372,20 @@ export const updateSkills = mutation({
       promptScore,
       rubric,
       ...leaderboardFields,
+    });
+
+    await ctx.runMutation(api.aiMatching.updateCareerMatches, {
+      userId,
+      promptScore,
+      skills,
+      completedProjects: stats.completedProjects?.length || 0,
+    });
+
+    await ctx.runMutation(api.certificates.checkAndIssueCertificates, {
+      userId,
+      promptScore,
+      completedProjects: stats.completedProjects?.length || 0,
+      assessmentComplete: stats.assessmentComplete || false,
     });
 
     return stats._id;

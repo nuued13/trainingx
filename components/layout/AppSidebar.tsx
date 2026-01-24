@@ -47,6 +47,11 @@ const mainItems = [
     icon: Sparkles,
   },
   {
+    title: "Success Pathway",
+    url: "/success-pathway",
+    icon: Briefcase,
+  },
+  {
     title: "AI Database",
     url: "/ai-database",
     icon: Database,
