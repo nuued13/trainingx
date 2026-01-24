@@ -14,7 +14,6 @@ interface User {
   location?: string;
   assessmentStarted?: boolean;
   needsProfileCompletion?: boolean;
-  isAnonymous?: boolean;
   isPaid?: boolean;
 }
 

@@ -271,7 +271,6 @@ async function getSystemUserId(ctx: any): Promise<Id<"users">> {
   return await ctx.db.insert("users", {
     name: "System",
     email: "system@trainingx.ai",
-    isAnonymous: false,
   });
 }
 
@@ -418,6 +417,66 @@ export const cleanOldDuels = internalMutation({
       deletedCount,
       updatedCount,
       message: `Cleaned up ${deletedCount} old duels and updated ${updatedCount} duels`,
+    };
+  },
+});
+// Clean up orphaned authAccounts without corresponding users records
+export const cleanupOrphanedAuthAccounts = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const allAuthAccounts = await ctx.db.query("authAccounts").collect();
+    let deletedCount = 0;
+
+    for (const authAccount of allAuthAccounts) {
+      // Check if user exists for this auth account
+      const user = await ctx.db.get(authAccount.userId);
+      
+      if (!user) {
+        console.log("[MIGRATION] Deleting orphaned authAccount", {
+          authAccountId: authAccount._id,
+          userId: authAccount.userId,
+        });
+        await ctx.db.delete(authAccount._id);
+        deletedCount++;
+      }
+    }
+
+    return {
+      deletedCount,
+      message: `Cleaned up ${deletedCount} orphaned authAccounts`,
+    };
+  },
+});
+
+// Verify all authAccounts have corresponding users (for debugging)
+export const verifyAuthIntegrity = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const allAuthAccounts = await ctx.db.query("authAccounts").collect();
+    const orphanedAccounts = [];
+    let validCount = 0;
+
+    for (const authAccount of allAuthAccounts) {
+      const user = await ctx.db.get(authAccount.userId);
+      
+      if (!user) {
+        orphanedAccounts.push({
+          authAccountId: authAccount._id,
+          userId: authAccount.userId,
+        });
+      } else {
+        validCount++;
+      }
+    }
+
+    return {
+      totalAuthAccounts: allAuthAccounts.length,
+      validCount,
+      orphanedCount: orphanedAccounts.length,
+      orphanedAccounts: orphanedAccounts.slice(0, 10), // Show first 10
+      message: orphanedAccounts.length === 0 
+        ? "All authAccounts have corresponding users" 
+        : `Found ${orphanedAccounts.length} orphaned authAccounts`,
     };
   },
 });

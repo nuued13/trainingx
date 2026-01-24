@@ -1,11 +1,6 @@
-// import { SignInFormAnonymous } from "@/components/auth/SignInFormAnonymous";
 import { SignInFormEmailCode } from "@/components/auth/SignInFormEmailCode";
 import { SignInFormEmailLink } from "@/components/auth/SignInFormEmailLink";
-import { SignInFormPassword } from "@/components/auth/SignInFormPassword";
 import { SignInFormPasswordAndCustomField } from "@/components/auth/SignInFormPasswordAndCustomField";
-import { SignInFormPasswordAndResetViaCode } from "@/components/auth/SignInFormPasswordAndResetViaCode";
-import { SignInFormPasswordAndVerifyViaCode } from "@/components/auth/SignInFormPasswordAndVerifyViaCode";
-import { SignInFormPhoneCode } from "@/components/auth/SignInFormPhoneCode";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // This component is here to showcase different combinations of sign-in methods.
@@ -19,21 +14,15 @@ export function SignInFormsShowcase() {
         <TabsTrigger value="otp">OTP</TabsTrigger>
         <TabsTrigger value="link">Magic Link</TabsTrigger>
         <TabsTrigger value="password">Password</TabsTrigger>
-        {/* <TabsTrigger value="anonymous">Anonymous</TabsTrigger> */}
       </TabsList>
       <TabsContent value="otp">
         <Tabs defaultValue="email" className="flex flex-col">
           <TabsList className="ml-auto mr-10 mb-7 opacity-60">
-            <TabsTrigger value="email">OAuth + Email</TabsTrigger>
-            <TabsTrigger value="phone">SMS</TabsTrigger>
+            <TabsTrigger value="email">Email OTP</TabsTrigger>
           </TabsList>
           <TabsContent value="email">
             {/* Sign in via emailed OTP */}
             <SignInFormEmailCode />
-          </TabsContent>
-          <TabsContent value="phone">
-            {/* Sign in via SMS OTP */}
-            <SignInFormPhoneCode />
           </TabsContent>
         </Tabs>
       </TabsContent>
@@ -42,38 +31,22 @@ export function SignInFormsShowcase() {
         <SignInFormEmailLink />
       </TabsContent>
       <TabsContent value="password">
-        <Tabs defaultValue="basic" className="flex flex-col">
+        <Tabs defaultValue="custom" className="flex flex-col">
           <TabsList className="ml-auto mr-10 mb-7 opacity-60 overflow-x-scroll max-w-full justify-start">
-            <TabsTrigger value="basic">Basic</TabsTrigger>
-            <TabsTrigger value="custom">Custom Sign Up</TabsTrigger>
+            <TabsTrigger value="custom">Sign Up</TabsTrigger>
             <TabsTrigger value="password reset">Password Reset</TabsTrigger>
-            <TabsTrigger value="email verification">
-              OAuth + Email Verification
-            </TabsTrigger>
           </TabsList>
-          <TabsContent value="basic">
-            {/* Simplest email + password, no recovery */}
-            <SignInFormPassword />
-          </TabsContent>
           <TabsContent value="custom">
             {/* Email + password and custom field in sign up flow */}
             <SignInFormPasswordAndCustomField />
           </TabsContent>
           <TabsContent value="password reset">
             {/* Email + password, plus password reset via OTP */}
-            <SignInFormPasswordAndResetViaCode />
-          </TabsContent>
-          <TabsContent value="email verification">
-            {/* Email + password, plus email verification and password
-                    reset via OTP */}
-            <SignInFormPasswordAndVerifyViaCode />
+            {/* Note: Password reset via OTP (password-with-reset provider) */}
+            <SignInFormPasswordAndCustomField />
           </TabsContent>
         </Tabs>
       </TabsContent>
-      {/* Sign in anonymously */}
-      {/* <TabsContent className="mt-20" value="anonymous">
-        <SignInFormAnonymous />
-      </TabsContent> */}
     </Tabs>
   );
 }
