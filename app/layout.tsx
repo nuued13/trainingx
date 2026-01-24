@@ -6,7 +6,16 @@ import { Toaster } from "react-hot-toast";
 import ComingSoon from "@/components/ComingSoon";
 import { comingSoonConfig, landingOnlyMode } from "@/lib/featureFlags";
 import HomePage from "@/components/pages/Home";
+import { validateEnv } from "@/lib/env-validation";
 import "./globals.css";
+
+if (typeof window === 'undefined') {
+  try {
+    validateEnv();
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],

@@ -131,6 +131,39 @@ export const getCareerMatches = query({
   },
 });
 
+export const updateCareerMatches = mutation({
+  args: {
+    userId: v.id("users"),
+    promptScore: v.number(),
+    skills: v.object({
+      generative_ai: v.number(),
+      agentic_ai: v.number(),
+      synthetic_ai: v.number(),
+      coding: v.number(),
+      agi_readiness: v.number(),
+      communication: v.number(),
+      logic: v.number(),
+      planning: v.number(),
+      analysis: v.number(),
+      creativity: v.number(),
+      collaboration: v.number(),
+    }),
+    completedProjects: v.number(),
+  },
+  handler: async (ctx, { userId, promptScore, skills, completedProjects }) => {
+    const existing = await ctx.db
+      .query("careerMatches")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        generatedAt: Date.now(),
+      });
+    }
+  },
+});
+
 export const getWizardResponse = query({
   args: {
     messages: v.array(v.object({
@@ -140,7 +173,6 @@ export const getWizardResponse = query({
     context: v.optional(v.record(v.string(), v.any())),
   },
   handler: async (ctx, { messages, context }) => {
-    // Simple mock response for now
     return {
       message: "Hello! I'm your TrainingX Wizard. I can help you with your learning journey and career exploration in AI and technology. What would you like to know?"
     };

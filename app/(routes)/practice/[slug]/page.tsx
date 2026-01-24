@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { loadState, saveState } from "@/lib/storage";
 import { computePromptScore, computeSkillSignals, Rubric } from "@/lib/scoring";
 import { trackEvent } from "@/lib/analytics";
 import { useQuery, useMutation } from "convex/react";
@@ -62,20 +61,50 @@ export default function PracticeProjectPage() {
   const updateSkillsMutation = useMutation(api.users.updateSkills);
   const updateMultipleSkillsMutation = useMutation(api.practiceUserSkills.updateMultipleSkills);
 
-  // Fetch user stats from shared context
   const { userStats: convexUserStats } = useUserStats();
 
-  // Load user state once and memoize it - use Convex data or localStorage or default
-  const [userState] = useState(() => {
-    const localState = loadState();
-    if (localState) return localState;
-    
-    // Return default state if no localStorage
+  const userState = useMemo(() => {
+    if (!convexUserStats) {
+      return {
+        promptScore: 0,
+        previousPromptScore: 0,
+        rubric: { clarity: 0, constraints: 0, iteration: 0, tool: 0 },
+        skills: {
+          generative_ai: 0,
+          agentic_ai: 0,
+          synthetic_ai: 0,
+          coding: 0,
+          agi_readiness: 0,
+          communication: 0,
+          logic: 0,
+          planning: 0,
+          analysis: 0,
+          creativity: 0,
+          collaboration: 0,
+        },
+        previousSkills: undefined,
+        badges: [],
+        completedProjects: [],
+        assessmentHistory: [],
+        streak: 0,
+        lastActiveDate: Date.now(),
+        assessmentComplete: false,
+        unlockedCareers: [],
+        weeklyPracticeMinutes: 0,
+        communityActivity: {
+          postsCreated: 0,
+          upvotesReceived: 0,
+          downvotesReceived: 0,
+          helpfulAnswers: 0,
+          communityScore: 0,
+        },
+      };
+    }
     return {
-      promptScore: 0,
-      previousPromptScore: 0,
-      rubric: { clarity: 0, constraints: 0, iteration: 0, tool: 0 },
-      skills: {
+      promptScore: convexUserStats.promptScore || 0,
+      previousPromptScore: convexUserStats.previousPromptScore || 0,
+      rubric: convexUserStats.rubric || { clarity: 0, constraints: 0, iteration: 0, tool: 0 },
+      skills: convexUserStats.skills || {
         generative_ai: 0,
         agentic_ai: 0,
         synthetic_ai: 0,
@@ -88,16 +117,16 @@ export default function PracticeProjectPage() {
         creativity: 0,
         collaboration: 0,
       },
-      previousSkills: undefined,
-      badges: [],
-      completedProjects: [],
-      assessmentHistory: [],
-      streak: 0,
-      lastActiveDate: Date.now(),
-      assessmentComplete: false,
-      unlockedCareers: [],
-      weeklyPracticeMinutes: 0,
-      communityActivity: {
+      previousSkills: convexUserStats.previousSkills,
+      badges: convexUserStats.badges || [],
+      completedProjects: convexUserStats.completedProjects || [],
+      assessmentHistory: convexUserStats.assessmentHistory || [],
+      streak: convexUserStats.streak || 0,
+      lastActiveDate: convexUserStats.lastActiveDate || Date.now(),
+      assessmentComplete: convexUserStats.assessmentComplete || false,
+      unlockedCareers: convexUserStats.unlockedCareers || [],
+      weeklyPracticeMinutes: convexUserStats.weeklyPracticeMinutes || 0,
+      communityActivity: convexUserStats.communityActivity || {
         postsCreated: 0,
         upvotesReceived: 0,
         downvotesReceived: 0,
@@ -105,22 +134,6 @@ export default function PracticeProjectPage() {
         communityScore: 0,
       },
     };
-  });
-
-  // Sync with Convex data if available
-  useEffect(() => {
-    if (convexUserStats && !loadState()) {
-      // If we have Convex data but no localStorage, save it
-      saveState({
-        ...userState,
-        promptScore: convexUserStats.promptScore || 0,
-        rubric: convexUserStats.rubric || userState.rubric,
-        skills: convexUserStats.skills || userState.skills,
-        badges: convexUserStats.badges || [],
-        completedProjects: convexUserStats.completedProjects || [],
-        assessmentComplete: convexUserStats.assessmentComplete || false,
-      });
-    }
   }, [convexUserStats]);
 
   // Get current step data - prioritize stepDetails if available
@@ -330,28 +343,6 @@ export default function PracticeProjectPage() {
         rubric: newRubric,
       });
 
-      // Also save to localStorage for backward compatibility
-      const updatedState = {
-        ...userState,
-        completedProjects: [...userState.completedProjects, {
-          slug: project.slug,
-          completedAt: new Date().toISOString(),
-          finalScore: ps,
-          rubric: { ...rubric },
-          badgeEarned: earnedBadge,
-          skillsGained
-        }],
-        badges: earnedBadge && !userState.badges.includes(project.badge)
-          ? [...userState.badges, project.badge]
-          : userState.badges,
-        previousPromptScore: userState.promptScore,
-        promptScore: newPromptScore,
-        previousSkills: userState.skills,
-        skills: userState.skills, // Skills now managed by Elo system
-        rubric: newRubric
-      };
-
-      saveState(updatedState);
 
       trackEvent('project_complete', {
         projectSlug: project.slug,

@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { loadState } from "@/lib/storage";
 import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { useAuth } from "@/contexts/AuthContextProvider";
@@ -34,15 +33,10 @@ export default function PracticeResultPage() {
     params.slug ? { slug: params.slug as string } : "skip"
   );
 
-  // Fetch user stats from shared context
   const { userStats: convexUserStats } = useUserStats();
 
   useEffect(() => {
-    const state = loadState();
-    if (state) {
-      setUserState(state);
-    } else if (convexUserStats) {
-      // Use Convex data if no localStorage
+    if (convexUserStats) {
       setUserState({
         promptScore: convexUserStats.promptScore || 0,
         previousPromptScore: convexUserStats.previousPromptScore || 0,
