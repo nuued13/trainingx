@@ -34,6 +34,34 @@ export default function AssessmentLite() {
     }
   }, [isAuthenticated, user]);
 
+  // Auto-redirect token users to preview after assessment completion
+  useEffect(() => {
+    if (step === "results") {
+      const token = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("token") || sessionStorage.getItem("testToken") : null;
+      
+      if (token) {
+        const results = calculateAssessmentResults(questions, answers);
+        const resultsData = {
+          ...results,
+          userName,
+          userEmail,
+          completedAt: new Date().toISOString(),
+        };
+        
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("lite_assessment_results", JSON.stringify(resultsData));
+        }
+        
+        // Auto-redirect after 2 seconds (show results briefly)
+        const timer = setTimeout(() => {
+          setLocation(`/results-preview?token=${token}`);
+        }, 2000);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [step, answers, userName, userEmail, setLocation]);
+
   const handleStartAssessment = (name: string, email: string) => {
     setUserName(name);
     setUserEmail(email);
