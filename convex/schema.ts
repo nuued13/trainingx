@@ -945,4 +945,15 @@ weight: v.number()
     .index("by_referrer", ["referrerId"])
     .index("by_code", ["referralCode"])
     .index("by_status", ["status"]),
+
+  // Test Tokens (for trial runs before sign-up)
+  testTokens: defineTable({
+    token: v.string(),
+    runsUsed: v.number(),
+    maxRuns: v.number(),
+    createdAt: v.number(),
+    lastUsedAt: v.number(),
+    userId: v.optional(v.id("users")),
+  })
+    .index("by_token", ["token"]),
 });
