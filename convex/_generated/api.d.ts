@@ -9,21 +9,25 @@
  */
 
 import type * as adaptiveEngine from "../adaptiveEngine.js";
+import type * as agents from "../agents.js";
 import type * as aiEvaluation from "../aiEvaluation.js";
 import type * as aiMatching from "../aiMatching.js";
 import type * as analytics from "../analytics.js";
 import type * as assessments from "../assessments.js";
 import type * as auth from "../auth.js";
+import type * as certificates from "../certificates.js";
 import type * as creatorStudio from "../creatorStudio.js";
 import type * as customGPTs from "../customGPTs.js";
 import type * as dailyDrills from "../dailyDrills.js";
 import type * as debug from "../debug.js";
+import type * as digitalThumbprint from "../digitalThumbprint.js";
 import type * as duels from "../duels.js";
 import type * as errors from "../errors.js";
 import type * as helpers from "../helpers.js";
 import type * as http from "../http.js";
 import type * as itemTemplates from "../itemTemplates.js";
 import type * as leaderboard from "../leaderboard.js";
+import type * as lib_database_pathwayRequirements from "../lib/database/pathwayRequirements.js";
 import type * as messages from "../messages.js";
 import type * as migrations_backfillDuelMembers from "../migrations/backfillDuelMembers.js";
 import type * as migrations_cleanOldDuels from "../migrations/cleanOldDuels.js";
@@ -47,6 +51,7 @@ import type * as quizzes from "../quizzes.js";
 import type * as seedPhase3 from "../seedPhase3.js";
 import type * as sharing from "../sharing.js";
 import type * as spacedRepetition from "../spacedRepetition.js";
+import type * as testTokens from "../testTokens.js";
 import type * as userStatsUtils from "../userStatsUtils.js";
 import type * as users from "../users.js";
 
@@ -66,21 +71,25 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   adaptiveEngine: typeof adaptiveEngine;
+  agents: typeof agents;
   aiEvaluation: typeof aiEvaluation;
   aiMatching: typeof aiMatching;
   analytics: typeof analytics;
   assessments: typeof assessments;
   auth: typeof auth;
+  certificates: typeof certificates;
   creatorStudio: typeof creatorStudio;
   customGPTs: typeof customGPTs;
   dailyDrills: typeof dailyDrills;
   debug: typeof debug;
+  digitalThumbprint: typeof digitalThumbprint;
   duels: typeof duels;
   errors: typeof errors;
   helpers: typeof helpers;
   http: typeof http;
   itemTemplates: typeof itemTemplates;
   leaderboard: typeof leaderboard;
+  "lib/database/pathwayRequirements": typeof lib_database_pathwayRequirements;
   messages: typeof messages;
   "migrations/backfillDuelMembers": typeof migrations_backfillDuelMembers;
   "migrations/cleanOldDuels": typeof migrations_cleanOldDuels;
@@ -104,6 +113,7 @@ declare const fullApi: ApiFromModules<{
   seedPhase3: typeof seedPhase3;
   sharing: typeof sharing;
   spacedRepetition: typeof spacedRepetition;
+  testTokens: typeof testTokens;
   userStatsUtils: typeof userStatsUtils;
   users: typeof users;
 }>;
