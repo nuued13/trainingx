@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { useLocation } from "wouter";
 
@@ -19,6 +19,20 @@ import { useAuth } from "@/contexts/AuthContextProvider";
 export default function PracticeZonePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
+  const [previewPromptScore, setPreviewPromptScore] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || user) return;
+    const savedResults = sessionStorage.getItem("lite_assessment_results");
+    if (savedResults) {
+      try {
+        const parsed = JSON.parse(savedResults);
+        setPreviewPromptScore(parsed.promptScore || 0);
+      } catch (e) {
+        console.error("Failed to parse preview results:", e);
+      }
+    }
+  }, [user]);
 
   const pageData = useQuery(
     api.practiceProjects.getPageData,
@@ -26,14 +40,23 @@ export default function PracticeZonePage() {
   );
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    const token = typeof window !== "undefined" ? sessionStorage.getItem("testToken") : null;
+    if (!authLoading && !isAuthenticated && !token) {
       sessionStorage.setItem("redirectAfterLogin", "/practice");
       setLocation("/auth");
     }
   }, [isAuthenticated, authLoading, setLocation]);
 
+  const userStatsWithPreview = useMemo(() => {
+    if (user && pageData?.userStats) return pageData.userStats;
+    if (previewPromptScore !== null && !user) {
+      return { ...pageData?.userStats, promptScore: previewPromptScore };
+    }
+    return pageData?.userStats;
+  }, [user, pageData?.userStats, previewPromptScore]);
+
   const { projects, stats, completedSlugs, levels, getLevelProgress } =
-    usePracticeData(pageData?.projects, pageData?.userStats);
+    usePracticeData(pageData?.projects, userStatsWithPreview);
 
   const { isLevelUnlocked, isProjectUnlocked } = useUnlockLogic(
     projects,

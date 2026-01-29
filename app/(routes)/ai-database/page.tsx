@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import {
@@ -15,7 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContextProvider";
 import { useUserStats } from "@/contexts/UserStatsContext";
-import { computeMatches, meetsRequirements } from "@/lib/matching";
+import { computeMatches, meetsRequirements, type Match } from "@/lib/matching";
+import { type SkillSignals } from "@/lib/scoring";
 import {
   ArrowRight,
   Briefcase,
@@ -26,6 +28,7 @@ import {
   Home,
   Lock,
   MapPin,
+  Sparkles,
   TrendingUp,
   Wrench,
 } from "lucide-react";
@@ -54,6 +57,30 @@ const categoryLabels = {
 export default function AIDatabase() {
   const { user } = useAuth();
   const { userStats } = useUserStats();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") || (typeof window !== "undefined" ? sessionStorage.getItem("testToken") : null);
+  
+  const [previewResults, setPreviewResults] = useState<{
+    promptScore: number;
+    skills: SkillSignals;
+  } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || user) return;
+    
+    const savedResults = sessionStorage.getItem("lite_assessment_results");
+    if (savedResults) {
+      try {
+        const parsed = JSON.parse(savedResults);
+        setPreviewResults({
+          promptScore: parsed.promptScore || 0,
+          skills: parsed.skills || {},
+        });
+      } catch (e) {
+        console.error("Failed to parse preview results:", e);
+      }
+    }
+  }, [user]);
 
   const completedProjects = useMemo(
     () => userStats?.completedProjects ?? [],
@@ -65,18 +92,29 @@ export default function AIDatabase() {
     [completedProjects]
   );
 
-  const allMatches = useMemo(
-    () =>
-      userStats
-        ? computeMatches(
-            userStats.promptScore,
-            userStats.skills,
-            completedProjects.length,
-            completedProjectSlugs
-          )
-        : [],
-    [userStats, completedProjects.length, completedProjectSlugs]
-  );
+  const allMatches = useMemo(() => {
+    if (user && userStats) {
+      return computeMatches(
+        userStats.promptScore,
+        userStats.skills,
+        completedProjects.length,
+        completedProjectSlugs
+      );
+    }
+    
+    if (previewResults) {
+      return computeMatches(
+        previewResults.promptScore,
+        previewResults.skills,
+        0,
+        []
+      );
+    }
+    
+    return [];
+  }, [userStats, previewResults, completedProjects.length, completedProjectSlugs]);
+
+  const isPreviewMode = !user && previewResults && token;
 
   const matchesByCategory = useMemo(() => {
     return allMatches.reduce(
@@ -89,7 +127,7 @@ export default function AIDatabase() {
     );
   }, [allMatches]);
 
-  if (!user) {
+  if (!user && !isPreviewMode) {
     return (
       <SidebarLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center text-center space-y-3">
@@ -109,7 +147,7 @@ export default function AIDatabase() {
     );
   }
 
-  if (userStats === undefined) {
+  if (!isPreviewMode && userStats === undefined) {
     return (
       <SidebarLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -119,7 +157,7 @@ export default function AIDatabase() {
     );
   }
 
-  if (!userStats) {
+  if (!isPreviewMode && !userStats) {
     return (
       <SidebarLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center text-center space-y-3">
@@ -142,36 +180,41 @@ export default function AIDatabase() {
     );
   }
 
+  const currentPromptScore = isPreviewMode ? previewResults!.promptScore : userStats!.promptScore;
+  const currentSkills = isPreviewMode ? previewResults!.skills : userStats!.skills;
+  const currentCompletedProjects = isPreviewMode ? 0 : completedProjects.length;
+
   const unlockedCount = allMatches.filter((match) =>
     meetsRequirements(
       match,
-      userStats.promptScore,
-      userStats.skills,
-      completedProjects.length
+      currentPromptScore,
+      currentSkills,
+      currentCompletedProjects
     )
   ).length;
 
+  const topMatches = isPreviewMode ? allMatches.slice(0, 3) : allMatches;
+
   const renderMatchCard = (
-    match: (typeof allMatches)[number],
+    match: Match,
     isUnlocked: boolean
   ) => {
     const Icon =
       categoryIcons[match.type as keyof typeof categoryIcons] || Briefcase;
     const colorClass =
       categoryColors[match.type as keyof typeof categoryColors];
-    const psGap = Math.max(0, (match.requiredPS || 0) - userStats.promptScore);
+    const psGap = Math.max(0, (match.requiredPS || 0) - currentPromptScore);
 
     const missingSkills = match.skillThresholds
       ? Object.entries(match.skillThresholds)
           .filter(
             ([skill, threshold]) =>
-              userStats.skills[skill as keyof typeof userStats.skills] <
-              threshold
+              currentSkills[skill as keyof SkillSignals] < threshold
           )
           .map(([skill]) => skill)
       : match.requiredSkills.filter(
           (skill) =>
-            userStats.skills[skill as keyof typeof userStats.skills] < 60
+            currentSkills[skill as keyof SkillSignals] < 60
         );
 
     return (
@@ -323,15 +366,45 @@ export default function AIDatabase() {
     <SidebarLayout>
       <div className="bg-gray-50 min-h-full">
         <div className="container mx-auto px-4 py-8">
+          {isPreviewMode && (
+            <Card className="mb-6 border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <Lock className="h-6 w-6 text-amber-600 mt-1" />
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold mb-2">Preview Mode</h3>
+                    <p className="text-sm text-gray-700 mb-4">
+                      You're viewing a preview of your matches. Sign up to unlock all {allMatches.length} opportunities, save your progress, and track your growth over time.
+                    </p>
+                    <Link href={`/auth?signup=true${token ? `&token=${token}` : ""}`}>
+                      <Button className="bg-gradient-to-r from-gradient-from to-gradient-to">
+                        Sign Up to Unlock Full Access
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
               <Database className="h-8 w-8 text-primary" />
               <h1 className="text-3xl font-bold">AI Opportunity Database</h1>
             </div>
             <p className="text-gray-600">
-              Browse our complete collection of {allMatches.length} AI career
-              opportunities. {unlockedCount} unlocked based on your current
-              skills.
+              {isPreviewMode ? (
+                <>
+                  Preview of {allMatches.length} AI career opportunities. {unlockedCount} unlocked based on your current score.
+                </>
+              ) : (
+                <>
+                  Browse our complete collection of {allMatches.length} AI career
+                  opportunities. {unlockedCount} unlocked based on your current
+                  skills.
+                </>
+              )}
             </p>
           </div>
 
@@ -379,30 +452,65 @@ export default function AIDatabase() {
           </div>
 
           <div className="space-y-6">
-            {Object.entries(matchesByCategory).map(([category, matches]) => (
-              <div key={category}>
-                <h2 className="text-xl font-bold mb-4 capitalize flex items-center gap-2">
-                  {(() => {
-                    const Icon =
-                      categoryIcons[category as keyof typeof categoryIcons];
-                    return <Icon className="h-5 w-5" />;
-                  })()}
-                  {categoryLabels[category as keyof typeof categoryLabels]} (
-                  {matches.length})
+            {isPreviewMode ? (
+              <div>
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5" />
+                  Your Top Matches (Preview)
                 </h2>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {matches.map((match) => {
+                  {topMatches.map((match) => {
                     const isUnlocked = meetsRequirements(
                       match,
-                      userStats.promptScore,
-                      userStats.skills,
-                      completedProjects.length
+                      currentPromptScore,
+                      currentSkills,
+                      currentCompletedProjects
                     );
                     return renderMatchCard(match, isUnlocked);
                   })}
                 </div>
+                {allMatches.length > 3 && (
+                  <Card className="mt-6 border-2 border-blue-200 bg-blue-50">
+                    <CardContent className="p-6 text-center">
+                      <p className="text-gray-700 mb-4">
+                        {allMatches.length - 3} more opportunities available. Sign up to see them all!
+                      </p>
+                      <Link href={`/auth?signup=true${token ? `&token=${token}` : ""}`}>
+                        <Button className="bg-gradient-to-r from-gradient-from to-gradient-to">
+                          Unlock All {allMatches.length} Opportunities
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
-            ))}
+            ) : (
+              Object.entries(matchesByCategory).map(([category, matches]) => (
+                <div key={category}>
+                  <h2 className="text-xl font-bold mb-4 capitalize flex items-center gap-2">
+                    {(() => {
+                      const Icon =
+                        categoryIcons[category as keyof typeof categoryIcons];
+                      return <Icon className="h-5 w-5" />;
+                    })()}
+                    {categoryLabels[category as keyof typeof categoryLabels]} (
+                    {matches.length})
+                  </h2>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {matches.map((match) => {
+                      const isUnlocked = meetsRequirements(
+                        match,
+                        currentPromptScore,
+                        currentSkills,
+                        currentCompletedProjects
+                      );
+                      return renderMatchCard(match, isUnlocked);
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
 
             {allMatches.length === 0 && (
               <Card className="bg-blue-50 border-blue-200">

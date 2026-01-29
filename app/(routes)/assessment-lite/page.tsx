@@ -71,16 +71,24 @@ export default function AssessmentLite() {
 
   const handleGetStarted = () => {
     const results = calculateResults();
-    localStorage.setItem(
-      "lite_assessment_results",
-      JSON.stringify({
-        ...results,
-        userName,
-        userEmail,
-        completedAt: new Date().toISOString(),
-      }),
-    );
-    setLocation("/enter");
+    const token = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("token") || sessionStorage.getItem("testToken") : null;
+    
+    const resultsData = {
+      ...results,
+      userName,
+      userEmail,
+      completedAt: new Date().toISOString(),
+    };
+    
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("lite_assessment_results", JSON.stringify(resultsData));
+    }
+    
+    if (token) {
+      setLocation(`/results-preview?token=${token}`);
+    } else {
+      setLocation("/enter");
+    }
   };
 
   // Welcome Screen
